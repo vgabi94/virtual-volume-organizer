@@ -1,0 +1,116 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VVO.UI.ViewModels"
+        xmlns:views="using:VVO.UI.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+        x:Class="VVO.UI.Views.MainWindowView"
+        x:DataType="vm:MainWindowViewModel"
+        x:Name="MainWindow"
+        Icon="/Assets/vvo.ico"
+        Title="Virtual Volume Organizer"
+        Background="{DynamicResource SystemRegionBrush}">
+
+    <Grid RowDefinitions="Auto, *">
+        <Grid ColumnDefinitions="Auto, *, Auto" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+            <Menu Classes="MenuBarStyle">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_New Database..." HotKey="Ctrl+N" InputGesture="Ctrl+N" Command="{Binding SidebarViewModel.NewDatabaseCommand}" CommandParameter="{Binding #MainWindow}"/>
+                    <MenuItem Header="_Open Database..." HotKey="Ctrl+O" InputGesture="Ctrl+O" Command="{Binding SidebarViewModel.OpenDatabaseCommand}" CommandParameter="{Binding #MainWindow}"/>
+                    <Separator/>
+                    <MenuItem Header="Save a _Copy..." HotKey="Ctrl+Shift+S" InputGesture="Ctrl+Shift+S" Command="{Binding SidebarViewModel.SaveCopyCommand}" CommandParameter="{Binding #MainWindow}"/>
+                    <Separator/>
+                    <MenuItem Header="_Export to JSON..." Command="{Binding SidebarViewModel.ExportCommand}" CommandParameter="{Binding #MainWindow}"/>
+                    <MenuItem Header="_Import from JSON..." Command="{Binding SidebarViewModel.ImportCommand}" CommandParameter="{Binding #MainWindow}"/>
+                    <Separator/>
+                    <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
+                </MenuItem>
+
+                <MenuItem Header="_Edit">
+                    <MenuItem Header="_Undo" HotKey="Ctrl+Z" InputGesture="Ctrl+Z" Command="{Binding UndoCommand}"/>
+                    <MenuItem Header="_Redo" HotKey="Ctrl+Y" InputGesture="Ctrl+Y" Command="{Binding RedoCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="Cu_t" Command="{Binding SidebarViewModel.CutFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
+                    <MenuItem Header="_Copy" Command="{Binding SidebarViewModel.CopyFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
+                    <MenuItem Header="_Paste" Command="{Binding SidebarViewModel.PasteBesideFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
+                    <MenuItem Header="D_uplicate..." HotKey="Ctrl+D" InputGesture="Ctrl+D" Command="{Binding SidebarViewModel.DuplicateFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
+                    <Separator/>
+                    <MenuItem Header="_Delete" Command="{Binding SidebarViewModel.DeleteFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
+                    <Separator/>
+                    <MenuItem Header="_Find..." HotKey="Ctrl+F" InputGesture="Ctrl+F" Command="{Binding FindCommand}"/>
+                </MenuItem>
+
+                <MenuItem Header="_View">
+                    <MenuItem Header="Always Show Folder _Details"
+                              ToggleType="CheckBox"
+                              IsChecked="{Binding SidebarViewModel.ShowFolderDetailsAlways, Mode=TwoWay}"/>
+                    <Separator/>
+                    <MenuItem Header="_Expand All Volumes" Command="{Binding SidebarViewModel.ExpandAllVirtualVolumesCommand}"/>
+                    <MenuItem Header="_Collapse All Volumes" Command="{Binding SidebarViewModel.CollapseAllVirtualVolumesCommand}"/>
+                </MenuItem>
+
+                <MenuItem Header="_Volume">
+                    <MenuItem Header="_New Virtual Volume..." HotKey="Ctrl+Shift+N" InputGesture="Ctrl+Shift+N" Command="{Binding SidebarViewModel.NewVirtualVolumeCommand}"/>
+                    <MenuItem Header="_Edit Virtual Volume..." Command="{Binding SidebarViewModel.EditVirtualVolumeCommand}" CommandParameter="{Binding SidebarViewModel.SelectedVirtualVolume}"/>
+                    <MenuItem Header="_Delete Virtual Volume" Command="{Binding SidebarViewModel.DeleteVirtualVolumeCommand}" CommandParameter="{Binding SidebarViewModel.SelectedVirtualVolume}"/>
+                    <Separator/>
+                    <MenuItem Header="_Add Folder..." HotKey="Ctrl+Shift+A" InputGesture="Ctrl+Shift+A" Command="{Binding AddFolderCommand}" CommandParameter="{Binding #MainWindow}"/>
+                    <MenuItem Header="Edit _Folder..." HotKey="Ctrl+E" InputGesture="Ctrl+E" Command="{Binding SidebarViewModel.EditFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
+                    <MenuItem Header="_Remove Folder" Command="{Binding SidebarViewModel.DeleteFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
+                    <Separator/>
+                    <MenuItem Header="_Compare Folders..." Command="{Binding SidebarViewModel.CompareCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
+                    <MenuItem Header="_Update Folder..." Command="{Binding SidebarViewModel.UpdateFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
+                </MenuItem>
+
+                <MenuItem Header="_Tools">
+                    <MenuItem Header="_Shrink Database" Command="{Binding ShrinkDatabaseCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="_Options..." Command="{Binding ShowOptionsCommand}" CommandParameter="{Binding #MainWindow}"/>
+                </MenuItem>
+
+                <MenuItem Header="_Help">
+                    <MenuItem Header="_Keyboard Shortcuts" Command="{Binding ShowShortcutsCommand}" CommandParameter="{Binding #MainWindow}"/>
+                    <Separator/>
+                    <MenuItem Header="_About" Command="{Binding ShowAboutCommand}" CommandParameter="{Binding #MainWindow}"/>
+                </MenuItem>
+            </Menu>
+            <Panel Grid.Column="2" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="10" IsVisible="{Binding IsStatusMessageVisible}">
+                    <!-- Fixed width and right-aligned: a count that grows a digit would
+                         otherwise reflow the row and shift what sits beside it -->
+                    <TextBlock Text="{Binding StatusMessage}"
+                               VerticalAlignment="Center"
+                               MinWidth="280"
+                               TextAlignment="Right"
+                               Margin="0,0,4,0" />
+                    <LoadingIndicator IsActive="{Binding IsStatusMessageVisible}" Mode="Wave" Height="30" />
+                    <Button Content="Cancel" Padding="4" Margin="0,0,4,0" Command="{Binding CancelCommand}" IsVisible="{Binding IsCancelVisible}"/>
+                </StackPanel>
+                <PathIcon Data="{StaticResource DatabaseCheck}"
+                          Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"
+                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                          HorizontalAlignment="Right" VerticalAlignment="Center"
+                          Margin="0,0,12,0"
+                          IsVisible="{Binding IsDatabaseStatusVisible}"
+                          ToolTip.Tip="{Binding LastWriteText}"/>
+            </Panel>
+        </Grid>
+        
+        <Grid Grid.Row="1">
+            <Grid IsVisible="{Binding !IsStartPageVisible}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250" MinWidth="180" MaxWidth="600"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" MinWidth="320"/>
+                </Grid.ColumnDefinitions>
+                <ContentControl Grid.Column="0" Content="{Binding SidebarViewModel}" />
+                <GridSplitter Grid.Column="1" Classes="PaneSplitter" ResizeDirection="Columns" />
+                <ContentControl Grid.Column="2" Content="{Binding VolumeExplorerViewModel}" />
+            </Grid>
+            <ContentControl Content="{Binding StartPageViewModel}" IsVisible="{Binding IsStartPageVisible}" />
+        </Grid>
+    </Grid>
+
+</Window>
+

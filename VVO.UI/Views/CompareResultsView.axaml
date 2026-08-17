@@ -1,0 +1,147 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VVO.UI.ViewModels"
+        x:Class="VVO.UI.Views.CompareResultsView"
+        x:DataType="vm:CompareResultsViewModel"
+        Title="{Binding WindowTitle}" Width="960" Height="620"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource SystemRegionBrush}">
+
+    <Window.Styles>
+        <Style Selector="DataGridRow.Added">
+            <Setter Property="Background" Value="{DynamicResource DiffAddedBackground}"/>
+        </Style>
+        <Style Selector="DataGridRow.Added:selected">
+            <Setter Property="Background" Value="{DynamicResource DiffAddedSelectedBackground}"/>
+        </Style>
+        <Style Selector="DataGridRow.Added TextBlock.StatusSymbol">
+            <Setter Property="Foreground" Value="{DynamicResource DiffAddedForeground}"/>
+        </Style>
+
+        <Style Selector="DataGridRow.Removed">
+            <Setter Property="Background" Value="{DynamicResource DiffRemovedBackground}"/>
+        </Style>
+        <Style Selector="DataGridRow.Removed:selected">
+            <Setter Property="Background" Value="{DynamicResource DiffRemovedSelectedBackground}"/>
+        </Style>
+        <Style Selector="DataGridRow.Removed TextBlock.StatusSymbol">
+            <Setter Property="Foreground" Value="{DynamicResource DiffRemovedForeground}"/>
+        </Style>
+
+        <Style Selector="DataGridRow.Changed">
+            <Setter Property="Background" Value="{DynamicResource DiffChangedBackground}"/>
+        </Style>
+        <Style Selector="DataGridRow.Changed:selected">
+            <Setter Property="Background" Value="{DynamicResource DiffChangedSelectedBackground}"/>
+        </Style>
+        <Style Selector="DataGridRow.Changed TextBlock.StatusSymbol">
+            <Setter Property="Foreground" Value="{DynamicResource DiffChangedForeground}"/>
+        </Style>
+
+        <Style Selector="TextBlock.StatusSymbol">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto, *, Auto" Margin="16">
+        <StackPanel Grid.Row="0" Spacing="4" Margin="4,0,4,12">
+            <Grid ColumnDefinitions="70, *">
+                <TextBlock Grid.Column="0" Text="Source" FontWeight="Bold" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                <TextBlock Grid.Column="1" Text="{Binding SourceName}" TextTrimming="CharacterEllipsis"/>
+            </Grid>
+            <Grid ColumnDefinitions="70, *">
+                <TextBlock Grid.Column="0" Text="Target" FontWeight="Bold" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                <TextBlock Grid.Column="1" Text="{Binding TargetName}" TextTrimming="CharacterEllipsis"/>
+            </Grid>
+            <TextBlock Text="{Binding Summary}" Margin="0,8,0,0" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Proposal}"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       IsVisible="{Binding IsUpdate}"/>
+        </StackPanel>
+
+        <TextBlock Grid.Row="1"
+                   Text="No differences found."
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                   IsVisible="{Binding !HasDifferences}"/>
+
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Rows}"
+                  Classes="ExplorerGrid"
+                  AutoGenerateColumns="False"
+                  CanUserReorderColumns="True"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="True"
+                  IsReadOnly="True"
+                  LoadingRow="OnRowLoading"
+                  IsVisible="{Binding HasDifferences}">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="" Width="46" SortMemberPath="Status">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Classes="StatusSymbol" Text="{Binding Symbol}" ToolTip.Tip="{Binding StatusName}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Path" Width="3*" SortMemberPath="Path">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="{DynamicResource VolumeExplorerCellSpacing}"
+                                        Background="Transparent"
+                                        ToolTip.Tip="{Binding FullPath}">
+                                <PathIcon Data="{Binding Icon}"
+                                          Classes.FlipY="{Binding IsIconFlipped}"
+                                          Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"
+                                          VerticalAlignment="Center"
+                                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                <TextBlock Text="{Binding Path}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Change" Binding="{Binding Detail}" Width="*" SortMemberPath="Detail"/>
+                <DataGridTextColumn Header="Items" Binding="{Binding Items}" Width="90" SortMemberPath="Items"/>
+                <DataGridTextColumn Header="Source Size" Binding="{Binding LeftSize}" Width="*" SortMemberPath="LeftSizeSortPath"/>
+                <DataGridTextColumn Header="Target Size" Binding="{Binding RightSize}" Width="*" SortMemberPath="RightSizeSortPath"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*, Auto" Margin="4,12,4,0">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                <Button Content="Copy added"
+                        Padding="14,7"
+                        IsEnabled="{Binding HasAdded}"
+                        ToolTip.Tip="Copy the full paths of added entries, one per line, under the target root"
+                        Click="OnCopyAddedClicked"/>
+                <Button Content="Copy removed"
+                        Padding="14,7"
+                        IsEnabled="{Binding HasRemoved}"
+                        ToolTip.Tip="Copy the full paths of removed entries, one per line, under the source root"
+                        Click="OnCopyRemovedClicked"/>
+                <Button Content="Copy changed"
+                        Padding="14,7"
+                        IsEnabled="{Binding HasChanged}"
+                        ToolTip.Tip="Copy the full paths of changed entries, one per line, under the source root"
+                        Click="OnCopyChangedClicked"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                <Button Content="{Binding CloseText}"
+                        Padding="18,7"
+                        IsCancel="True"
+                        Click="OnCloseClicked"/>
+                <Button Content="Update"
+                        Padding="18,7"
+                        IsDefault="True"
+                        IsVisible="{Binding IsUpdate}"
+                        Click="OnUpdateClicked"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

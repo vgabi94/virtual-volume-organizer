@@ -1,0 +1,197 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:VVO.UI.ViewModels"
+             x:Class="VVO.UI.Views.SidebarView"
+             x:DataType="vm:SidebarViewModel"
+             x:Name="Sidebar"
+             Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+    <Grid RowDefinitions="Auto, Auto, Auto, *">
+        
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="{DynamicResource SidebarHeaderMargin}">
+            <StackPanel>
+                <TextBlock Text="{Binding DatabaseName}" FontWeight="Bold" FontSize="{DynamicResource SidebarTitleFontSize}" VerticalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                <TextBlock Text="{Binding DatabasePath}" Foreground="{DynamicResource SystemControlForegroundBaseLowBrush}" FontSize="{StaticResource SidebarItemSubtitleFontSize}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                <Button ToolTip.Tip="New Database" Classes="LowEmphasis" Command="{Binding NewDatabaseCommand}" CommandParameter="{Binding #Sidebar}">
+                    <PathIcon Classes="SidebarIcon" Data="{StaticResource FilePlus}"/>
+                </Button>
+                <Button ToolTip.Tip="Open Database" Classes="LowEmphasis" Command="{Binding OpenDatabaseCommand}" CommandParameter="{Binding #Sidebar}">
+                    <PathIcon Classes="SidebarIcon" Data="{StaticResource FileOpenRound}"/>
+                </Button>
+                <Button ToolTip.Tip="Save Copy" Classes="LowEmphasis" Command="{Binding SaveCopyCommand}" CommandParameter="{Binding #Sidebar}">
+                    <PathIcon Classes="FlipY SidebarIcon" Data="{StaticResource SaveAs}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <TextBox Grid.Row="1"
+                 Margin="{DynamicResource SidebarSearchBoxMargin}"
+                 Classes="SearchBox"
+                 PlaceholderText="Search all..."
+                 ToolTip.Tip="Searches every folder; the matches are listed in the volume explorer"
+                 Text="{Binding SearchAllTerm}"/>
+
+        <StackPanel Grid.Row="2">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="{DynamicResource SidebarToolbarMargin}">
+                <Button ToolTip.Tip="New virtual volume" Classes="LowEmphasis" Command="{Binding NewVirtualVolumeCommand}">
+                    <PathIcon Classes="SidebarIcon" Data="{StaticResource DiskPlus}"/>
+                </Button>
+                <Separator Classes="SidebarHeaderSeparator"/>
+                <Button ToolTip.Tip="Expand all volumes" Classes="LowEmphasis" Command="{Binding ExpandAllVirtualVolumesCommand}">
+                    <PathIcon Classes="SidebarIcon" Data="{StaticResource ArrowExpandVertical}"/>
+                </Button>
+                <Button ToolTip.Tip="Collapse all volumes" Classes="LowEmphasis" Command="{Binding CollapseAllVirtualVolumesCommand}">
+                    <PathIcon Classes="SidebarIcon" Data="{StaticResource ArrowCollapseVertical}"/>
+                </Button>
+                <Separator Classes="SidebarHeaderSeparator"/>
+                <Button ToolTip.Tip="Undo" Classes="LowEmphasis" Command="{Binding UndoCommand}">
+                    <PathIcon Classes="SidebarIcon" Data="{StaticResource Undo}"/>
+                </Button>
+                <Button ToolTip.Tip="Redo" Classes="LowEmphasis" Command="{Binding RedoCommand}">
+                    <PathIcon Classes="SidebarIcon" Data="{StaticResource Redo}"/>
+                </Button>
+            </StackPanel>
+            <Separator Classes="SidebarToolbarRule"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="3" Padding="{DynamicResource SidebarScrollViewerPadding}">
+            <StackPanel>
+                <StackPanel>
+                    <ItemsControl ItemsSource="{Binding VirtualVolumes}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:VirtualVolumeNode">
+                                <StackPanel>
+                                    <ToggleButton Classes="SidebarHeader VirtualVolumeGroup"
+                                                  IsChecked="{Binding IsExpanded, Mode=TwoWay}"
+                                                  Command="{Binding Owner.SelectVirtualVolumeCommand}"
+                                                  CommandParameter="{Binding}">
+                                        <ToggleButton.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuItem Header="Paste" Command="{Binding Owner.PasteIntoVirtualVolumeCommand}" CommandParameter="{Binding}">
+                                                    <MenuItem.Icon>
+                                                        <PathIcon Classes="SidebarIcon" Data="{StaticResource ContentPaste}"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <Separator/>
+                                                <MenuItem Header="Edit..." Command="{Binding Owner.EditVirtualVolumeCommand}" CommandParameter="{Binding}">
+                                                    <MenuItem.Icon>
+                                                        <PathIcon Classes="SidebarIcon" Data="{StaticResource PencilBox}"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem Header="Delete" Command="{Binding Owner.DeleteVirtualVolumeCommand}" CommandParameter="{Binding}">
+                                                    <MenuItem.Icon>
+                                                        <PathIcon Classes="SidebarIcon" Data="{StaticResource DiskRemove}"/>
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </MenuFlyout>
+                                        </ToggleButton.ContextFlyout>
+                                        <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto, Auto">
+                                            <Panel Grid.Column="0" Margin="{DynamicResource SidebarToggleIconMargin}">
+                                                <PathIcon Classes="SidebarChevron" Data="{StaticResource ChevronRight}" IsVisible="{Binding !IsExpanded}"/>
+                                                <PathIcon Classes="SidebarChevron" Data="{StaticResource ChevronDown}" IsVisible="{Binding IsExpanded}"/>
+                                            </Panel>
+                                            <PathIcon Grid.Column="1"
+                                                      Classes="VolumeIcon"
+                                                      Classes.FlipY="{Binding IsIconFlipped}"
+                                                      Data="{Binding IconData}"
+                                                      Foreground="{Binding IconBrush}"
+                                                      Margin="{DynamicResource SidebarVolumeIconMargin}"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                            <Button Grid.Column="3" ToolTip.Tip="Scan folder into this volume" Classes="LowEmphasis" Command="{Binding Owner.AddFolderCommand}" CommandParameter="{Binding}">
+                                                <PathIcon Classes="SidebarIcon FlipY" Data="{StaticResource ScanSearch}"/>
+                                            </Button>
+                                            <Button Grid.Column="4" ToolTip.Tip="Edit virtual volume" Classes="LowEmphasis" Command="{Binding Owner.EditVirtualVolumeCommand}" CommandParameter="{Binding}">
+                                                <PathIcon Classes="SidebarIcon" Data="{StaticResource PencilBox}"/>
+                                            </Button>
+                                            <Button Grid.Column="5" ToolTip.Tip="Delete virtual volume" Classes="LowEmphasis" Command="{Binding Owner.DeleteVirtualVolumeCommand}" CommandParameter="{Binding}">
+                                                <PathIcon Classes="SidebarIcon" Data="{StaticResource DiskRemove}"/>
+                                            </Button>
+                                            <TextBlock Grid.Column="6" Text="{Binding Folders.Count}" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="{DynamicResource SidebarItemCountMargin}" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </ToggleButton>
+                                    <ListBox ItemsSource="{Binding Folders}"
+                                             Classes="SidebarList VirtualVolumeFolders"
+                                             Classes.AlwaysDetails="{Binding Owner.ShowFolderDetailsAlways}"
+                                             SelectedItem="{Binding SelectedFolder, Mode=TwoWay}"
+                                             SelectionMode="Single"
+                                             IsVisible="{Binding IsExpanded}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:FolderItem">
+                                                <Grid ColumnDefinitions="Auto, *" Background="Transparent" Classes.Cut="{Binding IsCut}">
+                                                    <Grid.ContextFlyout>
+                                                        <MenuFlyout>
+                                                            <MenuItem Header="Copy" Command="{Binding Owner.CopyFolderCommand}" CommandParameter="{Binding}">
+                                                                <MenuItem.Icon>
+                                                                    <PathIcon Classes="SidebarIcon" Data="{StaticResource ContentCopy}"/>
+                                                                </MenuItem.Icon>
+                                                            </MenuItem>
+                                                            <MenuItem Header="Cut" Command="{Binding Owner.CutFolderCommand}" CommandParameter="{Binding}">
+                                                                <MenuItem.Icon>
+                                                                    <PathIcon Classes="SidebarIcon" Data="{StaticResource ContentCut}"/>
+                                                                </MenuItem.Icon>
+                                                            </MenuItem>
+                                                            <MenuItem Header="Paste" Command="{Binding Owner.PasteBesideFolderCommand}" CommandParameter="{Binding}">
+                                                                <MenuItem.Icon>
+                                                                    <PathIcon Classes="SidebarIcon" Data="{StaticResource ContentPaste}"/>
+                                                                </MenuItem.Icon>
+                                                            </MenuItem>
+                                                            <MenuItem Header="Duplicate..." Command="{Binding Owner.DuplicateFolderCommand}" CommandParameter="{Binding}">
+                                                                <MenuItem.Icon>
+                                                                    <PathIcon Classes="SidebarIcon" Data="{StaticResource ContentDuplicate}"/>
+                                                                </MenuItem.Icon>
+                                                            </MenuItem>
+                                                            <Separator/>
+                                                            <MenuItem Header="Edit..." Command="{Binding Owner.EditFolderCommand}" CommandParameter="{Binding}">
+                                                                <MenuItem.Icon>
+                                                                    <PathIcon Classes="SidebarIcon" Data="{StaticResource PencilBox}"/>
+                                                                </MenuItem.Icon>
+                                                            </MenuItem>
+                                                            <MenuItem Header="Compare..." Command="{Binding Owner.CompareCommand}" CommandParameter="{Binding}">
+                                                                <MenuItem.Icon>
+                                                                    <PathIcon Classes="SidebarIcon" Data="{StaticResource FileCompare}"/>
+                                                                </MenuItem.Icon>
+                                                            </MenuItem>
+                                                            <MenuItem Header="Update..." Command="{Binding Owner.UpdateFolderCommand}" CommandParameter="{Binding}">
+                                                                <MenuItem.Icon>
+                                                                    <PathIcon Classes="SidebarIcon" Data="{StaticResource ArrowsCounterClockwiseFill}"/>
+                                                                </MenuItem.Icon>
+                                                            </MenuItem>
+                                                            <Separator/>
+                                                            <MenuItem Header="Delete" Command="{Binding Owner.DeleteFolderCommand}" CommandParameter="{Binding}">
+                                                                <MenuItem.Icon>
+                                                                    <PathIcon Classes="SidebarIcon" Data="{StaticResource Delete}"/>
+                                                                </MenuItem.Icon>
+                                                            </MenuItem>
+                                                        </MenuFlyout>
+                                                    </Grid.ContextFlyout>
+                                                    <PathIcon Grid.Column="0"
+                                                              Classes="SidebarIcon"
+                                                              Classes.FlipY="{Binding IsIconFlipped}"
+                                                              Data="{Binding IconData}"
+                                                              Foreground="{Binding IconBrush}"
+                                                              VerticalAlignment="Top"
+                                                              Margin="{DynamicResource SidebarItemIconMargin}"/>
+                                                    <!-- Details sit beside the two lines that are always there, so showing
+                                                         and hiding them never changes the height of a row -->
+                                                    <Grid Grid.Column="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Title}" FontWeight="Bold"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="1" Classes="FolderDetail" Text="{Binding Path}"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Subtitle}" FontSize="{DynamicResource SidebarItemSubtitleFontSize}" Opacity="{DynamicResource SidebarItemSubtitleOpacity}"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="1" Classes="FolderDetail" Text="{Binding Description}"/>
+                                                    </Grid>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
+

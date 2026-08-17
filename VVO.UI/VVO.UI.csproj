@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- The executable users see is named for the application, not for the project -->
+    <AssemblyName>VirtualVolumeOrganizer</AssemblyName>
+    <RootNamespace>VVO.UI</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\vvo.ico</ApplicationIcon>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- build-icon.py and its rasterizer live beside the art; they are tooling, not app resources -->
+    <AvaloniaResource Include="Assets\**"
+                      Exclude="Assets\*.py;Assets\*.js;Assets\package.json;Assets\package-lock.json;Assets\node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Program is the entry point and is internal; the tests build the same AppBuilder it does -->
+    <InternalsVisibleTo Include="VVO.UiTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Embedded rather than copied, so a published single file still carries the notices it has
+         to distribute. LogicalName is fixed so renaming the assembly cannot move it. -->
+    <EmbeddedResource Include="..\THIRD-PARTY-NOTICES.txt" LogicalName="THIRD-PARTY-NOTICES.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VVO.Core\VVO.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.0.4" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.4" />
+    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.0.4" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.0.0" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.4" />
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="LoadingIndicators.Avalonia.New" Version="4.0.3" />
+    <PackageReference Include="MessageBox.Avalonia" Version="12.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\MainWindowView.axaml.cs">
+      <DependentUpon>MainWindowView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <!-- SkiaSharp and HarfBuzz ship native .pdb files in their packages; publishing them puts
+       100 MB of symbols beside a single-file executable -->
+  <Target Name="DropNativeSymbolsFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+                             Condition="'%(ResolvedFileToPublish.Extension)' == '.pdb'" />
+    </ItemGroup>
+  </Target>
+</Project>

@@ -1,0 +1,88 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:VVO.UI.ViewModels"
+             x:Class="VVO.UI.Views.VolumeExplorerView"
+             x:DataType="vm:VolumeExplorerViewModel"
+             x:Name="Explorer"
+             Background="{DynamicResource SystemRevealListLowColor}">
+    <Grid RowDefinitions="Auto, *">
+        <Grid Grid.Row="0" ColumnDefinitions="2*, Auto, *, Auto" Margin="{DynamicResource VolumeExplorerHeaderMargin}">
+            <!-- A Grid, not a StackPanel: a horizontal stack measures its children with
+                 unbounded width, which is what let the crumbs spill past the border -->
+            <Border Classes="PathViewStyle" Grid.Column="0" ClipToBounds="True" IsVisible="{Binding !IsFlatMode}">
+                <Grid ColumnDefinitions="Auto, Auto, *">
+                    <Button Grid.Column="0" Classes="PathUp" Command="{Binding NavigateUpCommand}" ToolTip.Tip="Up one level">
+                        <PathIcon Data="{StaticResource ArrowBack}" Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"/>
+                    </Button>
+                    <!-- Stays put while the crumbs scroll, the way a drive letter does -->
+                    <TextBlock Grid.Column="1"
+                               Classes="VolumePrefix"
+                               Text="{Binding VolumePrefix}"
+                               IsVisible="{Binding VolumePrefix, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" VerticalAlignment="Center">
+                        <ItemsControl ItemsSource="{Binding Breadcrumbs}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Every folder hangs off the volume, the root included -->
+                                        <TextBlock Classes="BreadcrumbSeparator" Text="\"/>
+                                        <Button Classes="Breadcrumb"
+                                                Command="{Binding #Explorer.((vm:VolumeExplorerViewModel)DataContext).NavigateToCommand}"
+                                                CommandParameter="{Binding Id}">
+                                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="Transparent" MinWidth="2" Width="2"/>
+            <TextBox Grid.Column="2" x:Name="FileSearchBox" Classes="SearchBox" PlaceholderText="Search files..." VerticalAlignment="Center" Text="{Binding SearchTerm}"/>            
+            <TextBlock Grid.Column="3" Text="{Binding ItemSummary}" VerticalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
+        </Grid>
+
+        <DataGrid Grid.Row="1" x:Name="FileGrid" ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile, Mode=TwoWay}" Classes="ExplorerGrid" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" IsReadOnly="True" Margin="{DynamicResource VolumeExplorerHorizontalMargin}" DoubleTapped="OnFileGridDoubleTapped" ContextRequested="OnFileGridContextRequested">
+            <DataGrid.ContextMenu>
+                <ContextMenu x:Name="FileContextMenu">
+                    <MenuItem Header="Copy _Path" Command="{Binding CopyCommand}"/>
+                    <MenuItem Header="Copy _All Paths" Command="{Binding CopyAllCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="Copy P_hysical Path" Command="{Binding CopyPhysicalCommand}"/>
+                    <MenuItem Header="Copy All Ph_ysical Paths" Command="{Binding CopyPhysicalAllCommand}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Name" Width="2*" SortMemberPath="Name">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal"
+                                        Spacing="{DynamicResource VolumeExplorerCellSpacing}"
+                                        Background="Transparent"
+                                        ToolTip.Tip="{Binding PathTip}">
+                                <PathIcon Data="{Binding Icon}"
+                                          Classes.FlipY="{Binding IsIconFlipped}"
+                                          Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"
+                                          VerticalAlignment="Center"
+                                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*" SortMemberPath="Location" IsVisible="False" />
+                <DataGridTextColumn Header="Extension" Binding="{Binding Extension}" Width="*" SortMemberPath="Extension" />
+                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" SortMemberPath="SizeSortPath" />
+                <DataGridTextColumn Header="Modified" Binding="{Binding Modified}" Width="*" SortMemberPath="ModifiedSortPath" />
+                <DataGridTextColumn Header="Created" Binding="{Binding Created}" Width="*" SortMemberPath="CreatedSortPath" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>
+

@@ -1,0 +1,72 @@
+THIRD-PARTY NOTICES
+Virtual Volume Organizer
+
+Virtual Volume Organizer is released under the MIT License; see LICENSE.
+
+It incorporates material from the projects below, each under its own terms.
+
+
+-------------------------------------------------------------------------------
+ICONS
+-------------------------------------------------------------------------------
+
+Taken through IconPacks.Browser from the sets collected by MahApps.Metro.IconPacks,
+which is MIT licensed. The sets themselves are the work of their own authors:
+
+  Material Design Icons -- Apache License 2.0
+  https://github.com/Templarian/MaterialDesign
+  Copyright (c) Pictogrammers
+
+  Font Awesome Free (icons) -- Creative Commons Attribution 4.0 International
+  https://fontawesome.com
+  Copyright (c) Fonticons, Inc.
+
+  Phosphor Icons -- MIT License
+  https://github.com/phosphor-icons/core
+  Copyright (c) Phosphor Icons
+
+  Bootstrap Icons -- MIT License
+  https://github.com/twbs/icons
+  Copyright (c) The Bootstrap Authors
+
+
+-------------------------------------------------------------------------------
+RUNTIME AND LIBRARIES
+-------------------------------------------------------------------------------
+
+.NET Runtime and Libraries -- MIT License
+https://github.com/dotnet/runtime
+Copyright (c) .NET Foundation and Contributors
+
+Avalonia -- MIT License
+https://github.com/AvaloniaUI/Avalonia
+Copyright (c) AvaloniaUI OU
+
+  Inter typeface -- SIL Open Font License 1.1
+  https://github.com/rsms/inter
+  Copyright (c) The Inter Project Authors
+
+SkiaSharp, HarfBuzzSharp -- MIT License
+https://github.com/mono/SkiaSharp
+Copyright (c) Microsoft Corporation
+
+  Skia -- BSD 3-Clause License, Copyright (c) Google Inc.
+  HarfBuzz -- MIT License, Copyright (c) the HarfBuzz authors
+
+LiteDB -- MIT License
+https://github.com/litedb-org/LiteDB
+Copyright (c) Mauricio David
+
+CommunityToolkit.Mvvm -- MIT License
+https://github.com/CommunityToolkit/dotnet
+Copyright (c) .NET Foundation and Contributors
+
+MessageBox.Avalonia -- MIT License
+https://github.com/AvaloniaCommunity/MessageBox.Avalonia
+
+Microsoft.Extensions.DependencyInjection -- MIT License
+https://github.com/dotnet/runtime
+Copyright (c) .NET Foundation and Contributors
+
+LoadingIndicators.Avalonia -- The Unlicense (public domain)
+https://github.com/Der-Floh/LoadingIndicators.Avalonia

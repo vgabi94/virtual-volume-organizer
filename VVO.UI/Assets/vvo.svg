@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E0E0E0"></stop>
+      <stop offset="40%" stop-color="#B0B0B0"></stop>
+      <stop offset="100%" stop-color="#888888"></stop>
+    </linearGradient>
+    <linearGradient id="metalDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A8A8A8"></stop>
+      <stop offset="100%" stop-color="#6E6E6E"></stop>
+    </linearGradient>
+    <linearGradient id="metalLight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F0F0F0"></stop>
+      <stop offset="100%" stop-color="#C8C8C8"></stop>
+    </linearGradient>
+    <linearGradient id="tile" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#565656"></stop>
+      <stop offset="100%" stop-color="#333333"></stop>
+    </linearGradient>
+  </defs>
+
+
+  <rect x="0" y="0" width="64" height="64" rx="13" ry="13" fill="url(#tile)"></rect>
+
+
+  <circle cx="32" cy="32" r="26.5" stroke="#7C7C7C" stroke-width="2.2" stroke-dasharray="5 4" fill="none"></circle>
+
+
+  <ellipse cx="27" cy="19" rx="13" ry="5" fill="url(#metalLight)"></ellipse>
+  <rect x="14" y="19" width="26" height="20" fill="url(#metal)"></rect>
+  <ellipse cx="27" cy="29" rx="13" ry="5" fill="url(#metalDark)"></ellipse>
+  <ellipse cx="27" cy="39" rx="13" ry="5" fill="url(#metalDark)"></ellipse>
+
+
+  <circle cx="51" cy="15" r="12.5" fill="#2A2A2A"></circle>
+  <circle cx="51" cy="15" r="11" fill="url(#metal)"></circle>
+  <circle cx="51" cy="15" r="7" fill="#2A2A2A"></circle>
+  <circle cx="51" cy="15" r="3.2" fill="url(#metalLight)"></circle>
+
+
+  <rect x="6" y="44" width="21" height="14" rx="3" fill="url(#metal)"></rect>
+  <rect x="2" y="47.5" width="5" height="7" rx="1.2" fill="url(#metalDark)"></rect>
+  <rect x="10" y="47" width="5" height="8" rx="1" fill="#2A2A2A"></rect>
+
+
+  <rect x="38" y="44" width="23" height="14" rx="3" fill="url(#metal)"></rect>
+  <rect x="42" y="47.5" width="13" height="3" rx="1" fill="#2A2A2A"></rect>
+  <rect x="42" y="52.5" width="9" height="3" rx="1" fill="#2A2A2A"></rect>
+</svg>

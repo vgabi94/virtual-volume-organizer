@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="VVO.UI/VVO.UI.csproj" Id="0e91c215-d07c-47dd-be83-e571cad852e4" />
+  <Project Path="VVO.Tests/VVO.Tests.csproj" Id="94fb3f09-96cf-41a0-a788-661cac4df79a" />
+  <Project Path="VVO.Core/VVO.Core.csproj" />
+  <Project Path="VVO.UiTests/VVO.UiTests.csproj" />
+</Solution>

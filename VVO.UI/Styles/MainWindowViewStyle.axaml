@@ -1,0 +1,38 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+    <Border Padding="20">
+      <Menu Grid.Row="0" Classes="MenuBarStyle">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Scan D:\ Volume..."  />
+                <Separator/>
+                <MenuItem Header="_Exit" />
+            </MenuItem>
+            <MenuItem Header="_View" />
+            <MenuItem Header="_Tools" />
+            <MenuItem Header="_Settings" />
+            <MenuItem Header="_About" />
+        </Menu>
+    </Border>
+    </Design.PreviewWith>
+    
+    <Style Selector="Window">
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+    </Style>
+
+    <Style Selector="Menu.MenuBarStyle">
+      <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumBrush}" />
+    </Style>
+    <Style Selector="Menu.MenuBarStyle > MenuItem">
+      <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+    </Style>
+
+    <!-- Invisible until the pointer lands on it. MinWidth has to be set as well as Width: the
+         Fluent theme floors a GridSplitter at 6, and a floor outranks a width. -->
+    <Style Selector="GridSplitter.PaneSplitter">
+      <Setter Property="MinWidth" Value="4" />
+      <Setter Property="Width" Value="4" />
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+</Styles>
+

@@ -1,0 +1,31 @@
+# Build output
+bin/
+obj/
+publish/
+TestResults/
+*.coverage
+*.coverlet.json
+
+# Icon build tooling (see VVO.UI/Assets/build-icon.py)
+VVO.UI/Assets/node_modules/
+
+# Generated at runtime beside the executable
+settings.json
+
+# Agent instructions, kept local
+CLAUDE.md
+.claude/
+
+# IDE and editor state
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userprefs
+*.DotSettings.user
+
+# OS clutter
+Thumbs.db
+desktop.ini
+.DS_Store

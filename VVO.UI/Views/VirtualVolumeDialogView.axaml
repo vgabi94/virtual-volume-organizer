@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VVO.UI.ViewModels"
+        x:Class="VVO.UI.Views.VirtualVolumeDialogView"
+        x:DataType="vm:VirtualVolumeDialogViewModel"
+        x:Name="Dialog"
+        Title="{Binding Header}" Width="460" Height="470"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False"
+        Background="{DynamicResource SystemRegionColor}">
+
+    <Grid RowDefinitions="Auto, Auto, *, Auto, Auto" Margin="24" RowSpacing="14">
+
+        <StackPanel Grid.Row="0" Spacing="6">
+            <TextBlock Text="Name" FontWeight="Medium" FontSize="13"/>
+            <TextBox Text="{Binding VolumeName, Mode=TwoWay}"
+                     PlaceholderText="e.g. Backup Drives"
+                     Padding="10,8"/>
+        </StackPanel>
+
+        <TextBlock Grid.Row="1" Text="Icon" FontWeight="Medium" FontSize="13"/>
+
+        <Border Grid.Row="2"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="4">
+            <ScrollViewer>
+                <ListBox ItemsSource="{Binding Icons}"
+                         SelectedItem="{Binding SelectedIcon, Mode=TwoWay}"
+                         SelectionMode="Single"
+                         Background="Transparent">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:IconChoice">
+                            <PathIcon Data="{Binding Data}"
+                                      Classes.FlipY="{Binding IsFlipped}"
+                                      Width="26" Height="26"
+                                      Foreground="{Binding #Dialog.((vm:VirtualVolumeDialogViewModel)DataContext).SelectedBrush}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </Border>
+
+        <StackPanel Grid.Row="3" Spacing="6">
+            <Grid ColumnDefinitions="*, Auto">
+                <TextBlock Text="Colour" FontWeight="Medium" FontSize="13" VerticalAlignment="Center"/>
+                <Button Grid.Column="1"
+                        Content="Reset Color"
+                        Command="{Binding ResetColorCommand}"
+                        Padding="10,4"/>
+            </Grid>
+            <ColorPicker Color="{Binding SelectedColor, Mode=TwoWay}"
+                         IsAlphaVisible="False"
+                         HorizontalAlignment="Left"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+            <Button Content="Cancel"
+                    Click="OnCancelClicked"
+                    IsCancel="True"
+                    Padding="18,7"/>
+            <Button Content="{Binding ConfirmText}"
+                    Click="OnConfirmClicked"
+                    IsDefault="True"
+                    IsEnabled="{Binding CanConfirm}"
+                    Padding="18,7"/>
+        </StackPanel>
+    </Grid>
+</Window>

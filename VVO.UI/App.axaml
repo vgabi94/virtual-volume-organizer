@@ -1,0 +1,84 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="VVO.UI.App"
+             xmlns:local="using:VVO.UI"
+             xmlns:sys="using:System"
+             RequestedThemeVariant="Dark">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+    
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Icons/IconsResource.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        
+        <SolidColorBrush x:Key="TextControlBackground" Color="#1C1C1C"/>
+        <SolidColorBrush x:Key="DataGridTextControlBackground" Color="#1A1A1A"/>
+
+        <!-- Diff row tints, following the green/red a git diff uses on a dark background -->
+        <SolidColorBrush x:Key="DiffAddedBackground" Color="#12261E"/>
+        <SolidColorBrush x:Key="DiffAddedSelectedBackground" Color="#1D4430"/>
+        <SolidColorBrush x:Key="DiffAddedForeground" Color="#3FB950"/>
+        <SolidColorBrush x:Key="DiffRemovedBackground" Color="#25171C"/>
+        <SolidColorBrush x:Key="DiffRemovedSelectedBackground" Color="#4A2029"/>
+        <SolidColorBrush x:Key="DiffRemovedForeground" Color="#F85149"/>
+        <SolidColorBrush x:Key="DiffChangedBackground" Color="#221B10"/>
+        <SolidColorBrush x:Key="DiffChangedSelectedBackground" Color="#40331C"/>
+        <SolidColorBrush x:Key="DiffChangedForeground" Color="#D29922"/>
+        
+        <Thickness x:Key="SidebarHeaderMargin">15,15,15,5</Thickness>
+        <Thickness x:Key="SidebarSearchBoxMargin">10,5,10,10</Thickness>
+        <Thickness x:Key="SidebarScrollViewerPadding">4</Thickness>
+        <Thickness x:Key="SidebarToggleIconMargin">0,0,4,0</Thickness>
+        <Thickness x:Key="SidebarVolumeIconMargin">0,0,8,0</Thickness>
+        <Thickness x:Key="SidebarItemCountMargin">5,0,0,0</Thickness>
+        <Thickness x:Key="SidebarItemIconMargin">5,0,10,0</Thickness>
+        <Thickness x:Key="SidebarItemIconPadding">0,2,0,0</Thickness>
+        <Thickness x:Key="SidebarSectionMargin">0,10,0,0</Thickness>
+        <!-- Right inset matches SidebarHeaderMargin, so the toolbar lines up with the buttons above -->
+        <Thickness x:Key="SidebarToolbarMargin">8,0,15,4</Thickness>
+        <sys:Double x:Key="SidebarTitleFontSize">16</sys:Double>
+        <sys:Double x:Key="SidebarIconSmallFontSize">14</sys:Double>
+        <sys:Double x:Key="SidebarItemSubtitleFontSize">11</sys:Double>
+        <sys:Double x:Key="SidebarItemSubtitleOpacity">0.8</sys:Double>
+        
+        <sys:Double x:Key="StartPageContentWidth">460</sys:Double>
+        <sys:Double x:Key="StartPageIconSize">56</sys:Double>
+        <sys:Double x:Key="StartPageHeadingFontSize">20</sys:Double>
+        <sys:Double x:Key="StartPageCaptionFontSize">14</sys:Double>
+        <sys:Double x:Key="StartPageItemFontSize">14</sys:Double>
+        <sys:Double x:Key="StartPageItemPathFontSize">13</sys:Double>
+
+        <Thickness x:Key="VolumeExplorerHeaderMargin">20,10</Thickness>
+        <Thickness x:Key="VolumeExplorerBackButtonMargin">0,0,5,0</Thickness>
+        <Thickness x:Key="VolumeExplorerTitleMargin">10,0,20,0</Thickness>
+        <Thickness x:Key="VolumeExplorerHorizontalMargin">10,0</Thickness>
+        <sys:Double x:Key="VolumeExplorerSearchBoxWidth">300</sys:Double>
+        <sys:Double x:Key="VolumeExplorerIconFontSize">18</sys:Double>
+        <sys:Double x:Key="VolumeExplorerCellSpacing">10</sys:Double>
+    </Application.Resources>
+    
+    <Application.Styles>
+        <FluentTheme/>
+
+        <!-- A window shows no icon unless it is given one, and none of them inherit it from
+             the application or from the window they open over -->
+        <Style Selector="Window">
+            <Setter Property="Icon" Value="/Assets/vvo.ico"/>
+        </Style>
+
+        <StyleInclude Source="avares://LoadingIndicators.Avalonia/LoadingIndicators.axaml" />
+        
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="/Styles/SidebarStyles.axaml"/>
+        <StyleInclude Source="/Styles/VolumeExplorerStyles.axaml"/>
+        <StyleInclude Source="/Styles/MainWindowViewStyle.axaml"/>
+        <StyleInclude Source="/Styles/StartPageStyles.axaml"/>
+    </Application.Styles>
+</Application>
+

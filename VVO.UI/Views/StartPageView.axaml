@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:VVO.UI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="VVO.UI.Views.StartPageView"
+             x:DataType="vm:StartPageViewModel"
+             x:Name="StartPage"
+             Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+
+    <!-- Everything shares one centred column so headings, rows and buttons keep a single
+         left edge whatever the window width -->
+    <StackPanel Classes="StartPage" Width="{StaticResource StartPageContentWidth}">
+
+        <StackPanel Classes="BigButtonsGroup">
+            <Button Classes="BigButton" Command="{Binding NewDatabaseCommand}" CommandParameter="{Binding #StartPage}">
+                <StackPanel>
+                    <PathIcon Data="{StaticResource FilePlus}"/>
+                    <TextBlock Text="New Database"/>
+                </StackPanel>
+            </Button>
+            <Button Classes="BigButton" Command="{Binding OpenDatabaseCommand}" CommandParameter="{Binding #StartPage}">
+                <StackPanel>
+                    <PathIcon Data="{StaticResource FileOpenRound}"/>
+                    <TextBlock Text="Open Database"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Classes="RecentGroup">
+            <TextBlock Classes="RecentHeading" Text="Recent"/>
+
+            <TextBlock Classes="EmptyHint"
+                       IsVisible="{Binding !HaveRecentFiles}"
+                       Text="Databases you create or open show up here."/>
+
+            <ItemsControl ItemsSource="{Binding RecentDatabases}"
+                          Grid.IsSharedSizeScope="True"
+                          IsVisible="{Binding HaveRecentFiles}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:RecentDatabase">
+                        <Grid Classes="RecentRow"
+                              Classes.Missing="{Binding IsMissing}"
+                              ColumnDefinitions="*, Auto"
+                              Background="Transparent"
+                              ToolTip.Tip="{Binding Tooltip}">
+
+                            <Button Grid.Column="0"
+                                    Classes="RecentLink"
+                                    Command="{Binding #StartPage.((vm:StartPageViewModel)DataContext).OpenRecentCommand}"
+                                    CommandParameter="{Binding}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="RecentName"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Classes="RecentName" Text="{Binding Name}"/>
+                                    <TextBlock Grid.Column="1" Classes="RecentPath" Text="{Binding Path}"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </Button>
+
+                            <Button Grid.Column="1"
+                                    Classes="RecentRemove"
+                                    ToolTip.Tip="Remove from list"
+                                    Command="{Binding #StartPage.((vm:StartPageViewModel)DataContext).RemoveRecentCommand}"
+                                    CommandParameter="{Binding}">
+                                <PathIcon Data="{StaticResource Close}"/>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

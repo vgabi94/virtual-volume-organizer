@@ -1,0 +1,52 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VVO.UI.ViewModels"
+        x:Class="VVO.UI.Views.NewDatabaseDialogView"
+        x:DataType="vm:NewDatabaseDialogViewModel"
+        Title="New Database" Width="480" Height="300"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False"
+        x:Name="DialogWindow"
+        Background="{DynamicResource SystemRegionColor}">
+
+    <Grid RowDefinitions="Auto, *, Auto" Margin="24">
+        <StackPanel Grid.Row="1" Spacing="16">
+            <StackPanel Spacing="6">
+                <TextBlock Text="Database Name" FontWeight="Medium" FontSize="13"/>
+                <TextBox Text="{Binding CustomName, Mode=TwoWay}" 
+                         PlaceholderText="e.g. My Media Collection" 
+                         Padding="10,8"/>
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="Save Location" FontWeight="Medium" FontSize="13"/>
+                <Grid ColumnDefinitions="*, Auto">
+                    <TextBox Grid.Column="0" 
+                             Text="{Binding DatabasePath, Mode=TwoWay}" 
+                             PlaceholderText="Click Browse to choose path..." 
+                             IsReadOnly="True" 
+                             Padding="10,8"/>
+                    <Button Grid.Column="1" 
+                            Content="Browse..." 
+                            Margin="8,0,0,0" 
+                            Padding="14,8"
+                            Command="{Binding SelectPathCommand}" 
+                            CommandParameter="{Binding #DialogWindow}"/>
+                </Grid>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+            <Button Content="Cancel" 
+                    Click="OnCancelClicked" 
+                    IsCancel="True" 
+                    Padding="18,7"/>
+            <Button Content="Create" 
+                    Click="OnCreateClicked" 
+                    IsDefault="True" 
+                    IsEnabled="{Binding CanCreate}" 
+                    Padding="18,7"/>
+        </StackPanel>
+    </Grid>
+</Window>

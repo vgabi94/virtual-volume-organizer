@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VVO.UI.ViewModels"
+        x:Class="VVO.UI.Views.ShortcutsDialogView"
+        x:DataType="vm:ShortcutsDialogViewModel"
+        Title="Keyboard Shortcuts" Width="400" Height="400"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False"
+        Background="{DynamicResource SystemRegionColor}">
+
+    <Grid RowDefinitions="*, Auto" Margin="24">
+        <ItemsControl Grid.Row="0" ItemsSource="{Binding Shortcuts}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:ShortcutRow">
+                    <Grid ColumnDefinitions="120, *" Margin="0,0,0,10">
+                        <TextBlock Grid.Column="0" Text="{Binding Gesture}" FontWeight="Bold" FontSize="13"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding Action}"
+                                   FontSize="13"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Button Grid.Row="1"
+                Content="Close"
+                Click="OnCloseClicked"
+                IsDefault="True"
+                IsCancel="True"
+                HorizontalAlignment="Right"
+                Margin="0,16,0,0"
+                Padding="18,7"/>
+    </Grid>
+</Window>
