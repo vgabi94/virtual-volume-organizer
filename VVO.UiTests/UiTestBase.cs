@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Messaging;
 using Avalonia.Threading;
 using VVO.Core.Models;
@@ -15,7 +15,9 @@ namespace VVO.UiTests;
 public abstract class UiTestBase : IDisposable
 {
     private readonly string _dbPath;
-    private readonly string _settingsPath;
+
+    /// <summary>Where this test's settings are written, for reading them back as stored.</summary>
+    protected string SettingsPath { get; }
     private readonly List<string> _spilled = [];
 
     protected DatabaseService Database { get; }
@@ -34,14 +36,14 @@ public abstract class UiTestBase : IDisposable
     protected UiTestBase()
     {
         _dbPath = TempPath("vvo");
-        _settingsPath = TempPath("json");
+        SettingsPath = TempPath("json");
 
         Database = new DatabaseService();
         Database.EnsureDatabaseReadyAsync(_dbPath).GetAwaiter().GetResult();
         Volumes = new VirtualVolumeService(Database);
         Transfer = new DatabaseTransferService(Database);
         Undo = new UndoService();
-        Settings = new Settings(_settingsPath);
+        Settings = new Settings(SettingsPath);
 
         Shell = new Window { Width = 900, Height = 600 };
         Shell.Show();
@@ -277,6 +279,7 @@ public abstract class UiTestBase : IDisposable
     {
         Dialogs.Reset();
         DatabaseFiles.Reset();
+        Theme.Reset();
         FolderPicker.Reset();
         TextClipboard.Reset();
 

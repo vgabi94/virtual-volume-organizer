@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
@@ -146,15 +146,17 @@ public class ViewBuildTests : UiTestBase
     [AvaloniaFact]
     public void TheOptionsDialogShowsWhatIsStored()
     {
+        Settings.SetDarkTheme(false);
         Settings.SetShowFolderDetailsAlways(true);
         Settings.SetScanHiddenAndSystem(false);
         var window = Laid(new OptionsDialogView { DataContext = new OptionsDialogViewModel(Settings) });
 
         // One box per flag, in the order the dialog lists them
         var checks = window.GetVisualDescendants().OfType<CheckBox>().ToList();
-        Assert.Equal(2, checks.Count);
-        Assert.True(checks[0].IsChecked);
-        Assert.False(checks[1].IsChecked);
+        Assert.Equal(3, checks.Count);
+        Assert.False(checks[0].IsChecked);
+        Assert.True(checks[1].IsChecked);
+        Assert.False(checks[2].IsChecked);
         window.Close();
     }
 

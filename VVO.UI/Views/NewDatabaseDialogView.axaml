@@ -8,7 +8,7 @@
         CanResize="False"
         ShowInTaskbar="False"
         x:Name="DialogWindow"
-        Background="{DynamicResource SystemRegionColor}">
+        Background="{DynamicResource DialogBackground}">
 
     <Grid RowDefinitions="Auto, *, Auto" Margin="24">
         <StackPanel Grid.Row="1" Spacing="16">

@@ -583,6 +583,32 @@ public class VirtualVolumeServiceTests : IDisposable
         Assert.Equal(3, (await FilesOfAsync(tree.Metadata.TreeId)).Count);
     }
 
+    // The walk of a drive holding one of these came back whole and the store of it threw, so the
+    // scan of everything was lost to the one file whose name is not text
+    [Fact]
+    public async Task ATreeHoldingANameThatIsNotTextIsStored()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("Backups", "HardDrive");
+        var directory = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}");
+        Directory.CreateDirectory(directory);
+
+        try
+        {
+            File.WriteAllText(Path.Combine(directory, "a\uDC6D.txt"), "x");
+
+            var scan = await new FileScannerService().ScanDirectoryAsync(directory);
+            var entry = await _service.AddFolderAsync(volume.Id, scan.Metadata, scan.Records);
+
+            var stored = await FilesOfAsync(entry.TreeId);
+            Assert.Equal(2, stored.Count);
+            Assert.Contains(stored, record => record.Name == "a�.txt");
+        }
+        finally
+        {
+            try { Directory.Delete(directory, true); } catch { }
+        }
+    }
+
     #endregion
 
     #region Updating what a folder holds
