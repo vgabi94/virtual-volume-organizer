@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using CommunityToolkit.Mvvm.Messaging;
 using VVO.Core.Models;
@@ -35,6 +35,18 @@ public class MainWindowCommandTests : UiTestBase
         await MainWindow.ShowShortcutsCommand.ExecuteAsync(Shell);
 
         Assert.IsType<ShortcutsDialogView>(Assert.Single(Opened));
+    }
+
+    [AvaloniaFact]
+    public async Task LicenseOpensTheLicenceItselfRatherThanADescriptionOfIt()
+    {
+        await MainWindow.ShowLicenseCommand.ExecuteAsync(Shell);
+
+        var dialog = Assert.IsType<DocumentDialogView>(Assert.Single(Opened));
+        var document = Assert.IsType<DocumentDialogViewModel>(dialog.DataContext);
+
+        Assert.Equal("License", document.Title);
+        Assert.Contains("MIT License", document.Text);
     }
 
     [AvaloniaFact]

@@ -1,11 +1,11 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 
 namespace VVO.UI.Views;
 
-public partial class NoticesDialogView : Window
+public partial class DocumentDialogView : Window
 {
-    public NoticesDialogView()
+    public DocumentDialogView()
     {
         InitializeComponent();
     }

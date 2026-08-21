@@ -1,4 +1,4 @@
-using Avalonia.Media;
+﻿using Avalonia.Media;
 using VVO.Core.Models;
 using VVO.UI;
 using VVO.UI.ViewModels;
@@ -367,15 +367,36 @@ public class DialogViewModelTests
         Assert.Contains("MahApps.Metro.IconPacks", viewModel.IconsCredit);
     }
 
-    // The notices are embedded under a fixed name, which nothing but loading them proves
+    // Each document is embedded under a fixed name, which nothing but loading it proves
     [Fact]
-    public void TheNoticesDialogReadsTheNoticesEmbeddedInTheAssembly()
+    public void TheNoticesDocumentIsTheOneEmbeddedInTheAssembly()
     {
-        var viewModel = new NoticesDialogViewModel();
+        var viewModel = DocumentDialogViewModel.Notices();
 
-        Assert.Contains("THIRD-PARTY NOTICES", viewModel.Notices);
-        Assert.Contains("Font Awesome Free", viewModel.Notices);
-        Assert.DoesNotContain("is missing from this build", viewModel.Notices);
+        Assert.Equal("Third-Party Notices", viewModel.Title);
+        Assert.Contains("THIRD-PARTY NOTICES", viewModel.Text);
+        Assert.Contains("Font Awesome Free", viewModel.Text);
+        Assert.DoesNotContain("is missing from this build", viewModel.Text);
+    }
+
+    [Fact]
+    public void TheLicenseDocumentIsTheOneEmbeddedInTheAssembly()
+    {
+        var viewModel = DocumentDialogViewModel.License();
+
+        Assert.Equal("License", viewModel.Title);
+        Assert.Contains("MIT License", viewModel.Text);
+        Assert.Contains("WITHOUT WARRANTY OF ANY KIND", viewModel.Text);
+        Assert.DoesNotContain("is missing from this build", viewModel.Text);
+    }
+
+    // A build that dropped the resource says so rather than showing an empty window
+    [Fact]
+    public void ADocumentThatIsNotInTheBuildSaysSo()
+    {
+        var viewModel = new DocumentDialogViewModel("Missing", "NO-SUCH-DOCUMENT.txt");
+
+        Assert.Contains("is missing from this build", viewModel.Text);
     }
 
     // The SDK appends the source revision after a '+', which is noise on screen

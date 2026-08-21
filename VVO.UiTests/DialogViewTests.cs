@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
@@ -138,13 +138,13 @@ public class DialogViewTests : UiTestBase
     }
 
     [AvaloniaFact]
-    public void TheNoticesDialogClosesOnItsOwnButton()
+    public void TheDocumentDialogClosesOnItsOwnButton()
     {
-        var dialog = new NoticesDialogView { DataContext = new NoticesDialogViewModel() };
+        var dialog = new DocumentDialogView { DataContext = DocumentDialogViewModel.Notices() };
         dialog.Show();
         Pump();
 
-        // The scroll viewer around the notices brings buttons of its own along
+        // The scroll viewer around the document brings buttons of its own along
         Press(ButtonOf(dialog, cancel: true));
 
         Assert.False(dialog.IsVisible);

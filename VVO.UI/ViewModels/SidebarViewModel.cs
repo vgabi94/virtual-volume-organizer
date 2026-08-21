@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -103,20 +103,39 @@ public partial class SidebarViewModel : ViewModelBase
     public AvaloniaList<VirtualVolumeNode> VirtualVolumes { get; } = new();
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(EditVirtualVolumeCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteVirtualVolumeCommand))]
     public partial VirtualVolumeNode? SelectedVirtualVolume { get; set; }
 
     // The selection lives on whichever volume owns it, mirrored here so the menu bar has a
     // single place to reach it from
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CutFolderCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CopyFolderCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DuplicateFolderCommand))]
+    [NotifyCanExecuteChangedFor(nameof(EditFolderCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteFolderCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CompareCommand))]
+    [NotifyCanExecuteChangedFor(nameof(UpdateFolderCommand))]
     public partial FolderItem? SelectedFolder { get; set; }
 
     [ObservableProperty]
     public partial string DatabaseName { get; set; }
 
     [ObservableProperty]
+    public partial string DatabasePath { get; set; }
+
+    /// <summary>
+    /// Whether a catalogue is open. Every command that acts on one is dead until it is, which
+    /// is the whole of what the start page stands in front of.
+    /// </summary>
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveCopyCommand))]
     [NotifyCanExecuteChangedFor(nameof(ExportCommand))]
-    public partial string DatabasePath { get; set; }
+    [NotifyCanExecuteChangedFor(nameof(NewVirtualVolumeCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ExpandAllVirtualVolumesCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CollapseAllVirtualVolumesCommand))]
+    public partial bool HasDatabase { get; set; }
 
     [ObservableProperty]
     public partial bool ShowFolderDetailsAlways { get; set; }
@@ -292,11 +311,17 @@ public partial class SidebarViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasDatabase))]
     private void ExpandAllVirtualVolumes() => SetAllExpanded(true);
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasDatabase))]
     private void CollapseAllVirtualVolumes() => SetAllExpanded(false);
+
+    // Reached from the menu bar through the selection and from the sidebar through the row the
+    // menu was opened on, so either standing in for the other is what makes the command live
+    private bool CanActOnVolume(VirtualVolumeNode? node) => (node ?? SelectedVirtualVolume) != null;
+
+    private bool CanActOnFolder(FolderItem? item) => (item ?? SelectedFolder) != null;
 
     private void SetAllExpanded(bool expanded)
     {
@@ -306,7 +331,7 @@ public partial class SidebarViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasDatabase))]
     private async Task NewVirtualVolume()
     {
         try
@@ -354,7 +379,7 @@ public partial class SidebarViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanActOnVolume))]
     private async Task EditVirtualVolume(VirtualVolumeNode? node)
     {
         node ??= SelectedVirtualVolume;
@@ -391,7 +416,7 @@ public partial class SidebarViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanActOnVolume))]
     private async Task DeleteVirtualVolume(VirtualVolumeNode? node)
     {
         node ??= SelectedVirtualVolume;
@@ -462,7 +487,7 @@ public partial class SidebarViewModel : ViewModelBase
 
     #region Folder commands
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanActOnFolder))]
     private void CopyFolder(FolderItem? item)
     {
         if (item != null)
@@ -471,7 +496,7 @@ public partial class SidebarViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanActOnFolder))]
     private void CutFolder(FolderItem? item)
     {
         if (item != null)
@@ -590,7 +615,7 @@ public partial class SidebarViewModel : ViewModelBase
         PasteIntoVirtualVolumeCommand.NotifyCanExecuteChanged();
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanActOnFolder))]
     private async Task EditFolder(FolderItem? item)
     {
         if (item == null)
@@ -625,7 +650,7 @@ public partial class SidebarViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanActOnFolder))]
     private async Task DuplicateFolder(FolderItem? item)
     {
         if (item == null)
@@ -653,7 +678,7 @@ public partial class SidebarViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanActOnFolder))]
     private async Task DeleteFolder(FolderItem? item)
     {
         if (item == null)
@@ -695,7 +720,7 @@ public partial class SidebarViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanActOnFolder))]
     private async Task Compare(FolderItem? item)
     {
         if (item == null)
@@ -730,7 +755,7 @@ public partial class SidebarViewModel : ViewModelBase
     /// Reads the folder again from wherever it is now and replaces what was catalogued with it,
     /// but only once the user has seen what that would change and said so.
     /// </summary>
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanActOnFolder))]
     private async Task UpdateFolder(FolderItem? item)
     {
         if (item == null)
@@ -1147,8 +1172,6 @@ public partial class SidebarViewModel : ViewModelBase
         }
     }
 
-    private bool HasDatabase() => !string.IsNullOrEmpty(DatabasePath);
-
     #endregion
 
     public void Receive(FolderAddedMessage message)
@@ -1192,6 +1215,8 @@ public partial class SidebarViewModel : ViewModelBase
         {
             // The recorded steps describe records in the database that is being left behind
             _undoManager.Clear();
+
+            HasDatabase = !string.IsNullOrEmpty(_databaseService.DbPath);
 
             var query = await _databaseService.ReadItemsAsync<DatabaseMetadata>();
             var databaseMetadata = query.FirstOrDefault();

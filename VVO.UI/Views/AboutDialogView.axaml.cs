@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using VVO.UI.ViewModels;
 
@@ -13,7 +13,7 @@ public partial class AboutDialogView : Window
 
     private async void OnNoticesClicked(object sender, RoutedEventArgs e)
     {
-        var notices = new NoticesDialogView { DataContext = new NoticesDialogViewModel() };
+        var notices = new DocumentDialogView { DataContext = DocumentDialogViewModel.Notices() };
         await Dialogs.ShowAsync(notices, this);
     }
 

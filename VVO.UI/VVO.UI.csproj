@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
@@ -26,6 +26,7 @@
     <!-- Embedded rather than copied, so a published single file still carries the notices it has
          to distribute. LogicalName is fixed so renaming the assembly cannot move it. -->
     <EmbeddedResource Include="..\THIRD-PARTY-NOTICES.txt" LogicalName="THIRD-PARTY-NOTICES.txt" />
+    <EmbeddedResource Include="..\LICENSE" LogicalName="LICENSE" />
   </ItemGroup>
 
   <ItemGroup>

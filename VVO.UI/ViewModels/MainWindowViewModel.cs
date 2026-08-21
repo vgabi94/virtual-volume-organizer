@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -49,9 +49,18 @@ public partial class MainWindowViewModel : ViewModelBase
 
     // Shares its place with the running-operation status, so it only shows when nothing
     // else has that spot
-    public bool IsDatabaseStatusVisible => _hasDatabase && !IsStatusMessageVisible;
+    public bool IsDatabaseStatusVisible => HasDatabase && !IsStatusMessageVisible;
 
-    private bool _hasDatabase;
+    /// <summary>
+    /// Whether a catalogue is open. The commands that act on one are dead until it is, which is
+    /// the whole of what the start page stands in front of.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsDatabaseStatusVisible))]
+    [NotifyCanExecuteChangedFor(nameof(ShrinkDatabaseCommand))]
+    [NotifyCanExecuteChangedFor(nameof(FindCommand))]
+    [NotifyCanExecuteChangedFor(nameof(AddFolderCommand))]
+    public partial bool HasDatabase { get; set; }
 
     public SidebarViewModel SidebarViewModel { get; }
     public VolumeExplorerViewModel VolumeExplorerViewModel { get; }
@@ -91,6 +100,16 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task ShowLicense(Visual owner)
+    {
+        if (TopLevel.GetTopLevel(owner) is not Window window)
+            return;
+
+        await Dialogs.ShowAsync(
+            new Views.DocumentDialogView { DataContext = DocumentDialogViewModel.License() }, window);
+    }
+
+    [RelayCommand]
     private async Task ShowShortcuts(Visual owner)
     {
         if (TopLevel.GetTopLevel(owner) is not Window window)
@@ -117,7 +136,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasDatabase))]
     private void Find()
     {
         WeakReferenceMessenger.Default.Send(new FocusFileSearchMessage());
@@ -132,7 +151,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasDatabase))]
     private async Task ShrinkDatabaseAsync()
     {
         var path = _databaseService.DbPath;
@@ -205,7 +224,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     // The menu bar has no virtual volume to point at, so it falls back on whichever one the
     // sidebar is standing in.
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasDatabase))]
     private async Task AddFolderAsync(Visual mainWindow)
     {
         var targetVolumeId = SidebarViewModel.TargetVirtualVolumeId;
@@ -291,13 +310,11 @@ public partial class MainWindowViewModel : ViewModelBase
     private void RefreshLastWrite()
     {
         var path = _databaseService.DbPath;
-        _hasDatabase = !string.IsNullOrEmpty(path) && File.Exists(path);
+        HasDatabase = !string.IsNullOrEmpty(path) && File.Exists(path);
 
-        LastWriteText = _hasDatabase
+        LastWriteText = HasDatabase
             ? $"Last Write {File.GetLastWriteTime(path):yyyy-MM-dd HH:mm:ss}"
             : string.Empty;
-
-        OnPropertyChanged(nameof(IsDatabaseStatusVisible));
     }
 
     public async void Receive(AddFolderMessage message)

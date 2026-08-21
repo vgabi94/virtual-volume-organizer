@@ -1,9 +1,9 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:VVO.UI.ViewModels"
-        x:Class="VVO.UI.Views.NoticesDialogView"
-        x:DataType="vm:NoticesDialogViewModel"
-        Title="Third-Party Notices" Width="640" Height="560"
+        x:Class="VVO.UI.Views.DocumentDialogView"
+        x:DataType="vm:DocumentDialogViewModel"
+        Title="{Binding Title}" Width="640" Height="560"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         Background="{DynamicResource SystemRegionColor}">
@@ -15,7 +15,7 @@
                 CornerRadius="4"
                 BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
             <ScrollViewer Padding="14" HorizontalScrollBarVisibility="Auto">
-                <SelectableTextBlock Text="{Binding Notices}"
+                <SelectableTextBlock Text="{Binding Text}"
                                      FontFamily="Consolas,Menlo,Monospace"
                                      FontSize="12"
                                      Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
