@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +19,10 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var serviceProvider = ServiceConfiguration.ConfigureServices();
+
+            // Before the window is built, so it is never painted in one theme and then repainted
+            Theme.Apply(serviceProvider.GetRequiredService<Settings>().IsDarkTheme);
+
             var mainWindowVm = serviceProvider.GetRequiredService<MainWindowViewModel>();
 
             var window = new MainWindowView

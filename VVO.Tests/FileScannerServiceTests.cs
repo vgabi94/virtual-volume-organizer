@@ -618,4 +618,76 @@ public class FileScannerServiceTests : IDisposable
             () => _service.ScanDirectoryAsync(_testRoot, null, cancellation.Token));
     }
 
+
+    #region Names that are not text
+
+    // Built here rather than passed in: a lone surrogate does not survive being serialised as
+    // theory data, and would reach the test as something else entirely
+    private static string Half(params int[] codeUnits) =>
+        new string(codeUnits.Select(unit => (char)unit).ToArray());
+
+    private const int HighSurrogate = 0xD800;
+    private const int LowSurrogate = 0xDC6D;
+    private const string Replacement = "\uFFFD";
+
+    // Windows stores a name as UTF-16 code units and never checks that they spell anything, so
+    // a stray half of a surrogate pair is a name a real drive can hold
+    [Fact]
+    public async Task AFileNamedWithAStrayLowSurrogateIsCataloguedUnderTheReplacementCharacter()
+    {
+        CreateFile($"a{Half(LowSurrogate)}.txt", 10);
+
+        Assert.Equal($"a{Replacement}.txt", await ScannedFileNameAsync());
+    }
+
+    [Fact]
+    public async Task AFileNamedWithAStrayHighSurrogateIsCataloguedUnderTheReplacementCharacter()
+    {
+        CreateFile($"a{Half(HighSurrogate)}.txt", 10);
+
+        Assert.Equal($"a{Replacement}.txt", await ScannedFileNameAsync());
+    }
+
+    [Fact]
+    public async Task EveryStrayHalfInANameIsReplaced()
+    {
+        CreateFile($"a{Half(HighSurrogate, HighSurrogate)}.txt", 10);
+
+        Assert.Equal($"a{Replacement}{Replacement}.txt", await ScannedFileNameAsync());
+    }
+
+    [Fact]
+    public async Task AWholeCharacterOutsideTheBasicPlaneIsLeftAsItIs()
+    {
+        CreateFile("a\U0001F600.txt", 10);
+
+        Assert.Equal("a\U0001F600.txt", await ScannedFileNameAsync());
+    }
+
+    [Fact]
+    public async Task AFolderNamedWithHalfACharacterIsCataloguedToo()
+    {
+        Directory.CreateDirectory(Path.Combine(_testRoot, $"sub{Half(LowSurrogate)}"));
+
+        var scan = await _service.ScanDirectoryAsync(_testRoot);
+        var folder = scan.Records.Single(record => record.IsFolder && record.ParentId != null);
+
+        Assert.Equal($"sub{Replacement}", folder.Name);
+    }
+
+    private async Task<string> ScannedFileNameAsync()
+    {
+        var scan = await _service.ScanDirectoryAsync(_testRoot);
+        var name = scan.Records.Single(record => !record.IsFolder).Name;
+
+        // The property that matters, and the one the database enforces: a whole character made
+        // of two surrogates is fine, half of one is not
+        var strict = new System.Text.UTF8Encoding(false, throwOnInvalidBytes: true);
+        var encoded = Record.Exception(() => strict.GetBytes(name));
+        Assert.Null(encoded);
+
+        return name;
+    }
+
+    #endregion
 }

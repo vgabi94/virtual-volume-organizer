@@ -72,7 +72,7 @@ public class FileScannerService : IFileScannerService
             Id = rootFolderId,
             RootFolderId = rootFolderId,
             ParentId = null,
-            Name = rootName,
+            Name = Encodable(rootName),
             IsFolder = true,
             Size = 0, // will be computed before return
             Created = TruncateToMilliseconds(Directory.GetCreationTimeUtc(rootPath)),
@@ -83,7 +83,7 @@ public class FileScannerService : IFileScannerService
         {
             Id = Guid.NewGuid(),
             TreeId = rootFolderId,
-            Path = rootPath,
+            Path = Encodable(rootPath),
             LastScanned = DateTime.UtcNow,
             Label = label,
             Description = description
@@ -162,7 +162,7 @@ public class FileScannerService : IFileScannerService
                     Id = recordId,
                     RootFolderId = rootFolderId,
                     ParentId = parentId,
-                    Name = entry.FileName.ToString(),
+                    Name = Encodable(entry.FileName.ToString()),
                     IsFolder = isDir,
                     Size = entry.Length,
                     Created = TruncateToMilliseconds(entry.CreationTimeUtc.UtcDateTime),
@@ -263,6 +263,37 @@ public class FileScannerService : IFileScannerService
                 return size;
             }
         }, cancellationToken);
+    }
+
+    /// <summary>
+    /// A name as it can be stored. Windows takes any sequence of UTF-16 code units for a name,
+    /// unpaired surrogates included, and those have no UTF-8 to be written as; the database
+    /// refuses them outright rather than substituting, so one unnameable file would otherwise
+    /// cost the scan of a whole drive. The replacement character is what reading such a name
+    /// anywhere else already shows.
+    /// </summary>
+    private static string Encodable(string name)
+    {
+        char[]? repaired = null;
+
+        for (var i = 0; i < name.Length; i++)
+        {
+            if (!char.IsSurrogate(name[i]))
+                continue;
+
+            // A high surrogate followed by a low one is a character; anything else is a stray
+            // half of one, including any low surrogate this reaches
+            if (char.IsHighSurrogate(name[i]) && i + 1 < name.Length && char.IsLowSurrogate(name[i + 1]))
+            {
+                i++;
+                continue;
+            }
+
+            repaired ??= name.ToCharArray();
+            repaired[i] = '�';
+        }
+
+        return repaired == null ? name : new string(repaired);
     }
 
     // Dates persist with millisecond precision, so drop the extra ticks up front

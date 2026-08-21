@@ -1,0 +1,54 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- The colours the application picks for itself. Everything else is the Fluent palette,
+         which already carries a value for each variant. -->
+    <ResourceDictionary.ThemeDictionaries>
+
+        <ResourceDictionary x:Key="Dark">
+            <!-- Set apart from the panel behind it, which the theme's own value is not -->
+            <SolidColorBrush x:Key="TextControlBackground" Color="#1C1C1C"/>
+
+            <!-- Stated rather than laid over the window as a wash of white, which left the
+                 listing taking its colour from whatever happened to be behind it -->
+            <SolidColorBrush x:Key="ExplorerBackground" Color="#181818"/>
+
+            <!-- Level with the menu bar, so a dialog reads as part of the application rather
+                 than as a hole cut in it -->
+            <SolidColorBrush x:Key="DialogBackground" Color="#1F1F1F"/>
+
+            <!-- Diff row tints, following the green/red a git diff uses on a dark background -->
+            <SolidColorBrush x:Key="DiffAddedBackground" Color="#12261E"/>
+            <SolidColorBrush x:Key="DiffAddedSelectedBackground" Color="#1D4430"/>
+            <SolidColorBrush x:Key="DiffAddedForeground" Color="#3FB950"/>
+            <SolidColorBrush x:Key="DiffRemovedBackground" Color="#25171C"/>
+            <SolidColorBrush x:Key="DiffRemovedSelectedBackground" Color="#4A2029"/>
+            <SolidColorBrush x:Key="DiffRemovedForeground" Color="#F85149"/>
+            <SolidColorBrush x:Key="DiffChangedBackground" Color="#221B10"/>
+            <SolidColorBrush x:Key="DiffChangedSelectedBackground" Color="#40331C"/>
+            <SolidColorBrush x:Key="DiffChangedForeground" Color="#D29922"/>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="ExplorerBackground" Color="#FFFDFB"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#FAF9F7"/>
+
+            <!-- The shade that carries secondary text is too heavy for an edge on paper -->
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#C9C3BA"/>
+
+            <!-- The same tints held to the paper ground: enough colour to tell the three apart
+                 at a glance, little enough that a screenful of them is still restful -->
+            <SolidColorBrush x:Key="DiffAddedBackground" Color="#E9F5EC"/>
+            <SolidColorBrush x:Key="DiffAddedSelectedBackground" Color="#CFE7D6"/>
+            <SolidColorBrush x:Key="DiffAddedForeground" Color="#1A7F37"/>
+            <SolidColorBrush x:Key="DiffRemovedBackground" Color="#FBEBEA"/>
+            <SolidColorBrush x:Key="DiffRemovedSelectedBackground" Color="#F6D4D1"/>
+            <SolidColorBrush x:Key="DiffRemovedForeground" Color="#C0362C"/>
+            <SolidColorBrush x:Key="DiffChangedBackground" Color="#FBF3DE"/>
+            <SolidColorBrush x:Key="DiffChangedSelectedBackground" Color="#F1E3BC"/>
+            <SolidColorBrush x:Key="DiffChangedForeground" Color="#8A6116"/>
+        </ResourceDictionary>
+
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

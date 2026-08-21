@@ -1,4 +1,4 @@
-<p align="center">
+﻿<p align="center">
   <img src="VVO.UI/Assets/vvo.svg" alt="Virtual Volume Organizer" width="128" height="128">
 </p>
 
@@ -102,6 +102,9 @@ scanned tree are updated together.
 
 **Organising** — cut, copy, paste, duplicate and move folder entries between volumes; relabel and
 describe them; give any volume or folder its own icon and colour.
+
+**Themes** — a dark theme and a light one, chosen under Tools ▸ Options. Dark is the default. The
+choice takes effect immediately and is remembered between runs.
 
 **Undo and redo** — creating and editing volumes, editing folders, and copying, pasting and
 duplicating folders can all be undone with `Ctrl+Z`. Deletions cannot; they collect the scanned tree

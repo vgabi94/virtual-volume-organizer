@@ -23,6 +23,10 @@ namespace VVO.UI
             // When false a scan leaves out hidden and system entries, which on a system drive
             // is most of ProgramData and every AppData
             public bool ScanHiddenAndSystem { get; init; }
+
+            // Nullable so that a file written before there was a theme to choose reads as the
+            // dark one it was wearing, rather than as a light one the user never asked for
+            public bool? DarkTheme { get; init; }
         }
 
         private const int DefaultMaxRecentFiles = 7;
@@ -31,7 +35,8 @@ namespace VVO.UI
         {
             RecentFiles = [],
             MaxRecentFiles = DefaultMaxRecentFiles,
-            CollapsedVolumes = []
+            CollapsedVolumes = [],
+            DarkTheme = true
         };
 
         private readonly string _filePath;
@@ -65,7 +70,8 @@ namespace VVO.UI
                         MaxRecentFiles = loaded.MaxRecentFiles > 0 ? loaded.MaxRecentFiles : DefaultMaxRecentFiles,
                         CollapsedVolumes = loaded.CollapsedVolumes ?? [],
                         ShowFolderDetailsAlways = loaded.ShowFolderDetailsAlways,
-                        ScanHiddenAndSystem = loaded.ScanHiddenAndSystem
+                        ScanHiddenAndSystem = loaded.ScanHiddenAndSystem,
+                        DarkTheme = loaded.DarkTheme
                     };
                 }
                 catch (Exception ex)
@@ -120,6 +126,17 @@ namespace VVO.UI
             if (Data.ShowFolderDetailsAlways == value) return;
 
             Data = Data with { ShowFolderDetailsAlways = value };
+            Save();
+        }
+
+        /// <summary>The theme to open on, dark until the user says otherwise.</summary>
+        public bool IsDarkTheme => Data.DarkTheme ?? true;
+
+        public void SetDarkTheme(bool value)
+        {
+            if (Data.DarkTheme == value) return;
+
+            Data = Data with { DarkTheme = value };
             Save();
         }
 

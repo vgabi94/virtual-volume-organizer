@@ -1,16 +1,26 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:VVO.UI.ViewModels"
         x:Class="VVO.UI.Views.OptionsDialogView"
         x:DataType="vm:OptionsDialogViewModel"
-        Title="Options" Width="440" Height="340"
+        Title="Options" Width="440" Height="420"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         ShowInTaskbar="False"
-        Background="{DynamicResource SystemRegionColor}">
+        Background="{DynamicResource DialogBackground}">
 
     <Grid RowDefinitions="*, Auto" Margin="24">
         <StackPanel Grid.Row="0" Spacing="18">
+            <StackPanel Spacing="4">
+                <CheckBox Content="Dark theme"
+                          IsChecked="{Binding DarkTheme, Mode=TwoWay}"/>
+                <TextBlock Text="When off the application wears its light theme instead."
+                           TextWrapping="Wrap"
+                           FontSize="13"
+                           Margin="28,0,0,0"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+            </StackPanel>
+
             <StackPanel Spacing="4">
                 <CheckBox Content="Always show folder paths and descriptions"
                           IsChecked="{Binding ShowFolderDetailsAlways, Mode=TwoWay}"/>

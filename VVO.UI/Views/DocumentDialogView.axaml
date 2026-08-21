@@ -6,7 +6,7 @@
         Title="{Binding Title}" Width="640" Height="560"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
-        Background="{DynamicResource SystemRegionColor}">
+        Background="{DynamicResource DialogBackground}">
 
     <Grid RowDefinitions="*, Auto" Margin="24" RowSpacing="14">
 

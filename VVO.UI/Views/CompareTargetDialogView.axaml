@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:VVO.UI.ViewModels"
         x:Class="VVO.UI.Views.CompareTargetDialogView"
@@ -8,7 +8,7 @@
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         ShowInTaskbar="False"
-        Background="{DynamicResource SystemRegionColor}">
+        Background="{DynamicResource DialogBackground}">
 
     <Grid RowDefinitions="Auto, *, Auto, Auto" Margin="24">
         <TextBlock Grid.Row="0" Text="Compare against a catalogued volume" FontWeight="Medium" FontSize="13" Margin="0,0,0,6"/>

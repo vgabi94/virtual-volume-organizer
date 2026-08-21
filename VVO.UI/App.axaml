@@ -1,4 +1,4 @@
-<Application xmlns="https://github.com/avaloniaui"
+﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="VVO.UI.App"
              xmlns:local="using:VVO.UI"
@@ -13,22 +13,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Icons/IconsResource.axaml"/>
+                <ResourceInclude Source="/Styles/Theme.axaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-        
-        <SolidColorBrush x:Key="TextControlBackground" Color="#1C1C1C"/>
-        <SolidColorBrush x:Key="DataGridTextControlBackground" Color="#1A1A1A"/>
-
-        <!-- Diff row tints, following the green/red a git diff uses on a dark background -->
-        <SolidColorBrush x:Key="DiffAddedBackground" Color="#12261E"/>
-        <SolidColorBrush x:Key="DiffAddedSelectedBackground" Color="#1D4430"/>
-        <SolidColorBrush x:Key="DiffAddedForeground" Color="#3FB950"/>
-        <SolidColorBrush x:Key="DiffRemovedBackground" Color="#25171C"/>
-        <SolidColorBrush x:Key="DiffRemovedSelectedBackground" Color="#4A2029"/>
-        <SolidColorBrush x:Key="DiffRemovedForeground" Color="#F85149"/>
-        <SolidColorBrush x:Key="DiffChangedBackground" Color="#221B10"/>
-        <SolidColorBrush x:Key="DiffChangedSelectedBackground" Color="#40331C"/>
-        <SolidColorBrush x:Key="DiffChangedForeground" Color="#D29922"/>
         
         <Thickness x:Key="SidebarHeaderMargin">15,15,15,5</Thickness>
         <Thickness x:Key="SidebarSearchBoxMargin">10,5,10,10</Thickness>
@@ -63,7 +50,40 @@
     </Application.Resources>
     
     <Application.Styles>
-        <FluentTheme/>
+        <FluentTheme>
+            <FluentTheme.Palettes>
+                <!-- Fluent's own light palette is a white page under near-black text. This is
+                     the same structure warmed and softened at both ends: paper rather than
+                     paper-white, ink rather than black. Dark is left as Fluent draws it. -->
+                <ColorPaletteResources x:Key="Light"
+                                       RegionColor="#FAF9F7"
+                                       AltHigh="#FFFFFF"
+                                       AltLow="#FFFFFF"
+                                       AltMedium="#FFFFFF"
+                                       AltMediumHigh="#FFFFFF"
+                                       AltMediumLow="#FFFFFF"
+                                       BaseHigh="#22201D"
+                                       BaseMediumHigh="#35322E"
+                                       BaseMedium="#6A655D"
+                                       BaseMediumLow="#8B857C"
+                                       BaseLow="#CBC6BE"
+                                       ChromeWhite="#FFFFFF"
+                                       ChromeHigh="#D6D2CA"
+                                       ChromeMedium="#EDEBE7"
+                                       ChromeMediumLow="#F2F0EC"
+                                       ChromeLow="#F7F5F2"
+                                       ChromeAltLow="#35322E"
+                                       ChromeGray="#7A756D"
+                                       ChromeDisabledHigh="#DFDBD4"
+                                       ChromeDisabledLow="#ADA8A0"
+                                       ChromeBlackHigh="#000000"
+                                       ChromeBlackMedium="#35322E"
+                                       ChromeBlackMediumLow="#6A655D"
+                                       ChromeBlackLow="#CBC6BE"
+                                       ListLow="#14000000"
+                                       ListMedium="#28000000"/>
+            </FluentTheme.Palettes>
+        </FluentTheme>
 
         <!-- A window shows no icon unless it is given one, and none of them inherit it from
              the application or from the window they open over -->

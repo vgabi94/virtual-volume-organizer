@@ -4,7 +4,7 @@
              x:Class="VVO.UI.Views.VolumeExplorerView"
              x:DataType="vm:VolumeExplorerViewModel"
              x:Name="Explorer"
-             Background="{DynamicResource SystemRevealListLowColor}">
+             Background="{DynamicResource ExplorerBackground}">
     <Grid RowDefinitions="Auto, *">
         <Grid Grid.Row="0" ColumnDefinitions="2*, Auto, *, Auto" Margin="{DynamicResource VolumeExplorerHeaderMargin}">
             <!-- A Grid, not a StackPanel: a horizontal stack measures its children with
