@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags: [ 'v*.*.*' ]
+
+# gh release create writes to the repository
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install the .NET 10 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+
+    # Catches a tag pushed without the version bump committed, which would otherwise ship an
+    # executable whose About box disagrees with the release it is attached to
+    - name: Check the tag against Directory.Build.props
+      id: version
+      run: |
+        $version = ([xml](Get-Content Directory.Build.props)).SelectSingleNode('//Version').InnerText.Trim()
+        if ("v$version" -ne "${{ github.ref_name }}") {
+          Write-Error "Tag ${{ github.ref_name }} does not match Directory.Build.props version $version"
+          exit 1
+        }
+        "version=$version" >> $env:GITHUB_OUTPUT
+
+    - name: Restore
+      run: dotnet restore VVO.slnx
+
+    - name: Build
+      run: dotnet build VVO.slnx -c Release --no-restore
+
+    - name: Test
+      run: dotnet test VVO.slnx -c Release --no-build
+
+    - name: Publish a self-contained executable
+      run: >
+        dotnet publish VVO.UI/VVO.UI.csproj -c Release -r win-x64 --self-contained true
+        -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+        -p:EnableCompressionInSingleFile=true -p:DebugType=none -p:DebugSymbols=false
+        -p:SourceRevisionId=${{ github.sha }}
+        -o publish/win-x64
+
+    - name: Name the executable for the release
+      run: >
+        Move-Item publish/win-x64/VirtualVolumeOrganizer.exe
+        publish/win-x64/VirtualVolumeOrganizer-${{ steps.version.outputs.version }}-win-x64.exe
+
+    # Drafted rather than published, so the generated notes can be read before anyone downloads it
+    - name: Draft the release
+      run: >
+        gh release create ${{ github.ref_name }}
+        --draft
+        --generate-notes
+        --title "Virtual Volume Organizer ${{ steps.version.outputs.version }}"
+        publish/win-x64/VirtualVolumeOrganizer-${{ steps.version.outputs.version }}-win-x64.exe
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
