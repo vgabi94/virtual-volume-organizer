@@ -1,0 +1,15 @@
+<Project>
+
+  <!-- Imported before each project body, so a project that needs a different value can still set
+       its own; VVO.UiTests does, to build the About box a fixed version to assert against. -->
+  <PropertyGroup>
+    <!-- The release version, and the only place it is written. The release workflow refuses to
+         build a tag that disagrees with it. -->
+    <Version>1.0.0</Version>
+
+    <Product>Virtual Volume Organizer</Product>
+    <Company>Gabriel-Eugen Vaduva</Company>
+    <Copyright>Copyright (c) 2026 Gabriel-Eugen Vaduva</Copyright>
+  </PropertyGroup>
+
+</Project>
