@@ -36,6 +36,16 @@ public class VirtualVolumeServiceTests : IDisposable
         return _database.FindItemsAsync<FileRecord>(record => record.RootFolderId == treeId);
     }
 
+    private async Task<RootFolderMetadata> AddCodeAsync(Guid volumeId, string name = "Code")
+    {
+        var tree = TestTree.Root(name)
+            .File("readme.md", 10)
+            .Folder("AdventOfCode", folder => folder.File("notes.txt", 20))
+            .Build();
+
+        return await _service.AddFolderAsync(volumeId, tree.Metadata, tree.Records.ToList());
+    }
+
     #region Virtual volumes
 
     [Fact]
@@ -533,6 +543,165 @@ public class VirtualVolumeServiceTests : IDisposable
 
         Assert.DoesNotContain(reported, message => message.StartsWith("Deleting files"));
         Assert.NotEmpty(await FilesOfAsync(entry.TreeId));
+    }
+
+    #endregion
+
+    #region Removing catalogue records
+
+    [Fact]
+    public async Task RemoveRecords_ANestedFileShrinksTheFolderHoldingIt()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        var files = await FilesOfAsync(entry.TreeId);
+        var notes = files.Single(record => record.Name == "notes.txt");
+
+        await _service.RemoveRecordsAsync([notes.Id]);
+
+        files = await FilesOfAsync(entry.TreeId);
+        Assert.DoesNotContain(files, record => record.Name == "notes.txt");
+        Assert.Equal(0, files.Single(record => record.Name == "AdventOfCode").Size);
+        Assert.Equal(10, files.Single(record => record.ParentId == null).Size);
+    }
+
+    [Fact]
+    public async Task RemoveRecords_TwoSiblingsAreSubtractedTogether()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var tree = TestTree.Root("Code").File("a.txt", 10).File("b.txt", 20).Build();
+        var entry = await _service.AddFolderAsync(volume.Id, tree.Metadata, tree.Records.ToList());
+        var files = await FilesOfAsync(entry.TreeId);
+
+        await _service.RemoveRecordsAsync(
+        [
+            files.Single(record => record.Name == "a.txt").Id,
+            files.Single(record => record.Name == "b.txt").Id
+        ]);
+
+        files = await FilesOfAsync(entry.TreeId);
+        Assert.Equal("Code", Assert.Single(files).Name);
+        Assert.Equal(0, files.Single().Size);
+    }
+
+    [Fact]
+    public async Task RemoveRecords_DropsAFileAndShrinksItsAncestors()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        var files = await FilesOfAsync(entry.TreeId);
+        var readme = files.Single(record => record.Name == "readme.md");
+
+        var roots = await _service.RemoveRecordsAsync([readme.Id]);
+
+        files = await FilesOfAsync(entry.TreeId);
+        Assert.DoesNotContain(files, record => record.Name == "readme.md");
+        Assert.Equal(20, files.Single(record => record.ParentId == null).Size);
+        Assert.Equal(20, files.Single(record => record.Name == "AdventOfCode").Size);
+        Assert.Equal(20, Assert.Single(roots).Size);
+    }
+
+    [Fact]
+    public async Task RemoveRecords_DropsAFolderAndEverythingUnderIt()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        var files = await FilesOfAsync(entry.TreeId);
+        var advent = files.Single(record => record.Name == "AdventOfCode");
+
+        await _service.RemoveRecordsAsync([advent.Id]);
+
+        files = await FilesOfAsync(entry.TreeId);
+        Assert.Equal(["Code", "readme.md"], files.Select(record => record.Name).Order().ToArray());
+        Assert.Equal(10, files.Single(record => record.ParentId == null).Size);
+    }
+
+    [Fact]
+    public async Task RemoveRecords_AFolderSelectedWithSomethingInsideItIsSubtractedOnce()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        var files = await FilesOfAsync(entry.TreeId);
+        var advent = files.Single(record => record.Name == "AdventOfCode");
+        var notes = files.Single(record => record.Name == "notes.txt");
+
+        await _service.RemoveRecordsAsync([advent.Id, notes.Id]);
+
+        files = await FilesOfAsync(entry.TreeId);
+        Assert.Equal(10, files.Single(record => record.ParentId == null).Size);
+        Assert.DoesNotContain(files, record => record.Name == "notes.txt");
+    }
+
+    [Fact]
+    public async Task RemoveRecords_RejectsTheTreeRoot()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.RemoveRecordsAsync([entry.TreeId]));
+
+        Assert.Equal(4, (await FilesOfAsync(entry.TreeId)).Count);
+    }
+
+    [Fact]
+    public async Task RemoveRecords_RejectsAnUnknownRecord()
+    {
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.RemoveRecordsAsync([Guid.NewGuid()]));
+    }
+
+    [Fact]
+    public async Task RemoveRecords_FilesInTwoTreesComeBackAsTwoRoots()
+    {
+        var one = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var two = await _service.CreateVirtualVolumeAsync("copy", "HardDrive");
+        var code = await AddCodeAsync(one.Id);
+        var docs = await AddCodeAsync(two.Id, "Docs");
+        var readme = (await FilesOfAsync(code.TreeId)).Single(record => record.Name == "readme.md");
+        var other = (await FilesOfAsync(docs.TreeId)).Single(record => record.Name == "readme.md");
+
+        var roots = await _service.RemoveRecordsAsync([readme.Id, other.Id]);
+
+        Assert.Equal(2, roots.Count);
+        Assert.All(roots, root => Assert.Equal(20, root.Size));
+        Assert.Equal(20, (await FilesOfAsync(code.TreeId)).Single(record => record.ParentId == null).Size);
+        Assert.Equal(20, (await FilesOfAsync(docs.TreeId)).Single(record => record.ParentId == null).Size);
+    }
+
+    [Fact]
+    public async Task RemoveRecords_ASharedTreeShrinksForEveryPlacement()
+    {
+        var source = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var target = await _service.CreateVirtualVolumeAsync("copy", "HardDrive");
+        var original = await AddCodeAsync(source.Id);
+        await _service.CopyFolderAsync(original.Id, target.Id);
+        var readme = (await FilesOfAsync(original.TreeId)).Single(record => record.Name == "readme.md");
+
+        var roots = await _service.RemoveRecordsAsync([readme.Id]);
+
+        Assert.Equal(20, Assert.Single(roots).Size);
+        Assert.Equal(20, (await FilesOfAsync(original.TreeId)).Single(record => record.ParentId == null).Size);
+    }
+
+    [Fact]
+    public async Task CancellingRemoveRecords_LeavesTheFilesWhereTheyWere()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        var readme = (await FilesOfAsync(entry.TreeId)).Single(record => record.Name == "readme.md");
+        using var cancellation = new CancellationTokenSource();
+        await cancellation.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => _service.RemoveRecordsAsync([readme.Id], null, cancellation.Token));
+
+        Assert.Equal(4, (await FilesOfAsync(entry.TreeId)).Count);
+        Assert.Equal(30, (await FilesOfAsync(entry.TreeId)).Single(record => record.ParentId == null).Size);
+    }
+
+    [Fact]
+    public async Task RemoveRecords_NothingSelectedChangesNothing()
+    {
+        Assert.Empty(await _service.RemoveRecordsAsync([]));
     }
 
     #endregion

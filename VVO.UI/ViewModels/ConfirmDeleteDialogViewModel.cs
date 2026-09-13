@@ -34,6 +34,38 @@ public partial class ConfirmDeleteDialogViewModel : ObservableObject
             + "and folder under it. This cannot be undone.");
     }
 
+    public static ConfirmDeleteDialogViewModel ForCatalogueFile(string name)
+    {
+        return new ConfirmDeleteDialogViewModel(
+            "Delete File",
+            name,
+            "Deleting this file removes it from the catalogue. The file on disk is left alone. "
+            + "This cannot be undone.");
+    }
+
+    public static ConfirmDeleteDialogViewModel ForCatalogueFolder(string name)
+    {
+        return new ConfirmDeleteDialogViewModel(
+            "Delete Folder",
+            name,
+            "Deleting this folder removes it from the catalogue along with every catalogued file "
+            + "and folder under it. The files on disk are left alone. This cannot be undone.");
+    }
+
+    public static ConfirmDeleteDialogViewModel ForCatalogueItems(int count, bool includesFolder)
+    {
+        var extra = includesFolder
+            ? " Folders take every catalogued file and folder under them."
+            : string.Empty;
+
+        return new ConfirmDeleteDialogViewModel(
+            "Delete Items",
+            $"{count} items",
+            "Deleting these items removes them from the catalogue. The files on disk are left alone."
+            + extra
+            + " This cannot be undone.");
+    }
+
     public static ConfirmDeleteDialogViewModel ForVirtualVolume(string name, int folderCount)
     {
         var held = folderCount == 0

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Collections;
 using Avalonia.Media;
@@ -62,10 +63,12 @@ public record TreeLabel(string VolumeName, string FolderName, string RootPath = 
 public partial class VolumeExplorerViewModel : ViewModelBase
     , IRecipient<FolderSelectedMessage>
     , IRecipient<SearchAllMessage>
+    , IRecipient<CancelRequestedMessage>
 {
     private const int SearchDelayMilliseconds = 300;
 
     private readonly IDatabaseService _databaseService;
+    private readonly IVirtualVolumeService _virtualVolumeService;
 
     // Folder records of the current volume, fetched on the first search and reused afterwards.
     // Only folders are held: a file can never be part of another entry's location.
@@ -94,12 +97,19 @@ public partial class VolumeExplorerViewModel : ViewModelBase
     // Separately raised so that a keystroke still waiting out its delay can be abandoned
     private int _searchToken;
 
+    // The term a search-all listing was built from, so a delete can put the hits back
+    private string _everywhereTerm = string.Empty;
+
+    private CancellationTokenSource? _writeCancellation;
+
     [ObservableProperty]
     public partial AvaloniaList<FileItem>? Files { get; set; }
 
-    // What the copy commands act on, set by the grid as the selection moves
+    // What the copy and delete commands act on, set by the grid as the selection moves
     [ObservableProperty]
     public partial FileItem? SelectedFile { get; set; }
+
+    public AvaloniaList<FileItem> SelectedFiles { get; } = new();
 
     [ObservableProperty]
     public partial string ItemSummary { get; set; } = string.Empty;
@@ -119,11 +129,15 @@ public partial class VolumeExplorerViewModel : ViewModelBase
     public AvaloniaList<BreadcrumbItem> Breadcrumbs { get; } = new();
 
     public VolumeExplorerViewModel(IUndoService undoManager
-        , IDatabaseService databaseService)
+        , IDatabaseService databaseService
+        , IVirtualVolumeService virtualVolumeService)
         : base(undoManager)
     {
         _databaseService = databaseService;
+        _virtualVolumeService = virtualVolumeService;
         WeakReferenceMessenger.Default.RegisterAll(this);
+
+        SelectedFiles.CollectionChanged += (_, _) => NotifySelectionCommands();
     }
 
     public async void Receive(FolderSelectedMessage message)
@@ -224,14 +238,14 @@ public partial class VolumeExplorerViewModel : ViewModelBase
     #region Copying paths
 
     /// <summary>
-    /// The catalogue path of one entry, and the same for everything the grid is listing. The
-    /// physical pair of each is empty for a tree that was listed without a scanned path, which
-    /// is what leaves the two physical commands disabled.
+    /// The catalogue path of the selection, and the same for everything the grid is listing.
+    /// The physical pair of each is empty for a tree that was listed without a scanned path,
+    /// which is what leaves the two physical commands disabled.
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanCopy))]
-    private Task CopyAsync() => TextClipboard.WriteAsync(SelectedFile?.VirtualPath ?? string.Empty);
+    private Task CopyAsync() => TextClipboard.WriteAsync(SelectedLines(file => file.VirtualPath));
 
-    private bool CanCopy() => SelectedFile != null;
+    private bool CanCopy() => Selection().Count > 0;
 
     [RelayCommand(CanExecute = nameof(CanCopyAll))]
     private Task CopyAllAsync() => TextClipboard.WriteAsync(Lines(file => file.VirtualPath));
@@ -239,10 +253,9 @@ public partial class VolumeExplorerViewModel : ViewModelBase
     private bool CanCopyAll() => Files is { Count: > 0 };
 
     [RelayCommand(CanExecute = nameof(CanCopyPhysical))]
-    private Task CopyPhysicalAsync() =>
-        TextClipboard.WriteAsync(SelectedFile?.PhysicalPath ?? string.Empty);
+    private Task CopyPhysicalAsync() => TextClipboard.WriteAsync(SelectedLines(file => file.PhysicalPath));
 
-    private bool CanCopyPhysical() => SelectedFile is { PhysicalPath.Length: > 0 };
+    private bool CanCopyPhysical() => Selection().Any(file => file.PhysicalPath.Length > 0);
 
     [RelayCommand(CanExecute = nameof(CanCopyPhysicalAll))]
     private Task CopyPhysicalAllAsync() => TextClipboard.WriteAsync(Lines(file => file.PhysicalPath));
@@ -258,18 +271,167 @@ public partial class VolumeExplorerViewModel : ViewModelBase
                 .Where(value => value.Length > 0));
     }
 
+    private string SelectedLines(Func<FileItem, string> path)
+    {
+        return string.Join(Environment.NewLine, Selection()
+            .Select(path)
+            .Where(value => value.Length > 0));
+    }
+
+    /// <summary>
+    /// The grid's selection, or the single row tests and the SelectedItem binding set when
+    /// the multi-select list has not been filled.
+    /// </summary>
+    private IReadOnlyList<FileItem> Selection()
+    {
+        return SelectedFiles.Count > 0
+            ? SelectedFiles
+            : SelectedFile == null ? [] : [SelectedFile];
+    }
+
+    /// <summary>
+    /// Replaces the rows the copy and delete commands act on. The view pushes the grid's
+    /// selection here because SelectedItems cannot be bound.
+    /// </summary>
+    public void ReplaceSelection(IReadOnlyList<FileItem> items)
+    {
+        SelectedFiles.Clear();
+        SelectedFiles.AddRange(items);
+    }
+
     // The grid drives the selection and reloads replace the list, so every copy command has to
     // be told when either moves
     partial void OnSelectedFileChanged(FileItem? value)
     {
+        NotifySelectionCommands();
+    }
+
+    private void NotifySelectionCommands()
+    {
         CopyCommand.NotifyCanExecuteChanged();
         CopyPhysicalCommand.NotifyCanExecuteChanged();
+        DeleteCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnFilesChanged(AvaloniaList<FileItem>? value)
     {
         CopyAllCommand.NotifyCanExecuteChanged();
         CopyPhysicalAllCommand.NotifyCanExecuteChanged();
+    }
+
+    #endregion
+
+    #region Deleting
+
+    [RelayCommand(CanExecute = nameof(CanDelete))]
+    private async Task DeleteAsync()
+    {
+        var items = Selection().ToList();
+        if (items.Count == 0)
+            return;
+
+        var window = Dialogs.Owner();
+        if (window == null)
+            return;
+
+        var confirmation = items.Count == 1
+            ? items[0].IsFolder
+                ? ConfirmDeleteDialogViewModel.ForCatalogueFolder(items[0].Name)
+                : ConfirmDeleteDialogViewModel.ForCatalogueFile(items[0].Name)
+            : ConfirmDeleteDialogViewModel.ForCatalogueItems(items.Count, items.Any(item => item.IsFolder));
+
+        var confirmDialog = new Views.ConfirmDeleteDialogView { DataContext = confirmation };
+        if (!await Dialogs.ShowAsync(confirmDialog, window))
+            return;
+
+        try
+        {
+            IReadOnlyList<FileRecord> roots = [];
+
+            await WritingAsync("Deleting...", async (progress, token) =>
+                roots = await _virtualVolumeService.RemoveRecordsAsync(
+                    items.Select(item => item.Id).ToList(), progress, token));
+
+            var deleted = items.Select(item => item.Id).ToHashSet();
+            if (items.Any(item => item.IsFolder))
+            {
+                _folders.Clear();
+                _paths.Clear();
+                _physicalPaths.Clear();
+                _foldersCoverEveryTree = false;
+            }
+
+            foreach (var root in roots)
+            {
+                WeakReferenceMessenger.Default.Send(new TreeContentsChangedMessage(root));
+            }
+
+            await RefreshAfterDeleteAsync(deleted);
+        }
+        catch (OperationCanceledException)
+        {
+            // Rolled back with it, so the files are still listed where they were
+        }
+        catch (Exception e)
+        {
+            await Logger.ShowErrorAsync(e);
+        }
+    }
+
+    private bool CanDelete() => Selection().Count > 0;
+
+    public void Receive(CancelRequestedMessage message)
+    {
+        _writeCancellation?.Cancel();
+    }
+
+    private async Task WritingAsync(string what, Func<IProgress<string>, CancellationToken, Task> write)
+    {
+        using var cancellation = new CancellationTokenSource();
+        _writeCancellation = cancellation;
+
+        var progress = new Progress<string>(message =>
+            WeakReferenceMessenger.Default.Send(new UpdateStatusMessage(true, message, IsCancellable: true)));
+
+        try
+        {
+            WeakReferenceMessenger.Default.Send(new UpdateStatusMessage(true, what, IsCancellable: true));
+            await write(progress, cancellation.Token);
+        }
+        finally
+        {
+            _writeCancellation = null;
+            WeakReferenceMessenger.Default.Send(new UpdateStatusMessage(false, "Done"));
+        }
+    }
+
+    private async Task RefreshAfterDeleteAsync(HashSet<Guid> deleted)
+    {
+        if (IsFlatMode)
+        {
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                await SearchAsync(SearchTerm);
+                return;
+            }
+
+            if (_everywhereTerm.Length > 0)
+            {
+                await SearchEverywhereAsync(_everywhereTerm);
+                return;
+            }
+        }
+
+        var remaining = Breadcrumbs.TakeWhile(crumb => !deleted.Contains(crumb.Id)).ToList();
+        if (remaining.Count == 0 && Breadcrumbs.Count > 0)
+        {
+            remaining = [Breadcrumbs[0]];
+        }
+
+        if (remaining.Count > 0)
+        {
+            await NavigateAsync(remaining);
+        }
     }
 
     #endregion
@@ -338,6 +500,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
 
     private async Task SearchAsync(string term)
     {
+        _everywhereTerm = string.Empty;
         var treeId = _treeId;
         var token = ++_navigationToken;
 
@@ -366,6 +529,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
 
     private async Task SearchEverywhereAsync(string term)
     {
+        _everywhereTerm = term;
         var token = ++_navigationToken;
 
         WeakReferenceMessenger.Default.Send(new UpdateStatusMessage(true, "Searching every folder"));
@@ -401,6 +565,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
     /// </summary>
     private async Task NavigateAsync(IReadOnlyList<BreadcrumbItem> path)
     {
+        _everywhereTerm = string.Empty;
         var folderId = path[^1].Id;
         var token = ++_navigationToken;
 
@@ -457,6 +622,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
     {
         IsFlatMode = flat;
         SelectedFile = null;
+        SelectedFiles.Clear();
 
         Files = new AvaloniaList<FileItem>(records
             .OrderByDescending(record => record.IsFolder)

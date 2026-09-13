@@ -53,16 +53,25 @@ public partial class VolumeExplorerView : UserControl, IRecipient<FocusFileSearc
         }
     }
 
-    // A right-click does not move the selection on its own, which would leave the copy commands
-    // acting on whatever row was left selected rather than the one under the pointer.
+    // A right-click does not move the selection on its own. An unselected row becomes the
+    // whole selection; a row already selected keeps the rest, so delete and copy act on it.
     private void OnFileGridContextRequested(object? sender, ContextRequestedEventArgs e)
     {
         if (e.Source is not Visual source)
             return;
 
-        if (source.FindAncestorOfType<DataGridRow>()?.DataContext is FileItem item)
+        if (source.FindAncestorOfType<DataGridRow>()?.DataContext is FileItem item
+            && !FileGrid.SelectedItems.Contains(item))
         {
             FileGrid.SelectedItem = item;
+        }
+    }
+
+    private void OnFileGridSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (DataContext is VolumeExplorerViewModel viewModel)
+        {
+            viewModel.ReplaceSelection(FileGrid.SelectedItems.OfType<FileItem>().ToList());
         }
     }
 

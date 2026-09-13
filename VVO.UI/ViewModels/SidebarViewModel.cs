@@ -79,6 +79,7 @@ public partial class SidebarViewModel : ViewModelBase
     , IRecipient<FolderAddedMessage>
     , IRecipient<DatabaseReady>
     , IRecipient<CancelRequestedMessage>
+    , IRecipient<TreeContentsChangedMessage>
 {
     private const int SearchDelayMilliseconds = 300;
 
@@ -1173,6 +1174,17 @@ public partial class SidebarViewModel : ViewModelBase
     }
 
     #endregion
+
+    public void Receive(TreeContentsChangedMessage message)
+    {
+        foreach (var folder in AllFolders.Where(item => item.Entry.TreeId == message.Root.Id).ToList())
+        {
+            ReplaceListedFolder(folder with
+            {
+                Subtitle = FormattingUtils.FormatBytes(message.Root.Size)
+            });
+        }
+    }
 
     public void Receive(FolderAddedMessage message)
     {

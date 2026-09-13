@@ -188,7 +188,7 @@ public class ViewInteractionTests : UiTestBase
     }
 
     [AvaloniaFact]
-    public async Task TheContextMenuOffersTheFourCopyCommands()
+    public async Task TheContextMenuOffersTheCopyCommandsAndDelete()
     {
         var explorer = await GivenAFolderShownWithItsDiskPathAsync();
         var view = new VolumeExplorerView { DataContext = explorer };
@@ -199,13 +199,57 @@ public class ViewInteractionTests : UiTestBase
         Pump();
 
         var items = grid.ContextMenu.Items.OfType<MenuItem>().ToList();
-        Assert.Equal(4, items.Count);
+        Assert.Equal(5, items.Count);
         Assert.Same(explorer.CopyCommand, items[0].Command);
         Assert.Same(explorer.CopyAllCommand, items[1].Command);
         Assert.Same(explorer.CopyPhysicalCommand, items[2].Command);
         Assert.Same(explorer.CopyPhysicalAllCommand, items[3].Command);
+        Assert.Same(explorer.DeleteCommand, items[4].Command);
 
         grid.ContextMenu.Close();
+    }
+
+    [AvaloniaFact]
+    public async Task RightClickingAnUnselectedRowDropsTheRestOfTheSelection()
+    {
+        var explorer = await GivenAFolderShownWithItsDiskPathAsync();
+        var view = new VolumeExplorerView { DataContext = explorer };
+        Showing(view);
+
+        var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+        grid.SelectedItem = explorer.Files!.Single(file => file.Name == "AdventOfCode");
+        Pump();
+
+        var cell = RowOf(view, "readme").GetVisualDescendants().OfType<DataGridCell>().First();
+        cell.RaiseEvent(new ContextRequestedEventArgs());
+        Pump();
+
+        Assert.Equal("readme", explorer.SelectedFile?.Name);
+        Assert.Equal(["readme"], explorer.SelectedFiles.Select(file => file.Name));
+    }
+
+    [AvaloniaFact]
+    public async Task RightClickingInsideTheSelectionLeavesIt()
+    {
+        var explorer = await GivenAFolderShownWithItsDiskPathAsync();
+        var view = new VolumeExplorerView { DataContext = explorer };
+        Showing(view);
+
+        var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+        grid.SelectedItems.Clear();
+        foreach (var file in explorer.Files!)
+        {
+            grid.SelectedItems.Add(file);
+        }
+        Pump();
+
+        var cell = RowOf(view, "readme").GetVisualDescendants().OfType<DataGridCell>().First();
+        cell.RaiseEvent(new ContextRequestedEventArgs());
+        Pump();
+
+        Assert.Equal(2, explorer.SelectedFiles.Count);
+        Assert.Contains(explorer.SelectedFiles, file => file.Name == "readme");
+        Assert.Contains(explorer.SelectedFiles, file => file.Name == "AdventOfCode");
     }
 
     // The view models are covered against a stub; this is the one path to the real clipboard

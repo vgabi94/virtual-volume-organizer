@@ -110,7 +110,7 @@ public abstract class UiTestBase : IDisposable
             Volumes, Transfer, Settings));
     }
 
-    protected VolumeExplorerViewModel NewExplorer() => Track(new VolumeExplorerViewModel(Undo, Database));
+    protected VolumeExplorerViewModel NewExplorer() => Track(new VolumeExplorerViewModel(Undo, Database, Volumes));
 
     protected StartPageViewModel NewStartPage() => Track(new StartPageViewModel(Undo, Settings, Database));
 

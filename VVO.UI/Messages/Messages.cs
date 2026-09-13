@@ -50,3 +50,9 @@ public record SearchScope(Guid TreeId, string Name, string VolumeName, string Ro
 /// volume explorer back where it was.
 /// </summary>
 public record SearchAllMessage(string Term, IReadOnlyList<SearchScope> Scopes);
+
+/// <summary>
+/// Sent after catalogued files are removed from a tree, carrying the root as it now stands
+/// so every sidebar row sharing that tree can show the new size.
+/// </summary>
+public record TreeContentsChangedMessage(FileRecord Root);

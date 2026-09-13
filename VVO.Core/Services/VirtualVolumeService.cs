@@ -280,6 +280,23 @@ public class VirtualVolumeService : IVirtualVolumeService
         });
     }
 
+    public async Task<IReadOnlyList<FileRecord>> RemoveRecordsAsync(
+        IReadOnlyCollection<Guid> recordIds,
+        IProgress<string>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(recordIds);
+
+        IReadOnlyList<FileRecord> roots = [];
+
+        await _databaseService.TransactionAsync(db =>
+        {
+            roots = RemoveRecords(db, recordIds, progress, cancellationToken);
+        });
+
+        return roots;
+    }
+
     public Task RestoreFolderAsync(RootFolderMetadata entry)
     {
         return _databaseService.TransactionAsync(db =>
@@ -301,6 +318,107 @@ public class VirtualVolumeService : IVirtualVolumeService
 
             entries.Insert(entry);
         });
+    }
+
+    /// <summary>
+    /// Drops the given records and, for a folder, everything under it. Ancestor sizes are
+    /// reduced once per top-level removal so a folder selected with something inside it is
+    /// not subtracted twice.
+    /// </summary>
+    private IReadOnlyList<FileRecord> RemoveRecords(
+        LiteDatabase db,
+        IReadOnlyCollection<Guid> recordIds,
+        IProgress<string>? progress,
+        CancellationToken cancellationToken)
+    {
+        var files = Files(db);
+        var requested = new List<FileRecord>();
+
+        foreach (var id in recordIds.Distinct())
+        {
+            var record = files.FindById(id);
+            if (record == null)
+            {
+                throw new ArgumentException($"There is no catalogue record '{id}'.", nameof(recordIds));
+            }
+
+            if (record.ParentId == null)
+            {
+                throw new ArgumentException("The scanned tree cannot be removed this way.", nameof(recordIds));
+            }
+
+            requested.Add(record);
+        }
+
+        if (requested.Count == 0)
+        {
+            return [];
+        }
+
+        var groups = requested.GroupBy(record => record.RootFolderId).ToList();
+        var roots = new List<FileRecord>(groups.Count);
+        var done = 0;
+
+        foreach (var group in groups)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            progress?.Report($"Deleting files... {++done} of {groups.Count}");
+
+            var treeId = group.Key;
+            var tree = files.Find(record => record.RootFolderId == treeId).ToList();
+            var byId = tree.ToDictionary(record => record.Id);
+            var children = tree
+                .Where(record => record.ParentId != null)
+                .ToLookup(record => record.ParentId!.Value);
+
+            var toDelete = new HashSet<Guid>();
+            void Collect(Guid id)
+            {
+                if (!toDelete.Add(id))
+                    return;
+
+                foreach (var child in children[id])
+                {
+                    Collect(child.Id);
+                }
+            }
+
+            foreach (var record in group)
+            {
+                Collect(record.Id);
+            }
+
+            // A selected folder already carries the size of everything under it, so only
+            // records whose parent is surviving need to be subtracted from ancestors.
+            var topLevel = toDelete
+                .Select(id => byId[id])
+                .Where(record => record.ParentId is { } parent && !toDelete.Contains(parent));
+
+            var sizeDelta = new Dictionary<Guid, long>();
+            foreach (var record in topLevel)
+            {
+                var current = record.ParentId;
+                while (current != null && byId.TryGetValue(current.Value, out var ancestor))
+                {
+                    sizeDelta[ancestor.Id] = sizeDelta.GetValueOrDefault(ancestor.Id) + record.Size;
+                    current = ancestor.ParentId;
+                }
+            }
+
+            foreach (var (id, delta) in sizeDelta)
+            {
+                files.Update(byId[id] with { Size = byId[id].Size - delta });
+            }
+
+            foreach (var id in toDelete)
+            {
+                files.Delete(id);
+            }
+
+            roots.Add(files.FindById(treeId)!);
+        }
+
+        return roots;
     }
 
     /// <summary>
