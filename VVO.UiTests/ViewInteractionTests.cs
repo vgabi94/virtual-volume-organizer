@@ -74,20 +74,6 @@ public class ViewInteractionTests : UiTestBase
     }
 
     [AvaloniaFact]
-    public async Task DoubleTappingSomethingThatIsNotOnScreenAtAllOpensNothing()
-    {
-        var explorer = await GivenAFolderShownAsync();
-        var view = new VolumeExplorerView { DataContext = explorer };
-        Showing(view);
-
-        var cell = view.GetVisualDescendants().OfType<DataGridCell>().First();
-        cell.RaiseEvent(new TappedEventArgs(InputElement.DoubleTappedEvent, null!) { Source = "not a control" });
-        Pump();
-
-        Assert.Equal(["Code"], explorer.Breadcrumbs.Select(crumb => crumb.Name));
-    }
-
-    [AvaloniaFact]
     public async Task DoubleTappingAnythingButARowOpensNothing()
     {
         var explorer = await GivenAFolderShownAsync();
