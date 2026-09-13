@@ -265,6 +265,27 @@ public class FileScannerService : IFileScannerService
         }, cancellationToken);
     }
 
+    public Task<FileRecord> ReadFileAsync(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        {
+            throw new FileNotFoundException($"The path '{path}' does not exist or is inaccessible.", path);
+        }
+
+        path = Path.GetFullPath(path);
+        var info = new FileInfo(path);
+
+        return Task.FromResult(new FileRecord
+        {
+            Id = Guid.NewGuid(),
+            Name = Encodable(info.Name),
+            IsFolder = false,
+            Size = info.Length,
+            Created = TruncateToMilliseconds(info.CreationTimeUtc),
+            Modified = TruncateToMilliseconds(info.LastWriteTimeUtc)
+        });
+    }
+
     /// <summary>
     /// A name as it can be stored. Windows takes any sequence of UTF-16 code units for a name,
     /// unpaired surrogates included, and those have no UTF-8 to be written as; the database

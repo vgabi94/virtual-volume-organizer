@@ -19,7 +19,8 @@ public class VolumeExplorerViewModelTests : IDisposable
         _database = new DatabaseService();
         _database.EnsureDatabaseReadyAsync(_dbPath).GetAwaiter().GetResult();
         _volumes = new VirtualVolumeService(_database);
-        _explorer = new VolumeExplorerViewModel(new UndoService(), _database, _volumes);
+        _explorer = new VolumeExplorerViewModel(
+            new UndoService(), _database, _volumes, new FileScannerService(), new Settings(_dbPath + ".settings.json"));
     }
 
     public void Dispose()
@@ -550,6 +551,33 @@ public class VolumeExplorerViewModelTests : IDisposable
         Assert.Contains(_explorer.Files!, file => file.Name == "readme");
         Assert.Equal(4, (await _database.FindItemsAsync<FileRecord>(
             record => record.RootFolderId == entry.TreeId)).Count);
+    }
+
+    [Fact]
+    public async Task AddingIsOffUntilAFolderIsOpen()
+    {
+        Assert.False(_explorer.AddFoldersCommand.CanExecute(null));
+        Assert.False(_explorer.AddFilesCommand.CanExecute(null));
+
+        var volume = await _volumes.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        await ShowAsync(entry, "Code", "test");
+
+        Assert.True(_explorer.AddFoldersCommand.CanExecute(null));
+        Assert.True(_explorer.AddFilesCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task AddingIsOffWhileSearching()
+    {
+        var volume = await _volumes.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        await ShowAsync(entry, "Code", "test");
+        await SearchAllAsync("readme", new SearchScope(entry.TreeId, "Code", "test"));
+
+        Assert.True(_explorer.IsFlatMode);
+        Assert.False(_explorer.AddFoldersCommand.CanExecute(null));
+        Assert.False(_explorer.AddFilesCommand.CanExecute(null));
     }
 
     #endregion

@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 
 namespace VVO.UI.ViewModels;
@@ -10,6 +11,8 @@ public class AboutDialogViewModel
 
     public string IconsCredit =>
         "Icons come from MahApps.Metro.IconPacks (MIT) and the icon sets it bundles.";
+
+    public Uri RepositoryUrl { get; } = new("https://github.com/vgabi94/virtual-volume-organizer");
 
     public AboutDialogViewModel()
     {

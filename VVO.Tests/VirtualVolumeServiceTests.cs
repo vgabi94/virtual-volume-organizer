@@ -706,6 +706,159 @@ public class VirtualVolumeServiceTests : IDisposable
 
     #endregion
 
+    #region Adding catalogue records
+
+    [Fact]
+    public async Task AddRecords_AFileGrowsTheFolderItLandsIn()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        var extra = new FileRecord
+        {
+            Id = Guid.NewGuid(),
+            RootFolderId = entry.TreeId,
+            ParentId = entry.TreeId,
+            Name = "extra.txt",
+            Size = 5
+        };
+
+        var result = await _service.AddRecordsAsync(entry.TreeId, [extra]);
+
+        Assert.Empty(result.Skipped);
+        Assert.Equal(35, result.Root.Size);
+        var files = await FilesOfAsync(entry.TreeId);
+        Assert.Contains(files, record => record.Name == "extra.txt" && record.ParentId == entry.TreeId);
+    }
+
+    [Fact]
+    public async Task AddRecords_ANestedFileGrowsItsFolderAndTheRoot()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        var advent = (await FilesOfAsync(entry.TreeId)).Single(record => record.Name == "AdventOfCode");
+        var extra = new FileRecord
+        {
+            Id = Guid.NewGuid(),
+            RootFolderId = entry.TreeId,
+            ParentId = advent.Id,
+            Name = "extra.txt",
+            Size = 7
+        };
+
+        await _service.AddRecordsAsync(advent.Id, [extra]);
+
+        var files = await FilesOfAsync(entry.TreeId);
+        Assert.Equal(27, files.Single(record => record.Name == "AdventOfCode").Size);
+        Assert.Equal(37, files.Single(record => record.ParentId == null).Size);
+        Assert.Equal(entry.TreeId, files.Single(record => record.Name == "extra.txt").RootFolderId);
+    }
+
+    [Fact]
+    public async Task AddRecords_AFolderTakesWhatIsUnderIt()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        var folderId = Guid.NewGuid();
+        var fileId = Guid.NewGuid();
+
+        await _service.AddRecordsAsync(entry.TreeId,
+        [
+            new FileRecord
+            {
+                Id = folderId,
+                RootFolderId = entry.TreeId,
+                ParentId = entry.TreeId,
+                IsFolder = true,
+                Name = "Extra",
+                Size = 8
+            },
+            new FileRecord
+            {
+                Id = fileId,
+                RootFolderId = entry.TreeId,
+                ParentId = folderId,
+                Name = "x.txt",
+                Size = 8
+            }
+        ]);
+
+        var files = await FilesOfAsync(entry.TreeId);
+        Assert.Equal(folderId, files.Single(record => record.Name == "x.txt").ParentId);
+        Assert.Equal(38, files.Single(record => record.ParentId == null).Size);
+    }
+
+    [Fact]
+    public async Task AddRecords_ANameAlreadyThereIsSkippedWithItsDescendants()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        var folderId = Guid.NewGuid();
+        var nestedId = Guid.NewGuid();
+
+        var result = await _service.AddRecordsAsync(entry.TreeId,
+        [
+            new FileRecord
+            {
+                Id = folderId,
+                RootFolderId = entry.TreeId,
+                ParentId = entry.TreeId,
+                IsFolder = true,
+                Name = "AdventOfCode",
+                Size = 99
+            },
+            new FileRecord
+            {
+                Id = nestedId,
+                RootFolderId = entry.TreeId,
+                ParentId = folderId,
+                Name = "ghost.txt",
+                Size = 99
+            }
+        ]);
+
+        Assert.Equal(["AdventOfCode"], result.Skipped);
+        var files = await FilesOfAsync(entry.TreeId);
+        Assert.DoesNotContain(files, record => record.Name == "ghost.txt");
+        Assert.Equal(30, files.Single(record => record.ParentId == null).Size);
+    }
+
+    [Fact]
+    public async Task AddRecords_RejectsAMissingParent()
+    {
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => _service.AddRecordsAsync(Guid.NewGuid(), []));
+    }
+
+    [Fact]
+    public async Task AddRecords_RejectsAFileAsParent()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        var readme = (await FilesOfAsync(entry.TreeId)).Single(record => record.Name == "readme.md");
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.AddRecordsAsync(readme.Id, []));
+    }
+
+    [Fact]
+    public async Task CancellingAddRecords_LeavesTheTreeWhereItWas()
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        using var cancellation = new CancellationTokenSource();
+        await cancellation.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => _service.AddRecordsAsync(
+            entry.TreeId,
+            [new FileRecord { Id = Guid.NewGuid(), RootFolderId = entry.TreeId, ParentId = entry.TreeId, Name = "x.txt", Size = 1 }],
+            null,
+            cancellation.Token));
+
+        Assert.Equal(4, (await FilesOfAsync(entry.TreeId)).Count);
+        Assert.Equal(30, (await FilesOfAsync(entry.TreeId)).Single(record => record.ParentId == null).Size);
+    }
+
+    #endregion
+
     #region Saving a scanned tree
 
     // Unlike a scan, the total is known here, so the save can say how far along it is

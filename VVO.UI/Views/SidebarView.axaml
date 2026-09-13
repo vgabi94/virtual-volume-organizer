@@ -152,7 +152,7 @@
                                                                     <PathIcon Classes="SidebarIcon" Data="{StaticResource FileCompare}"/>
                                                                 </MenuItem.Icon>
                                                             </MenuItem>
-                                                            <MenuItem Header="Update..." Command="{Binding Owner.UpdateFolderCommand}" CommandParameter="{Binding}">
+                                                            <MenuItem Header="Rescan..." Command="{Binding Owner.RescanFolderCommand}" CommandParameter="{Binding}">
                                                                 <MenuItem.Icon>
                                                                     <PathIcon Classes="SidebarIcon" Data="{StaticResource ArrowsCounterClockwiseFill}"/>
                                                                 </MenuItem.Icon>

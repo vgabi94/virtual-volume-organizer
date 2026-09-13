@@ -23,6 +23,11 @@
                        TextWrapping="Wrap"
                        FontSize="13"
                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+            <HyperlinkButton Content="GitHub"
+                             NavigateUri="{Binding RepositoryUrl}"
+                             FontSize="13"
+                             Padding="0"
+                             HorizontalAlignment="Left"/>
             <HyperlinkButton Content="Third-party notices"
                              Click="OnNoticesClicked"
                              FontSize="13"

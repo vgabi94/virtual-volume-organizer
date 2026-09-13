@@ -108,5 +108,47 @@ public class PickerTests : UiTestBase
         Assert.Null(await FolderPicker.PickAsync(Unparented, "Select Folder to Scan"));
     }
 
+    [AvaloniaFact]
+    public async Task SeveralFoldersAreHandedBackTogether()
+    {
+        PickFolders(@"D:\Code", @"D:\Photos");
+
+        Assert.Equal(
+            [@"D:\Code", @"D:\Photos"],
+            await FolderPicker.PickManyAsync(Shell, "Select Folder(s) to Add"));
+    }
+
+    [AvaloniaFact]
+    public async Task AMultiFolderPickerAnsweredWithNothingPickedReturnsNothing()
+    {
+        Assert.Empty(await FolderPicker.PickManyAsync(Shell, "Select Folder(s) to Add"));
+    }
+
+    #endregion
+
+    #region The disk file picker
+
+    [AvaloniaFact]
+    public async Task SeveralFilesAreHandedBackTogether()
+    {
+        PickDiskFiles(@"D:\a.txt", @"D:\b.txt");
+
+        Assert.Equal(
+            [@"D:\a.txt", @"D:\b.txt"],
+            await DiskFiles.PickManyAsync(Shell, "Select File(s) to Add"));
+    }
+
+    [AvaloniaFact]
+    public async Task ADiskFilePickerAnsweredWithNothingPickedReturnsNothing()
+    {
+        Assert.Empty(await DiskFiles.PickManyAsync(Shell, "Select File(s) to Add"));
+    }
+
+    [AvaloniaFact]
+    public async Task NoDiskFilePickerIsShownWithoutAWindowToShowItOver()
+    {
+        Assert.Empty(await DiskFiles.PickManyAsync(Unparented, "Select File(s) to Add"));
+    }
+
     #endregion
 }

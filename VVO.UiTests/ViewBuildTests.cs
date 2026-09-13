@@ -129,6 +129,11 @@ public class ViewBuildTests : UiTestBase
         var text = TextOf(window).Select(block => block.Text).ToList();
         Assert.Contains("Virtual Volume Organizer", text);
         Assert.Contains($"Version {viewModel.Version}", text);
+
+        var github = window.GetVisualDescendants().OfType<HyperlinkButton>()
+            .Single(link => Equals(link.Content, "GitHub"));
+        Assert.Equal(viewModel.RepositoryUrl, github.NavigateUri);
+
         window.Close();
     }
 
@@ -278,8 +283,8 @@ public class ViewBuildTests : UiTestBase
         var window = Laid(new CompareResultsView { DataContext = viewModel });
         var buttons = window.GetVisualDescendants().OfType<Button>().ToList();
 
-        Assert.Equal("Update Folder", window.Title);
-        Assert.Contains(buttons, button => Equals(button.Content, "Update") && button.IsVisible);
+        Assert.Equal("Rescan Folder", window.Title);
+        Assert.Contains(buttons, button => Equals(button.Content, "Rescan") && button.IsVisible);
         Assert.Contains(buttons, button => Equals(button.Content, "Cancel") && button.IsCancel);
         Assert.Contains(viewModel.Proposal, TextOf(window).Select(block => block.Text));
 

@@ -60,7 +60,7 @@ public class SidebarUpdateTests : UiTestBase
         GivenAFolderOnDisk("notes.txt", "todo.md");
         ApproveProposal();
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         var stored = Stored(folder.Entry.TreeId);
         Assert.Contains(stored, record => record.Name == "notes.txt");
@@ -75,7 +75,7 @@ public class SidebarUpdateTests : UiTestBase
         var live = GivenAFolderOnDisk("notes.txt");
         ApproveProposal();
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         var entry = Assert.Single(await Volumes.GetFoldersAsync(folder.Entry.VirtualVolumeId));
         Assert.Equal(live, entry.Path);
@@ -90,7 +90,7 @@ public class SidebarUpdateTests : UiTestBase
         var live = GivenAFolderOnDisk("notes.txt");
         ApproveProposal();
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         var relisted = Listed();
         Assert.Equal(Path.GetFileName(live), relisted.Title);
@@ -109,7 +109,7 @@ public class SidebarUpdateTests : UiTestBase
         GivenAFolderOnDisk("notes.txt");
         ApproveProposal();
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(Listed());
+        await Sidebar.RescanFolderCommand.ExecuteAsync(Listed());
 
         var rows = Sidebar.VirtualVolumes.SelectMany(node => node.Folders).ToList();
         Assert.Equal(2, rows.Count);
@@ -133,7 +133,7 @@ public class SidebarUpdateTests : UiTestBase
         CompareResultsViewModel? proposal = null;
         ApproveProposal(shown => proposal = shown);
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(Listed());
+        await Sidebar.RescanFolderCommand.ExecuteAsync(Listed());
 
         Assert.NotNull(proposal);
         Assert.False(proposal!.HasDifferences);
@@ -153,7 +153,7 @@ public class SidebarUpdateTests : UiTestBase
         CompareResultsViewModel? proposal = null;
         ApproveProposal(shown => proposal = shown);
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         Assert.NotNull(proposal);
         Assert.True(proposal!.IsUpdate);
@@ -174,7 +174,7 @@ public class SidebarUpdateTests : UiTestBase
         GivenAFolderOnDisk("notes.txt");
         AnswerDialogs(_ => false);
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         Assert.Contains(Stored(folder.Entry.TreeId), record => record.Name == "readme.md");
         Assert.Equal(folder, Listed());
@@ -193,10 +193,10 @@ public class SidebarUpdateTests : UiTestBase
         using var reported = new MessageProbe<UpdateStatusMessage>();
         ApproveProposal();
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         Assert.Contains(reported.All, message => message.IsVisible && message.IsCancellable);
-        Assert.Contains(reported.All, message => message.Message.StartsWith("Updating folder"));
+        Assert.Contains(reported.All, message => message.Message.StartsWith("Rescanning folder"));
 
         // The relisted row sends the explorer off to read the folder again, which puts a status
         // of its own up behind this one
@@ -214,7 +214,7 @@ public class SidebarUpdateTests : UiTestBase
         using var reported = new MessageProbe<UpdateStatusMessage>(
             _ => Sidebar.Receive(new CancelRequestedMessage()));
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         Assert.Empty(Opened);
         Assert.Contains(Stored(folder.Entry.TreeId), record => record.Name == "readme.md");
@@ -231,13 +231,13 @@ public class SidebarUpdateTests : UiTestBase
 
         using var reported = new MessageProbe<UpdateStatusMessage>(message =>
         {
-            if (message.Message.StartsWith("Updating folder"))
+            if (message.Message.StartsWith("Rescanning folder"))
             {
                 Sidebar.Receive(new CancelRequestedMessage());
             }
         });
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         Assert.Contains(Stored(folder.Entry.TreeId), record => record.Name == "readme.md");
         Assert.Empty(Told);
@@ -252,7 +252,7 @@ public class SidebarUpdateTests : UiTestBase
     {
         await GivenACataloguedFolderAsync();
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(null);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(null);
 
         Assert.Empty(Opened);
     }
@@ -264,7 +264,7 @@ public class SidebarUpdateTests : UiTestBase
         GivenAFolderOnDisk("notes.txt");
         VVO.UI.Dialogs.Owner = () => null;
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         Assert.Empty(Opened);
     }
@@ -275,7 +275,7 @@ public class SidebarUpdateTests : UiTestBase
         var folder = await GivenACataloguedFolderAsync();
         PickFolder(null);
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         Assert.Empty(Opened);
         Assert.Contains(Stored(folder.Entry.TreeId), record => record.Name == "readme.md");
@@ -288,7 +288,7 @@ public class SidebarUpdateTests : UiTestBase
         var folder = await GivenACataloguedFolderAsync();
         PickFolder(Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}"));
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         Assert.Equal("Error", Assert.Single(Told).Title);
         Assert.Contains(Stored(folder.Entry.TreeId), record => record.Name == "readme.md");
@@ -301,7 +301,7 @@ public class SidebarUpdateTests : UiTestBase
         GivenAFolderOnDisk("notes.txt");
         FailDialogs();
 
-        await Sidebar.UpdateFolderCommand.ExecuteAsync(folder);
+        await Sidebar.RescanFolderCommand.ExecuteAsync(folder);
 
         Assert.Equal("Error", Assert.Single(Told).Title);
         Assert.Contains(Stored(folder.Entry.TreeId), record => record.Name == "readme.md");

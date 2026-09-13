@@ -6,7 +6,7 @@
              x:Name="Explorer"
              Background="{DynamicResource ExplorerBackground}">
     <Grid RowDefinitions="Auto, *">
-        <Grid Grid.Row="0" ColumnDefinitions="2*, Auto, *, Auto" Margin="{DynamicResource VolumeExplorerHeaderMargin}">
+        <Grid Grid.Row="0" ColumnDefinitions="2*, Auto, *, Auto, Auto" Margin="{DynamicResource VolumeExplorerHeaderMargin}">
             <!-- A Grid, not a StackPanel: a horizontal stack measures its children with
                  unbounded width, which is what let the crumbs spill past the border -->
             <Border Classes="PathViewStyle" Grid.Column="0" ClipToBounds="True" IsVisible="{Binding !IsFlatMode}">
@@ -44,8 +44,16 @@
                 </Grid>
             </Border>
             <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="Transparent" MinWidth="2" Width="2"/>
-            <TextBox Grid.Column="2" x:Name="FileSearchBox" Classes="SearchBox" PlaceholderText="Search files..." VerticalAlignment="Center" Text="{Binding SearchTerm}"/>            
-            <TextBlock Grid.Column="3" Text="{Binding ItemSummary}" VerticalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
+            <TextBox Grid.Column="2" x:Name="FileSearchBox" Classes="SearchBox" PlaceholderText="Search files..." VerticalAlignment="Center" Text="{Binding SearchTerm}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
+            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Classes="LowEmphasis" ToolTip.Tip="Add folder(s)" Command="{Binding AddFoldersCommand}">
+                    <PathIcon Classes="SidebarIcon" Data="{StaticResource FolderPlus}"/>
+                </Button>
+                <Button Classes="LowEmphasis" ToolTip.Tip="Add file(s)" Command="{Binding AddFilesCommand}">
+                    <PathIcon Classes="SidebarIcon" Data="{StaticResource FilePlus}"/>
+                </Button>
+            </StackPanel>
+            <TextBlock Grid.Column="4" Text="{Binding ItemSummary}" VerticalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
         </Grid>
 
         <DataGrid Grid.Row="1" x:Name="FileGrid" ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile, Mode=TwoWay}" SelectionMode="Extended" Classes="ExplorerGrid" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" IsReadOnly="True" Margin="{DynamicResource VolumeExplorerHorizontalMargin}" DoubleTapped="OnFileGridDoubleTapped" ContextRequested="OnFileGridContextRequested" SelectionChanged="OnFileGridSelectionChanged">

@@ -136,7 +136,7 @@
                         Padding="18,7"
                         IsCancel="True"
                         Click="OnCloseClicked"/>
-                <Button Content="Update"
+                <Button Content="Rescan"
                         Padding="18,7"
                         IsDefault="True"
                         IsVisible="{Binding IsUpdate}"

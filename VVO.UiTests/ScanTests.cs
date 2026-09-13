@@ -235,6 +235,9 @@ public class ScanTests : UiTestBase
         {
             return Task.FromResult(AScanOf(rootPath, _skipped));
         }
+
+        public Task<FileRecord> ReadFileAsync(string path) =>
+            throw new NotSupportedException();
     }
 
     /// <summary>
@@ -264,6 +267,9 @@ public class ScanTests : UiTestBase
 
             return Task.FromResult(AScanOf(rootPath, skipped: 0));
         }
+
+        public Task<FileRecord> ReadFileAsync(string path) =>
+            throw new NotSupportedException();
     }
 
     private async Task<Guid> ScanIntoAVolumeAsync(IFileScannerService scanner)

@@ -117,7 +117,7 @@ public partial class SidebarViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(EditFolderCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteFolderCommand))]
     [NotifyCanExecuteChangedFor(nameof(CompareCommand))]
-    [NotifyCanExecuteChangedFor(nameof(UpdateFolderCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RescanFolderCommand))]
     public partial FolderItem? SelectedFolder { get; set; }
 
     [ObservableProperty]
@@ -757,7 +757,7 @@ public partial class SidebarViewModel : ViewModelBase
     /// but only once the user has seen what that would change and said so.
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanActOnFolder))]
-    private async Task UpdateFolder(FolderItem? item)
+    private async Task RescanFolder(FolderItem? item)
     {
         if (item == null)
             return;
@@ -768,7 +768,7 @@ public partial class SidebarViewModel : ViewModelBase
             if (window == null)
                 return;
 
-            var path = await FolderPicker.PickAsync(window, "Select Folder to Update From");
+            var path = await FolderPicker.PickAsync(window, "Select Folder to Rescan From");
             if (string.IsNullOrEmpty(path))
                 return;
 
@@ -847,7 +847,7 @@ public partial class SidebarViewModel : ViewModelBase
         {
             RootFolderMetadata? updated = null;
 
-            await WritingAsync("Updating folder...", async (progress, token) =>
+            await WritingAsync("Rescanning folder...", async (progress, token) =>
                 updated = await _virtualVolumeService.UpdateFolderContentsAsync(
                     item.Entry.Id, scan.Metadata, scan.Records, progress, token));
 

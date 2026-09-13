@@ -34,6 +34,27 @@ public class FileScannerServiceTests : IDisposable
     }
         
     [Fact]
+    public async Task ReadFileAsync_ReturnsTheFileAsACatalogueRecord()
+    {
+        CreateFile("notes.txt", 20);
+
+        var record = await _service.ReadFileAsync(Path.Combine(_testRoot, "notes.txt"));
+
+        Assert.Equal("notes.txt", record.Name);
+        Assert.False(record.IsFolder);
+        Assert.Equal(20, record.Size);
+        Assert.Equal(Guid.Empty, record.RootFolderId);
+        Assert.Null(record.ParentId);
+    }
+
+    [Fact]
+    public async Task ReadFileAsync_RejectsAMissingFile()
+    {
+        await Assert.ThrowsAsync<FileNotFoundException>(
+            () => _service.ReadFileAsync(Path.Combine(_testRoot, "gone.txt")));
+    }
+
+    [Fact]
     public async Task ScanDirectoryAsync_RootEmpty()
     {
         // 1 root -> empty
