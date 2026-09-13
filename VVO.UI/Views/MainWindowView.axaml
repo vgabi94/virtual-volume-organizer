@@ -8,7 +8,7 @@
         x:Class="VVO.UI.Views.MainWindowView"
         x:DataType="vm:MainWindowViewModel"
         x:Name="MainWindow"
-        Icon="/Assets/vvo.ico"
+        Icon="/Assets/vvo2.ico"
         Title="Virtual Volume Organizer"
         Background="{DynamicResource SystemRegionBrush}">
 

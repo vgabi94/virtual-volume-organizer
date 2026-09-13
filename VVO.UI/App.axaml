@@ -88,7 +88,7 @@
         <!-- A window shows no icon unless it is given one, and none of them inherit it from
              the application or from the window they open over -->
         <Style Selector="Window">
-            <Setter Property="Icon" Value="/Assets/vvo.ico"/>
+            <Setter Property="Icon" Value="/Assets/vvo2.ico"/>
         </Style>
 
         <StyleInclude Source="avares://LoadingIndicators.Avalonia/LoadingIndicators.axaml" />

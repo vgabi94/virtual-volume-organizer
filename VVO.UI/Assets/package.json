@@ -1,7 +1,7 @@
 {
   "name": "vvo-icon",
   "private": true,
-  "description": "Rasterizer used by build-icon.py to turn vvo.svg into vvo.ico",
+  "description": "Rasterizer used by build-icon.py to turn vvo2.svg into vvo2.ico",
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2"
   }
