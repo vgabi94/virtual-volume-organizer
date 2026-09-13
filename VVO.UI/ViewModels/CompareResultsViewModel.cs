@@ -47,13 +47,13 @@ public class CompareResultsViewModel
     /// </summary>
     public bool IsUpdate { get; }
 
-    public string WindowTitle => IsUpdate ? "Update Folder" : "Comparison Results";
+    public string WindowTitle => IsUpdate ? "Rescan Folder" : "Comparison Results";
 
     // Turning the update down and closing the window are the same button
     public string CloseText => IsUpdate ? "Cancel" : "Close";
 
     public string Proposal => IsUpdate
-        ? "Updating replaces what is catalogued for this folder with what was just scanned."
+        ? "Rescanning replaces what is catalogued for this folder with what was just scanned."
         : string.Empty;
 
     public bool HasDifferences => Rows.Count > 0;

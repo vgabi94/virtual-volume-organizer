@@ -77,7 +77,7 @@ public class AppResourceTests
     {
         string[] keys =
         [
-            "FilePlus", "FileOpenRound", "SaveAs", "DiskPlus", "DiskRemove", "PencilBox",
+            "FilePlus", "FolderPlus", "FileOpenRound", "SaveAs", "DiskPlus", "DiskRemove", "PencilBox",
             "ScanSearch", "ChevronRight", "ChevronDown", "ArrowExpandVertical",
             "ArrowCollapseVertical", "Undo", "Redo", "ContentCopy", "ContentCut",
             "ContentPaste", "ContentDuplicate", "Delete", "FileCompare", "Alert",

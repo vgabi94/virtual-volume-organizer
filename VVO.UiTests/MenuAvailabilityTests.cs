@@ -43,7 +43,7 @@ public class MenuAvailabilityTests : UiTestBase
         ["Volume > Add Folder"] = MainWindow.AddFolderCommand.CanExecute(Shell),
         ["Volume > Edit Folder"] = Sidebar.EditFolderCommand.CanExecute(Sidebar.SelectedFolder),
         ["Volume > Compare Folders"] = Sidebar.CompareCommand.CanExecute(Sidebar.SelectedFolder),
-        ["Volume > Update Folder"] = Sidebar.UpdateFolderCommand.CanExecute(Sidebar.SelectedFolder),
+        ["Volume > Rescan Folder"] = Sidebar.RescanFolderCommand.CanExecute(Sidebar.SelectedFolder),
         ["Tools > Shrink Database"] = MainWindow.ShrinkDatabaseCommand.CanExecute(null)
     };
 
@@ -135,7 +135,7 @@ public class MenuAvailabilityTests : UiTestBase
         Assert.Null(Sidebar.SelectedFolder);
         Assert.False(Sidebar.CompareCommand.CanExecute(Sidebar.SelectedFolder));
         Assert.False(Sidebar.DeleteFolderCommand.CanExecute(Sidebar.SelectedFolder));
-        Assert.False(Sidebar.UpdateFolderCommand.CanExecute(Sidebar.SelectedFolder));
+        Assert.False(Sidebar.RescanFolderCommand.CanExecute(Sidebar.SelectedFolder));
 
         Assert.True(Sidebar.NewVirtualVolumeCommand.CanExecute(null));
         Assert.True(MainWindow.ShrinkDatabaseCommand.CanExecute(null));

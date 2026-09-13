@@ -110,7 +110,8 @@ public abstract class UiTestBase : IDisposable
             Volumes, Transfer, Settings));
     }
 
-    protected VolumeExplorerViewModel NewExplorer() => Track(new VolumeExplorerViewModel(Undo, Database, Volumes));
+    protected VolumeExplorerViewModel NewExplorer() =>
+        Track(new VolumeExplorerViewModel(Undo, Database, Volumes, new FileScannerService(), Settings));
 
     protected StartPageViewModel NewStartPage() => Track(new StartPageViewModel(Undo, Settings, Database));
 
@@ -256,6 +257,14 @@ public abstract class UiTestBase : IDisposable
     /// <summary>Chooses a folder in place of the folder picker.</summary>
     protected static void PickFolder(string? path) => FolderPicker.Picking = _ => path;
 
+    /// <summary>Chooses several folders in place of the multi-select folder picker.</summary>
+    protected static void PickFolders(params string[] paths) =>
+        FolderPicker.PickingMany = _ => paths;
+
+    /// <summary>Chooses several files in place of the disk file picker.</summary>
+    protected static void PickDiskFiles(params string[] paths) =>
+        DiskFiles.Picking = _ => paths;
+
     /// <summary>
     /// Makes every dialog throw on being opened, which is how the error path of a command that
     /// shows one is reached without a database in a state no user could put it in.
@@ -281,6 +290,7 @@ public abstract class UiTestBase : IDisposable
         DatabaseFiles.Reset();
         Theme.Reset();
         FolderPicker.Reset();
+        DiskFiles.Reset();
         TextClipboard.Reset();
 
         foreach (var recipient in _recipients)

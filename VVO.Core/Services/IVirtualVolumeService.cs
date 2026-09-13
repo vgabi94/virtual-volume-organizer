@@ -2,6 +2,12 @@ using VVO.Core.Models;
 
 namespace VVO.Core.Services;
 
+/// <summary>
+/// What an add left in the tree: the root as it now stands, and the top-level names that
+/// were already there and so were not inserted.
+/// </summary>
+public sealed record AddRecordsResult(FileRecord Root, IReadOnlyList<string> Skipped);
+
 public interface IVirtualVolumeService
 {
     Task<IReadOnlyCollection<VirtualVolumeRecord>> GetVirtualVolumesAsync();
@@ -94,6 +100,17 @@ public interface IVirtualVolumeService
     /// <returns>The root of each tree that changed, carrying its size as it now stands.</returns>
     Task<IReadOnlyList<FileRecord>> RemoveRecordsAsync(
         IReadOnlyCollection<Guid> recordIds,
+        IProgress<string>? progress = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Inserts catalogued files and nested folders under an existing folder, growing ancestor
+    /// sizes by the same amount. A top-level name that is already there is skipped, along with
+    /// everything under it. One transaction, so cancelling leaves the tree where it was.
+    /// </summary>
+    Task<AddRecordsResult> AddRecordsAsync(
+        Guid parentId,
+        IReadOnlyCollection<FileRecord> records,
         IProgress<string>? progress = null,
         CancellationToken cancellationToken = default);
 

@@ -69,6 +69,8 @@ public partial class VolumeExplorerViewModel : ViewModelBase
 
     private readonly IDatabaseService _databaseService;
     private readonly IVirtualVolumeService _virtualVolumeService;
+    private readonly IFileScannerService _fileScannerService;
+    private readonly Settings _settings;
 
     // Folder records of the current volume, fetched on the first search and reused afterwards.
     // Only folders are held: a file can never be part of another entry's location.
@@ -130,11 +132,15 @@ public partial class VolumeExplorerViewModel : ViewModelBase
 
     public VolumeExplorerViewModel(IUndoService undoManager
         , IDatabaseService databaseService
-        , IVirtualVolumeService virtualVolumeService)
+        , IVirtualVolumeService virtualVolumeService
+        , IFileScannerService fileScannerService
+        , Settings settings)
         : base(undoManager)
     {
         _databaseService = databaseService;
         _virtualVolumeService = virtualVolumeService;
+        _fileScannerService = fileScannerService;
+        _settings = settings;
         WeakReferenceMessenger.Default.RegisterAll(this);
 
         SelectedFiles.CollectionChanged += (_, _) => NotifySelectionCommands();
@@ -436,6 +442,160 @@ public partial class VolumeExplorerViewModel : ViewModelBase
 
     #endregion
 
+    #region Adding
+
+    [RelayCommand(CanExecute = nameof(CanAddToCurrentFolder))]
+    private async Task AddFoldersAsync()
+    {
+        if (!CanAddToCurrentFolder())
+            return;
+
+        var window = Dialogs.Owner();
+        if (window == null)
+            return;
+
+        var paths = await FolderPicker.PickManyAsync(window, "Select Folder(s) to Add");
+        if (paths.Count == 0)
+            return;
+
+        try
+        {
+            var parentId = Breadcrumbs[^1].Id;
+            var records = new List<FileRecord>();
+            var scans = new List<(ScanResult Scan, string Path)>();
+
+            using (var cancellation = new CancellationTokenSource())
+            {
+                _writeCancellation = cancellation;
+                var progress = new Progress<string>(message =>
+                    WeakReferenceMessenger.Default.Send(
+                        new UpdateStatusMessage(true, message, IsCancellable: true)));
+
+                WeakReferenceMessenger.Default.Send(
+                    new UpdateStatusMessage(true, "Scanning folders...", IsCancellable: true));
+
+                try
+                {
+                    foreach (var path in paths)
+                    {
+                        var scan = await _fileScannerService.ScanDirectoryAsync(
+                            path, progress, cancellation.Token,
+                            includeHiddenAndSystem: _settings.Data.ScanHiddenAndSystem);
+                        scans.Add((scan, path));
+                        records.AddRange(Graft(scan.Records, parentId, _treeId));
+                    }
+                }
+                finally
+                {
+                    _writeCancellation = null;
+                    WeakReferenceMessenger.Default.Send(new UpdateStatusMessage(false, "Done"));
+                }
+            }
+
+            foreach (var (scan, path) in scans)
+            {
+                await ScanWarning.TellIfShortAsync(scan, path);
+            }
+
+            await CommitAddedAsync(parentId, records, "Adding folders...");
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception e)
+        {
+            await Logger.ShowErrorAsync(e);
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanAddToCurrentFolder))]
+    private async Task AddFilesAsync()
+    {
+        if (!CanAddToCurrentFolder())
+            return;
+
+        var window = Dialogs.Owner();
+        if (window == null)
+            return;
+
+        var paths = await DiskFiles.PickManyAsync(window, "Select File(s) to Add");
+        if (paths.Count == 0)
+            return;
+
+        try
+        {
+            var parentId = Breadcrumbs[^1].Id;
+            var records = new List<FileRecord>(paths.Count);
+
+            foreach (var path in paths)
+            {
+                var record = await _fileScannerService.ReadFileAsync(path);
+                records.Add(record with { ParentId = parentId, RootFolderId = _treeId });
+            }
+
+            await CommitAddedAsync(parentId, records, "Adding files...");
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception e)
+        {
+            await Logger.ShowErrorAsync(e);
+        }
+    }
+
+    private bool CanAddToCurrentFolder() => Breadcrumbs.Count > 0 && !IsFlatMode;
+
+    private void NotifyAddCommands()
+    {
+        AddFoldersCommand.NotifyCanExecuteChanged();
+        AddFilesCommand.NotifyCanExecuteChanged();
+    }
+
+    private static IEnumerable<FileRecord> Graft(
+        IReadOnlyList<FileRecord> scanned, Guid parentId, Guid treeId)
+    {
+        return scanned.Select(record => record with
+        {
+            RootFolderId = treeId,
+            ParentId = record.ParentId == null ? parentId : record.ParentId
+        });
+    }
+
+    private async Task CommitAddedAsync(
+        Guid parentId, IReadOnlyCollection<FileRecord> records, string status)
+    {
+        AddRecordsResult? result = null;
+
+        await WritingAsync(status, async (progress, token) =>
+            result = await _virtualVolumeService.AddRecordsAsync(parentId, records, progress, token));
+
+        if (result == null)
+            return;
+
+        if (records.Any(record => record.IsFolder))
+        {
+            _folders.Clear();
+            _paths.Clear();
+            _physicalPaths.Clear();
+            _foldersCoverEveryTree = false;
+        }
+
+        WeakReferenceMessenger.Default.Send(new TreeContentsChangedMessage(result.Root));
+
+        if (result.Skipped.Count > 0)
+        {
+            var names = string.Join(", ", result.Skipped.Select(name => $"'{name}'"));
+            await Dialogs.TellAsync(
+                "Some items were not added",
+                $"{names} already exist in this folder and were left out.");
+        }
+
+        await NavigateAsync(Breadcrumbs.ToList());
+    }
+
+    #endregion
+
     [RelayCommand(CanExecute = nameof(CanNavigateUp))]
     private async Task NavigateUpAsync()
     {
@@ -586,6 +746,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
             VolumePrefix = known ? CataloguePath.Root(label!.VolumeName) : string.Empty;
 
             NavigateUpCommand.NotifyCanExecuteChanged();
+            NotifyAddCommands();
 
             // The crumbs already spell out where we are, so the folder holding these records
             // needs no walk back up through the folder records to name it
@@ -623,6 +784,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
         IsFlatMode = flat;
         SelectedFile = null;
         SelectedFiles.Clear();
+        NotifyAddCommands();
 
         Files = new AvaloniaList<FileItem>(records
             .OrderByDescending(record => record.IsFolder)

@@ -60,7 +60,7 @@
                     <MenuItem Header="_Remove Folder" Command="{Binding SidebarViewModel.DeleteFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
                     <Separator/>
                     <MenuItem Header="_Compare Folders..." Command="{Binding SidebarViewModel.CompareCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
-                    <MenuItem Header="_Update Folder..." Command="{Binding SidebarViewModel.UpdateFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
+                    <MenuItem Header="_Rescan Folder..." Command="{Binding SidebarViewModel.RescanFolderCommand}" CommandParameter="{Binding SidebarViewModel.SelectedFolder}"/>
                 </MenuItem>
 
                 <MenuItem Header="_Tools">

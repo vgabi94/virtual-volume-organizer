@@ -7,8 +7,8 @@ written. MSBuild imports it before each project body, so every assembly inherits
 that needs another value can still set its own — `VVO.UiTests` does, pinning `1.4.2` and a fixed
 `SourceRevisionId` so the About box has a known version to be asserted against.
 
-The .NET SDK appends the git commit to the informational version, giving `1.0.0+<sha>`.
-`AboutDialogViewModel` trims at the `+`, so the About box shows `1.0.0` while the executable's file
+The .NET SDK appends the git commit to the informational version, giving `1.1.0+<sha>`.
+`AboutDialogViewModel` trims at the `+`, so the About box shows `1.1.0` while the executable's file
 properties still identify the commit it was built from.
 
 ## Continuous integration

@@ -297,6 +297,24 @@ public class VirtualVolumeService : IVirtualVolumeService
         return roots;
     }
 
+    public async Task<AddRecordsResult> AddRecordsAsync(
+        Guid parentId,
+        IReadOnlyCollection<FileRecord> records,
+        IProgress<string>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(records);
+
+        AddRecordsResult? result = null;
+
+        await _databaseService.TransactionAsync(db =>
+        {
+            result = AddRecords(db, parentId, records, progress, cancellationToken);
+        });
+
+        return result!;
+    }
+
     public Task RestoreFolderAsync(RootFolderMetadata entry)
     {
         return _databaseService.TransactionAsync(db =>
@@ -419,6 +437,88 @@ public class VirtualVolumeService : IVirtualVolumeService
         }
 
         return roots;
+    }
+
+    /// <summary>
+    /// Inserts records under <paramref name="parentId"/>. A top-level name already present is
+    /// skipped with its descendants so a folder clash does not leave a partial tree.
+    /// </summary>
+    private AddRecordsResult AddRecords(
+        LiteDatabase db,
+        Guid parentId,
+        IReadOnlyCollection<FileRecord> records,
+        IProgress<string>? progress,
+        CancellationToken cancellationToken)
+    {
+        var files = Files(db);
+        var parent = files.FindById(parentId);
+        if (parent == null)
+        {
+            throw new ArgumentException($"There is no catalogue record '{parentId}'.", nameof(parentId));
+        }
+
+        if (!parent.IsFolder)
+        {
+            throw new ArgumentException("Files can only be added under a folder.", nameof(parentId));
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        progress?.Report("Adding files...");
+
+        var existing = files.Find(record => record.ParentId == parentId)
+            .Select(record => record.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var children = records
+            .Where(record => record.ParentId != null)
+            .ToLookup(record => record.ParentId!.Value);
+
+        var skippedIds = new HashSet<Guid>();
+        var skippedNames = new List<string>();
+        var acceptedTopLevel = new List<FileRecord>();
+
+        void SkipTree(Guid id)
+        {
+            if (!skippedIds.Add(id))
+                return;
+
+            foreach (var child in children[id])
+            {
+                SkipTree(child.Id);
+            }
+        }
+
+        foreach (var record in records.Where(record => record.ParentId == parentId))
+        {
+            if (existing.Contains(record.Name))
+            {
+                skippedNames.Add(record.Name);
+                SkipTree(record.Id);
+                continue;
+            }
+
+            existing.Add(record.Name);
+            acceptedTopLevel.Add(record);
+        }
+
+        var toInsert = records.Where(record => !skippedIds.Contains(record.Id)).ToList();
+        if (toInsert.Count > 0)
+        {
+            files.InsertBulk(toInsert);
+
+            var addedSize = acceptedTopLevel.Sum(record => record.Size);
+            var current = parent;
+            while (current != null)
+            {
+                files.Update(current with { Size = current.Size + addedSize });
+                current = current.ParentId is { } ancestor
+                    ? files.FindById(ancestor)
+                    : null;
+            }
+        }
+
+        var treeId = parent.RootFolderId;
+        return new AddRecordsResult(files.FindById(treeId)!, skippedNames);
     }
 
     /// <summary>

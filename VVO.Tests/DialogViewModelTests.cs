@@ -365,6 +365,9 @@ public class DialogViewModelTests
 
         Assert.Equal("Virtual Volume Organizer", viewModel.AppName);
         Assert.Contains("MahApps.Metro.IconPacks", viewModel.IconsCredit);
+        Assert.Equal(
+            new Uri("https://github.com/vgabi94/virtual-volume-organizer"),
+            viewModel.RepositoryUrl);
     }
 
     // Each document is embedded under a fixed name, which nothing but loading it proves

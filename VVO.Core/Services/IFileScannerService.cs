@@ -36,4 +36,10 @@ public interface IFileScannerService
         string? label = null,
         string? description = null,
         bool includeHiddenAndSystem = false);
+
+    /// <summary>
+    /// Reads one file's catalogue metadata. Parent and tree are left unset so the caller can
+    /// place it under the folder it is being added to.
+    /// </summary>
+    Task<FileRecord> ReadFileAsync(string path);
 }
