@@ -1,4 +1,4 @@
-"""Regenerate vvo.ico from vvo.svg. Run after editing the SVG.
+"""Regenerate vvo2.ico from vvo2.svg. Run after editing the SVG.
 
     python build-icon.py
 
@@ -19,12 +19,13 @@ except ImportError:
     sys.exit("Pillow is required: pip install Pillow")
 
 HERE = Path(__file__).parent
-SOURCE = HERE / "vvo.svg"
-TARGET = HERE / "vvo.ico"
+SOURCE = HERE / "vvo2.svg"
+TARGET = HERE / "vvo2.ico"
 
-# The full set Windows picks from: 16-48 for the shell and title bars, 256 for
-# the extra-large view. Anything absent gets stretched by the shell instead.
-SIZES = (16, 20, 24, 32, 40, 48, 64, 96, 128, 256)
+# Sizes Windows Explorer and the taskbar pick from across 100–300% DPI.
+# Anything absent gets stretched by the shell instead. 256 is PNG-compressed
+# and is what extra-large / jumbo view uses; the rest stay as 32-bit DIBs.
+SIZES = (16, 20, 24, 30, 32, 36, 40, 48, 64, 96, 128, 256)
 
 # Rasterize above the target and reduce, so strokes thinner than a pixel land as
 # partial coverage rather than dropping out.
