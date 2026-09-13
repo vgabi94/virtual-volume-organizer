@@ -48,7 +48,7 @@
             <TextBlock Grid.Column="3" Text="{Binding ItemSummary}" VerticalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
         </Grid>
 
-        <DataGrid Grid.Row="1" x:Name="FileGrid" ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile, Mode=TwoWay}" Classes="ExplorerGrid" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" IsReadOnly="True" Margin="{DynamicResource VolumeExplorerHorizontalMargin}" DoubleTapped="OnFileGridDoubleTapped" ContextRequested="OnFileGridContextRequested">
+        <DataGrid Grid.Row="1" x:Name="FileGrid" ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile, Mode=TwoWay}" SelectionMode="Extended" Classes="ExplorerGrid" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" IsReadOnly="True" Margin="{DynamicResource VolumeExplorerHorizontalMargin}" DoubleTapped="OnFileGridDoubleTapped" ContextRequested="OnFileGridContextRequested" SelectionChanged="OnFileGridSelectionChanged">
             <DataGrid.ContextMenu>
                 <ContextMenu x:Name="FileContextMenu">
                     <MenuItem Header="Copy _Path" Command="{Binding CopyCommand}"/>
@@ -56,6 +56,8 @@
                     <Separator/>
                     <MenuItem Header="Copy P_hysical Path" Command="{Binding CopyPhysicalCommand}"/>
                     <MenuItem Header="Copy All Ph_ysical Paths" Command="{Binding CopyPhysicalAllCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="_Delete" Command="{Binding DeleteCommand}"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>

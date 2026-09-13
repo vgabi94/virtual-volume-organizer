@@ -86,6 +86,18 @@ public interface IVirtualVolumeService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Removes catalogued files and nested folders from their trees, and every record under a
+    /// folder. Ancestor folder sizes shrink by the same amount. The tree root cannot be
+    /// removed this way. Not reversible; one transaction, so cancelling leaves the records
+    /// where they were.
+    /// </summary>
+    /// <returns>The root of each tree that changed, carrying its size as it now stands.</returns>
+    Task<IReadOnlyList<FileRecord>> RemoveRecordsAsync(
+        IReadOnlyCollection<Guid> recordIds,
+        IProgress<string>? progress = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Puts a folder entry back under the identity it had, for redoing a copy or a duplicate
     /// that was undone. The tree it points at is still there, since only a delete collects one
     /// and a delete cannot be undone.

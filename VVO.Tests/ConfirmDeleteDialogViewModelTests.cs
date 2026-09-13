@@ -75,6 +75,48 @@ public class ConfirmDeleteDialogViewModelTests
     }
 
     [Fact]
+    public void ACatalogueFileIsNamedAndTheDiskIsLeftAlone()
+    {
+        var viewModel = ConfirmDeleteDialogViewModel.ForCatalogueFile("readme");
+
+        Assert.Equal("Delete File", viewModel.Title);
+        Assert.Equal("readme", viewModel.ItemName);
+        Assert.Contains("catalogue", viewModel.Message);
+        Assert.Contains("disk is left alone", viewModel.Message);
+        Assert.Contains("cannot be undone", viewModel.Message);
+    }
+
+    [Fact]
+    public void ACatalogueFolderTakesWhatIsUnderItAndLeavesTheDiskAlone()
+    {
+        var viewModel = ConfirmDeleteDialogViewModel.ForCatalogueFolder("AdventOfCode");
+
+        Assert.Equal("Delete Folder", viewModel.Title);
+        Assert.Equal("AdventOfCode", viewModel.ItemName);
+        Assert.Contains("every catalogued file", viewModel.Message);
+        Assert.Contains("disk are left alone", viewModel.Message);
+    }
+
+    [Fact]
+    public void SeveralCatalogueItemsAreCountedTogether()
+    {
+        var viewModel = ConfirmDeleteDialogViewModel.ForCatalogueItems(3, includesFolder: true);
+
+        Assert.Equal("Delete Items", viewModel.Title);
+        Assert.Equal("3 items", viewModel.ItemName);
+        Assert.Contains("Folders take every catalogued file", viewModel.Message);
+        Assert.Contains("cannot be undone", viewModel.Message);
+    }
+
+    [Fact]
+    public void SeveralCatalogueFilesDoNotMentionFolders()
+    {
+        var viewModel = ConfirmDeleteDialogViewModel.ForCatalogueItems(2, includesFolder: false);
+
+        Assert.DoesNotContain("Folders", viewModel.Message);
+    }
+
+    [Fact]
     public void AVirtualVolumeIsNamedAndItsDeleteCalledFinal()
     {
         var viewModel = ConfirmDeleteDialogViewModel.ForVirtualVolume("test", 3);

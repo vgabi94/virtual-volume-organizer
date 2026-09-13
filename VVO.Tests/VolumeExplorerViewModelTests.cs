@@ -19,12 +19,13 @@ public class VolumeExplorerViewModelTests : IDisposable
         _database = new DatabaseService();
         _database.EnsureDatabaseReadyAsync(_dbPath).GetAwaiter().GetResult();
         _volumes = new VirtualVolumeService(_database);
-        _explorer = new VolumeExplorerViewModel(new UndoService(), _database);
+        _explorer = new VolumeExplorerViewModel(new UndoService(), _database, _volumes);
     }
 
     public void Dispose()
     {
         TextClipboard.Reset();
+        Dialogs.Reset();
 
         if (File.Exists(_dbPath))
         {
@@ -459,6 +460,22 @@ public class VolumeExplorerViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task CopyPutsEverySelectedPathOnTheClipboard()
+    {
+        var volume = await _volumes.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        await ShowAsync(entry, "Code", "test");
+
+        var copied = Copied();
+        _explorer.ReplaceSelection(_explorer.Files!.ToList());
+        await _explorer.CopyCommand.ExecuteAsync(null);
+
+        var lines = copied.Single().Split(Environment.NewLine);
+        Assert.Contains(@"test:\Code\AdventOfCode", lines);
+        Assert.Contains(@"test:\Code\readme.md", lines);
+    }
+
+    [Fact]
     public async Task NothingIsCopiedUntilAnEntryIsSelected()
     {
         var volume = await _volumes.CreateVirtualVolumeAsync("test", "HardDrive");
@@ -502,6 +519,37 @@ public class VolumeExplorerViewModelTests : IDisposable
 
         Assert.Null(_explorer.SelectedFile);
         Assert.False(_explorer.CopyCommand.CanExecute(null));
+        Assert.False(_explorer.DeleteCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task NothingIsDeletedUntilAnEntryIsSelected()
+    {
+        var volume = await _volumes.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        await ShowAsync(entry, "Code", "test");
+
+        Assert.False(_explorer.DeleteCommand.CanExecute(null));
+
+        _explorer.SelectedFile = _explorer.Files!.First();
+
+        Assert.True(_explorer.DeleteCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task ADeleteWithNoWindowLeavesTheFileAlone()
+    {
+        var volume = await _volumes.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await AddCodeAsync(volume.Id);
+        await ShowAsync(entry, "Code", "test");
+        _explorer.SelectedFile = _explorer.Files!.Single(file => file.Name == "readme");
+
+        Dialogs.Owner = () => null;
+        await _explorer.DeleteCommand.ExecuteAsync(null);
+
+        Assert.Contains(_explorer.Files!, file => file.Name == "readme");
+        Assert.Equal(4, (await _database.FindItemsAsync<FileRecord>(
+            record => record.RootFolderId == entry.TreeId)).Count);
     }
 
     #endregion
