@@ -27,6 +27,11 @@ public static class CliApp
         root.Subcommands.Add(VolumeCommands.Create(services));
         root.Subcommands.Add(FolderCommands.Create(services));
 
+        foreach (var command in BrowseCommands.Create(services))
+        {
+            root.Subcommands.Add(command);
+        }
+
         return root;
     }
 

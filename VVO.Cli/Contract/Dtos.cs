@@ -83,6 +83,11 @@ public sealed record RecordDto(
             entries);
 }
 
+/// <param name="Children">
+/// What the folder holds, folders first. Null for a file, and for a folder below the depth asked for.
+/// </param>
+public sealed record TreeNodeDto(RecordDto Record, IReadOnlyList<TreeNodeDto>? Children);
+
 /// <summary>
 /// One side of a compared pair. A side read from disk was never stored, so it has no id.
 /// </summary>

@@ -1,4 +1,6 @@
+using VVO.Cli.Contract;
 using VVO.Cli.Output;
+using VVO.Core;
 using VVO.Core.Models;
 using VVO.Core.Services;
 
@@ -44,4 +46,78 @@ public static class Catalogue
             ? root
             : throw new InvalidOperationException(
                 $"The folder entry '{entry.Id}' points at a tree '{entry.TreeId}' the catalogue does not hold.");
+
+    /// <summary>
+    /// A record and the folder entries it is reached through. An entry id stands for the root
+    /// of its tree, reached through that entry alone; a record id is reached through every entry
+    /// standing on its tree.
+    /// </summary>
+    public static async Task<Located> LocateAsync(CommandContext context, Guid id)
+    {
+        var database = context.Service<IDatabaseService>();
+
+        var entry = (await database.FindItemsAsync<RootFolderMetadata>(item => item.Id == id)).SingleOrDefault();
+        if (entry != null)
+        {
+            var roots = await database.FindItemsAsync<FileRecord>(record => record.Id == entry.TreeId);
+            return new Located(RootOf(roots.ToDictionary(root => root.Id), entry), [entry]);
+        }
+
+        var found = (await database.FindItemsAsync<FileRecord>(record => record.Id == id)).SingleOrDefault()
+            ?? throw CliException.NotFound($"There is no folder entry or catalogue record '{id}'.");
+
+        var entries = await database.FindItemsAsync<RootFolderMetadata>(item => item.TreeId == found.RootFolderId);
+        return new Located(found, entries.ToList());
+    }
+
+    /// <summary>
+    /// The folders above a record, from the root of its tree down to its parent.
+    /// </summary>
+    public static async Task<IReadOnlyList<FileRecord>> AncestorsAsync(CommandContext context, FileRecord record)
+    {
+        var database = context.Service<IDatabaseService>();
+        var ancestors = new List<FileRecord>();
+
+        for (var parentId = record.ParentId; parentId is { } id;)
+        {
+            var parent = (await database.FindItemsAsync<FileRecord>(item => item.Id == id)).SingleOrDefault()
+                ?? throw new InvalidOperationException($"The catalogue record '{record.Id}' has lost its parent '{id}'.");
+
+            ancestors.Insert(0, parent);
+            parentId = parent.ParentId;
+        }
+
+        return ancestors;
+    }
+
+    /// <summary>
+    /// Places records the way each of the given entries does.
+    /// </summary>
+    /// <param name="records">
+    /// Every record to be placed, together with all the folders above them.
+    /// </param>
+    public static async Task<Placer> PlacerAsync(
+        CommandContext context, IReadOnlyList<RootFolderMetadata> entries, IReadOnlyCollection<FileRecord> records)
+    {
+        var volumes = (await context.Service<IDatabaseService>().ReadItemsAsync<VirtualVolumeRecord>())
+            .ToDictionary(volume => volume.Id, volume => volume.Name);
+
+        return new Placer(entries
+            .OrderBy(entry => entry.Id)
+            .Select(entry => (entry, new EntryPaths(entry, volumes.GetValueOrDefault(entry.VirtualVolumeId, string.Empty), records)))
+            .ToList());
+    }
+
+    public static IEnumerable<FileRecord> InExplorerOrder(IEnumerable<FileRecord> records) =>
+        records
+            .OrderByDescending(record => record.IsFolder)
+            .ThenBy(record => record.Name, StringComparer.OrdinalIgnoreCase);
+}
+
+public sealed record Located(FileRecord Record, IReadOnlyList<RootFolderMetadata> Entries);
+
+public sealed class Placer(IReadOnlyList<(RootFolderMetadata Entry, EntryPaths Paths)> entries)
+{
+    public RecordDto Describe(FileRecord record) =>
+        RecordDto.From(record, entries.Select(item => PlacementDto.From(item.Entry, item.Paths, record.Id)).ToList());
 }

@@ -91,6 +91,17 @@ public class ContractTests
     }
 
     [Fact]
+    public void TreeNode()
+    {
+        var paths = new Core.EntryPaths(Entry, "Backups", [Root, File]);
+        var describe = (FileRecord record) => RecordDto.From(record, [PlacementDto.From(Entry, paths, record.Id)]);
+
+        var node = new TreeNodeDto(describe(Root), [new TreeNodeDto(describe(File), null)]);
+
+        AssertMatchesSnapshot(node, "tree-node");
+    }
+
+    [Fact]
     public void ComparisonRow()
     {
         var right = File with { Id = Guid.NewGuid(), Size = 4096, Modified = Scanned };
