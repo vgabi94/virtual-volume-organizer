@@ -12,9 +12,33 @@ public static class ProcessRunner
 {
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(60);
 
-    public static async Task<CliResult> RunAsync(string[] args, string? stdin = null)
+    public static Task<CliResult> RunAsync(string[] args, string? stdin = null)
     {
-        var start = new ProcessStartInfo("dotnet")
+        var start = Start();
+        start.ArgumentList.Add(typeof(CliApp).Assembly.Location);
+        foreach (var arg in args)
+        {
+            start.ArgumentList.Add(arg);
+        }
+
+        return RunAsync(start, string.Join(' ', args), stdin);
+    }
+
+    /// <summary>
+    /// Runs a command line as typed, split into arguments by Windows' own rules, the way a command
+    /// pasted into a terminal is.
+    /// </summary>
+    /// <param name="arguments">Everything after "vvo".</param>
+    public static Task<CliResult> RunCommandLineAsync(string arguments)
+    {
+        var start = Start();
+        start.Arguments = $"\"{typeof(CliApp).Assembly.Location}\" {arguments}";
+
+        return RunAsync(start, arguments, stdin: null);
+    }
+
+    private static ProcessStartInfo Start() =>
+        new("dotnet")
         {
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
@@ -25,12 +49,8 @@ public static class ProcessRunner
             CreateNoWindow = true
         };
 
-        start.ArgumentList.Add(typeof(CliApp).Assembly.Location);
-        foreach (var arg in args)
-        {
-            start.ArgumentList.Add(arg);
-        }
-
+    private static async Task<CliResult> RunAsync(ProcessStartInfo start, string shown, string? stdin)
+    {
         using var process = Process.Start(start)!;
 
         if (stdin != null)
@@ -51,7 +71,7 @@ public static class ProcessRunner
         catch (OperationCanceledException)
         {
             process.Kill(entireProcessTree: true);
-            Assert.Fail($"vvo {string.Join(' ', args)} did not finish within {Timeout}.");
+            Assert.Fail($"vvo {shown} did not finish within {Timeout}.");
         }
 
         return new CliResult(process.ExitCode, await stdout, await stderr);
