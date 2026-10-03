@@ -3,5 +3,6 @@
   <Project Path="VVO.Tests/VVO.Tests.csproj" Id="94fb3f09-96cf-41a0-a788-661cac4df79a" />
   <Project Path="VVO.Core/VVO.Core.csproj" />
   <Project Path="VVO.Cli/VVO.Cli.csproj" />
+  <Project Path="VVO.Cli.Tests/VVO.Cli.Tests.csproj" />
   <Project Path="VVO.UiTests/VVO.UiTests.csproj" />
 </Solution>
