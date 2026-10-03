@@ -9,6 +9,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using VVO.Core;
 using VVO.Core.Models;
 using VVO.Core.Services;
 using VVO.UI.Messages;

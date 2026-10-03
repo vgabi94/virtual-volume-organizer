@@ -1,4 +1,4 @@
-namespace VVO.UI;
+namespace VVO.Core;
 
 /// <summary>
 /// How a path inside a catalogued tree is written. The folder at the top of the tree heads it

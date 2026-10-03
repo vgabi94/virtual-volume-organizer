@@ -1,3 +1,4 @@
+using VVO.Core;
 using VVO.Core.Models;
 using VVO.Core.Services;
 using VVO.UI;
@@ -291,6 +292,28 @@ public class VolumeExplorerViewModelTests : IDisposable
     #endregion
 
     #region The paths an entry carries
+
+    // The CLI writes paths with EntryPaths; this is what keeps it saying what the explorer says
+    [Fact]
+    public async Task EntryPathsPlacesEveryRecordWhereTheExplorerDoes()
+    {
+        var volume = await _volumes.CreateVirtualVolumeAsync("test", "HardDrive");
+        var entry = await _volumes.UpdateFolderAsync(
+            (await AddCodeAsync(volume.Id)).Id, "Projects", null, null, null);
+
+        await ShowAsync(entry, "Projects", "test");
+        await SearchAllAsync("e", new SearchScope(entry.TreeId, "Projects", "test", entry.Path));
+
+        var records = await _database.FindItemsAsync<FileRecord>(record => record.RootFolderId == entry.TreeId);
+        var paths = new EntryPaths(entry, "test", records);
+
+        Assert.Equal(3, _explorer.Files!.Count);
+        foreach (var file in _explorer.Files!)
+        {
+            Assert.Equal(file.VirtualPath, paths.CataloguePathOf(file.Id));
+            Assert.Equal(file.PhysicalPath, paths.PhysicalPathOf(file.Id));
+        }
+    }
 
     [Fact]
     public async Task AListedEntryCarriesItsCataloguePathAndThePathItCameFromOnDisk()
