@@ -1,5 +1,6 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using VVO.Cli.Commands;
 using VVO.Cli.Output;
 
 namespace VVO.Cli;
@@ -22,6 +23,7 @@ public static class CliApp
             + "output is JSON on stdout.");
 
         root.Options.Add(QuietOption);
+        root.Subcommands.Add(DbCommands.Create(services));
 
         return root;
     }

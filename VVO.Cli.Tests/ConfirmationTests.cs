@@ -15,7 +15,7 @@ public class ConfirmationTests
         var danger = new Command("danger")
         {
             new Argument<string[]>("items") { Arity = ArgumentArity.ZeroOrMore },
-            new Option<string>(Confirmation.DbOptionName),
+            new Option<string>("--db").TakesPath(),
             new Option<string>("--label")
         };
 
@@ -26,6 +26,16 @@ public class ConfirmationTests
         });
 
         root.Subcommands.Add(danger);
+
+        var file = new Argument<string>("file").TakesPath();
+        var overwrite = new Command("overwrite") { file };
+        overwrite.SetJsonAction(services, context =>
+        {
+            Confirmation.Require(context, Request);
+            return Task.FromResult<object?>(null);
+        });
+
+        root.Subcommands.Add(overwrite);
     }
 
     private static Task<CliResult> RunAsync(ScriptedTerminal terminal, params string[] args) =>
@@ -119,6 +129,24 @@ public class ConfirmationTests
         Assert.Equal(
             $"vvo danger --db {Path.GetFullPath("x.vvo")}",
             result.Error.GetProperty("command").GetString());
+    }
+
+    [Fact]
+    public async Task TheCommandMakesAPositionalPathAbsolute()
+    {
+        var result = await CliRunner.RunAsync(["overwrite", "x.vvo"], AddDanger, ScriptedTerminal.Redirected());
+
+        Assert.Equal(
+            $"vvo overwrite {Path.GetFullPath("x.vvo")}",
+            result.Error.GetProperty("command").GetString());
+    }
+
+    [Fact]
+    public async Task TheCommandLeavesArgumentsThatAreNotPathsAsTyped()
+    {
+        var result = await RunAsync(ScriptedTerminal.Redirected(), "x.vvo", "--label", "y.vvo");
+
+        Assert.Equal("vvo danger x.vvo --label y.vvo", result.Error.GetProperty("command").GetString());
     }
 
     [Fact]

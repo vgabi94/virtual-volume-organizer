@@ -287,6 +287,16 @@ public class DatabaseService : IDatabaseService
         });
     }
 
+    public Task<int> CountItemsAsync<T>(Expression<Func<T, bool>>? predicate = null)
+    {
+        return ExclusiveAsync(() =>
+        {
+            using var db = Open(_dbPath);
+            var collection = db.GetCollection<T>(TableName<T>());
+            return predicate == null ? collection.Count() : collection.Count(predicate);
+        });
+    }
+
     public Task ShrinkDatabaseAsync(
         IProgress<string>? progress = null,
         CancellationToken cancellationToken = default)

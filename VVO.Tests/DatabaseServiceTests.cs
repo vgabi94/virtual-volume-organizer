@@ -488,6 +488,27 @@ public class DatabaseServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task CountItemsAsync_CountsEveryItemOrTheMatchingOnes()
+    {
+        await _service.InsertItemsAsync(new List<TestItem>
+        {
+            new TestItem { Id = Guid.NewGuid(), Name = "Target" },
+            new TestItem { Id = Guid.NewGuid(), Name = "Target" },
+            new TestItem { Id = Guid.NewGuid(), Name = "Other" }
+        });
+
+        Assert.Equal(3, await _service.CountItemsAsync<TestItem>());
+        Assert.Equal(2, await _service.CountItemsAsync<TestItem>(x => x.Name == "Target"));
+        Assert.Equal(0, await _service.CountItemsAsync<TestItem>(x => x.Name == "Missing"));
+    }
+
+    [Fact]
+    public async Task CountItemsAsync_IsZeroForATableNothingWasWrittenTo()
+    {
+        Assert.Equal(0, await _service.CountItemsAsync<TestItem>());
+    }
+
+    [Fact]
     public async Task DatabaseMetadata_PersistsNameAndPath()
     {
         var dbMeta = new DatabaseMetadata

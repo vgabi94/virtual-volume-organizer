@@ -9,11 +9,11 @@ namespace VVO.Cli;
 /// </summary>
 public static class DatabaseFile
 {
-    public static Option<string> CreateOption() => new(Confirmation.DbOptionName)
+    public static Option<string> CreateOption() => new Option<string>("--db")
     {
         Description = "The .vvo catalogue to work on.",
         Required = true
-    };
+    }.TakesPath();
 
     /// <summary>
     /// Opens a catalogue that has to be there already. LiteDB creates whatever file it is pointed

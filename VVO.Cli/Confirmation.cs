@@ -1,5 +1,6 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using System.Runtime.CompilerServices;
 using System.Text;
 using VVO.Cli.Output;
 
@@ -14,7 +15,17 @@ public sealed record ConfirmationRequest(string Title, string ItemName, string M
 /// </summary>
 public static class Confirmation
 {
-    public const string DbOptionName = "--db";
+    private static readonly ConditionalWeakTable<Symbol, object> PathSymbols = new();
+
+    /// <summary>
+    /// Marks an argument or option as naming a file, so the command line handed back to the
+    /// user carries it in full and works from whatever directory they paste it into.
+    /// </summary>
+    public static T TakesPath<T>(this T symbol) where T : Symbol
+    {
+        PathSymbols.AddOrUpdate(symbol, symbol);
+        return symbol;
+    }
 
     /// <summary>
     /// Returns once the user has typed the word. Throws <see cref="CliException"/> when there is
@@ -54,23 +65,43 @@ public static class Confirmation
     public static string CommandLine(ParseResult parseResult)
     {
         var parts = new List<string> { "vvo" };
-        Token? previous = null;
+        var paths = PathTokens(parseResult);
 
         foreach (var token in parseResult.Tokens)
         {
-            var value = token.Value;
-
-            if (token.Type == TokenType.Argument
-                && previous is { Type: TokenType.Option, Value: DbOptionName })
-            {
-                value = Path.GetFullPath(value);
-            }
-
-            parts.Add(Quote(value));
-            previous = token;
+            parts.Add(Quote(paths.Contains(token) ? Path.GetFullPath(token.Value) : token.Value));
         }
 
         return string.Join(' ', parts);
+    }
+
+    // The values given to arguments and options marked as paths, on the command and its parents
+    private static HashSet<Token> PathTokens(ParseResult parseResult)
+    {
+        var tokens = new HashSet<Token>(ReferenceEqualityComparer.Instance);
+
+        for (SymbolResult? command = parseResult.CommandResult; command != null; command = command.Parent)
+        {
+            if (command is not CommandResult commandResult)
+                continue;
+
+            foreach (var child in commandResult.Children)
+            {
+                Symbol symbol = child switch
+                {
+                    ArgumentResult argument => argument.Argument,
+                    OptionResult option => option.Option,
+                    _ => commandResult.Command
+                };
+
+                if (PathSymbols.TryGetValue(symbol, out _))
+                {
+                    tokens.UnionWith(child.Tokens);
+                }
+            }
+        }
+
+        return tokens;
     }
 
     // The Windows command-line convention, which is what vvo.exe parses its arguments with
