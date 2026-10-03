@@ -41,7 +41,7 @@ public static class SearchCommand
 
             await DatabaseFile.OpenExistingAsync(context, db);
 
-            var database = context.Service<IDatabaseService>();
+            var volumes = context.Service<IVirtualVolumeService>();
             var entries = await Catalogue.EntriesAsync(context);
 
             IReadOnlyCollection<FileRecord> found;
@@ -51,9 +51,7 @@ public static class SearchCommand
                     ?? throw CliException.NotFound($"There is no folder entry '{entryId}'.");
 
                 // The explorer's search within one folder
-                var treeId = entry.TreeId;
-                found = await database.FindItemsAsync<FileRecord>(record =>
-                    record.RootFolderId == treeId && record.Id != treeId && record.Name.Contains(text));
+                found = await volumes.FindByNameAsync(text, entry.TreeId);
 
                 entries = [entry];
             }
@@ -61,8 +59,7 @@ public static class SearchCommand
             {
                 // The explorer's search everywhere, which skips trees no folder is listed with
                 var live = entries.Select(entry => entry.TreeId).ToHashSet();
-                found = (await database.FindItemsAsync<FileRecord>(record =>
-                        record.ParentId != null && record.Name.Contains(text)))
+                found = (await volumes.FindByNameAsync(text))
                     .Where(record => live.Contains(record.RootFolderId))
                     .ToList();
             }

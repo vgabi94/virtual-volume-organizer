@@ -1,3 +1,4 @@
+using System.Globalization;
 using LiteDB;
 using VVO.Core.Models;
 
@@ -90,6 +91,23 @@ public class VirtualVolumeService : IVirtualVolumeService
     {
         return _databaseService.FindItemsAsync<RootFolderMetadata>(entry => entry.VirtualVolumeId == virtualVolumeId);
     }
+
+    public async Task<IReadOnlyList<FileRecord>> FindByNameAsync(string term, Guid? treeId = null)
+    {
+        // The name is indexed but a substring match cannot use that index, so this is a scan
+        // either way. LiteDB answers Contains with LIKE, where '_' and '%' are wildcards; that
+        // answer holds every literal match and more, so it is narrowed to the literal ones.
+        var found = treeId is { } id
+            ? await _databaseService.FindItemsAsync<FileRecord>(record =>
+                record.RootFolderId == id && record.Id != id && record.Name.Contains(term))
+            : await _databaseService.FindItemsAsync<FileRecord>(record =>
+                record.ParentId != null && record.Name.Contains(term));
+
+        return found.Where(record => ContainsIgnoringCase(record.Name, term)).ToList();
+    }
+
+    private static bool ContainsIgnoringCase(string name, string term) =>
+        CultureInfo.InvariantCulture.CompareInfo.IndexOf(name, term, CompareOptions.IgnoreCase) >= 0;
 
     // Big enough that the batching costs nothing next to the write, small enough that a scan of
     // a system drive reports more than once

@@ -73,6 +73,28 @@ public class SearchCommandTests : IAsyncLifetime
         Assert.Equal(Names(await SearchAsync("beach")), Names(await SearchAsync("BEACH")));
     }
 
+    [Theory]
+    [InlineData("a_b", "a_b.txt")]
+    [InlineData("50%", "50%.txt")]
+    [InlineData("[x]", "[x].txt")]
+    public async Task TheTermIsMatchedAsWritten(string term, string name)
+    {
+        var archive = await _catalogue.AddVolumeAsync("Archive");
+        await _catalogue.AddFolderAsync(archive.Id, TestTree.Root("odd")
+            .File("a_b.txt").File("axb.txt").File("50%.txt").File("500.txt").File("[x].txt").File("x.txt")
+            .Build());
+
+        Assert.Equal([name], Names(await SearchAsync(term)));
+        Assert.Equal([name], Names(await SearchAsync(term, "--folder", (await _catalogue.Database
+            .FindItemsAsync<RootFolderMetadata>(entry => entry.VirtualVolumeId == archive.Id)).Single().Id.ToString())));
+    }
+
+    [Fact]
+    public async Task PercentSignsAloneMatchNothing()
+    {
+        Assert.Empty(Names(await SearchAsync("%")));
+    }
+
     [Fact]
     public async Task FolderLimitsTheSearchToOneTree()
     {

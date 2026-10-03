@@ -169,6 +169,19 @@ public class VolumeExplorerViewModelTests : IDisposable
 
     #region Searching every folder
 
+    // LiteDB reads '_' as a wildcard; the explorer must not
+    [Fact]
+    public async Task SearchAllMatchesTheTermAsWritten()
+    {
+        var volume = await _volumes.CreateVirtualVolumeAsync("test", "HardDrive");
+        var tree = TestTree.Root("files").File("a_b.txt").File("axb.txt").Build();
+        var entry = await _volumes.AddFolderAsync(volume.Id, tree.Metadata, tree.Records.ToList());
+
+        await SearchAllAsync("a_b", new SearchScope(entry.TreeId, "files", "test"));
+
+        Assert.Equal("a_b.txt", Assert.Single(_explorer.Files!).VirtualPath[^7..]);
+    }
+
     [Fact]
     public async Task SearchAllFindsMatchesInEveryFolderItCovers()
     {
