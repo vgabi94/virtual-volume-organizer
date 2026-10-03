@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "confirmation_required",
+    "message": "Deleting this folder cannot be undone. Run the command in a terminal to confirm.",
+    "command": "vvo folder delete 22222222-2222-2222-2222-222222222222 --db D:\\b.vvo"
+  }
+}
