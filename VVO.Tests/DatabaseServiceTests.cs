@@ -915,6 +915,20 @@ public class DatabaseServiceTests : IDisposable
         Assert.True(waited.Elapsed < TimeSpan.FromSeconds(1), $"Took {waited.Elapsed}.");
     }
 
+    // A file system allows spaces at either end of a name, and the catalogue has to keep them, or
+    // the path it gives is wrong and every rescan sees the file as removed and added again
+    [Theory]
+    [InlineData(" leading.txt")]
+    [InlineData("trailing.txt ")]
+    [InlineData("  both  ")]
+    public async Task NamesKeepTheirSpaces(string name)
+    {
+        var record = new FileRecord { Id = Guid.NewGuid(), Name = name };
+        await _service.InsertItemsAsync([record]);
+
+        Assert.Equal(name, Assert.Single(await _service.ReadItemsAsync<FileRecord>()).Name);
+    }
+
     #region Read-only catalogues
 
     private async Task<string> ReadOnlyCatalogueAsync()

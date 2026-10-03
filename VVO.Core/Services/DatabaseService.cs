@@ -44,7 +44,9 @@ public class DatabaseService : IDatabaseService
 
     private static BsonMapper CreateMapper()
     {
-        var mapper = new BsonMapper();
+        // LiteDB trims every string it stores unless told not to, which cuts the spaces a file
+        // system allows at either end of a name
+        var mapper = new BsonMapper { TrimWhitespace = false };
         mapper.RegisterType(
             serialize: (DateTime value) => value.ToUniversalTime(),
             deserialize: bson => bson.AsDateTime.ToUniversalTime());
