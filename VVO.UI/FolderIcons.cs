@@ -2,25 +2,19 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using VVO.Core;
 
 namespace VVO.UI;
 
 /// <summary>
-/// The icons a folder can be listed under, by resource key.
+/// The icons a folder can be listed under, by resource key. The keys are shared with the CLI
+/// through <see cref="IconKeys"/>.
 /// </summary>
 public static class FolderIcons
 {
-    public static IReadOnlyList<string> Keys { get; } =
-    [
-        "Folder",
-        "FolderStar",
-        "FolderHeart",
-        "FolderImage",
-        "FolderMusic",
-        "FolderPlay"
-    ];
+    public static IReadOnlyList<string> Keys => IconKeys.Folders;
 
-    public static string Default => Keys[0];
+    public static string Default => IconKeys.DefaultFolder;
 
     // Icons whose path data is drawn bottom-up, which renders them upside down until flipped
     private static readonly HashSet<string> FlippedKeys = [];
