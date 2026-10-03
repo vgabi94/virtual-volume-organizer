@@ -42,7 +42,7 @@ public static class RecordCommands
 
         command.SetJsonAction(services, async context =>
         {
-            await DatabaseFile.OpenExistingAsync(context, db);
+            await DatabaseFile.OpenForWritingAsync(context, db);
 
             var (folder, _) = await Catalogue.LocateAsync(context, context.ParseResult.GetValue(parent));
             if (!folder.IsFolder)
@@ -115,7 +115,7 @@ public static class RecordCommands
 
         command.SetJsonAction(services, async context =>
         {
-            await DatabaseFile.OpenExistingAsync(context, db);
+            await DatabaseFile.OpenForWritingAsync(context, db);
 
             var wanted = context.ParseResult.GetRequiredValue(ids).Distinct().ToList();
             var found = await context.Service<IDatabaseService>()

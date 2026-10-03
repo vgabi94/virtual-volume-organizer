@@ -27,6 +27,7 @@ public static class ErrorCodes
     public const string Error = "error";
     public const string InvalidDatabase = "invalid_database";
     public const string InvalidFile = "invalid_file";
+    public const string ReadOnly = "read_only";
     public const string Usage = "usage";
     public const string NotFound = "not_found";
     public const string ConfirmationRequired = "confirmation_required";

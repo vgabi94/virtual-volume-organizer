@@ -10,6 +10,7 @@ public static class ErrorMapper
         {
             CliException cli => cli,
             DatabaseBusyException => new CliException(ExitCode.DatabaseBusy, ErrorCodes.DatabaseBusy, exception.Message),
+            CatalogueReadOnlyException => new CliException(ExitCode.Error, ErrorCodes.ReadOnly, exception.Message),
             CatalogueItemNotFoundException notFound => CliException.NotFound(MessageOf(notFound)),
             FileNotFoundException or DirectoryNotFoundException => CliException.NotFound(exception.Message),
             ArgumentException argument => CliException.Usage(MessageOf(argument)),

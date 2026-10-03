@@ -80,30 +80,83 @@ public class DatabaseService : IDatabaseService
         Modified?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>
+    /// A write to the open catalogue. One that can only be read is refused before anything is
+    /// touched, and a write the file system turns away is reported the same way.
+    /// </summary>
+    private Task WriteAsync(Action operation)
+    {
+        return ExclusiveWriteAsync(() =>
+        {
+            if (_readOnly)
+                throw new CatalogueReadOnlyException(_dbPath);
+
+            try
+            {
+                operation();
+            }
+            catch (Exception e) when (IsWriteRefused(e))
+            {
+                throw new CatalogueReadOnlyException(_dbPath, e);
+            }
+        });
+    }
+
+    private bool _readOnly;
+    public bool IsReadOnly => _readOnly;
+
     public Task EnsureDatabaseReadyAsync(string dbPath, bool replace = false)
     {
         return ExclusiveWriteAsync(() =>
         {
-            if (replace && File.Exists(dbPath))
-            {
-                WhileBusy(dbPath, () => File.Delete(dbPath));
-            }
+            var readOnly = false;
 
-            if (File.Exists(dbPath))
+            try
             {
-                RequireCatalogue(dbPath);
-            }
+                if (replace && File.Exists(dbPath))
+                {
+                    WhileBusy(dbPath, () => File.Delete(dbPath));
+                }
 
-            using var db = Open(dbPath);
-            EnsureIndexes(db);
+                if (File.Exists(dbPath))
+                {
+                    RequireCatalogue(dbPath);
+                }
+
+                using var db = Open(dbPath, readOnly: false);
+                EnsureIndexes(db);
+            }
+            catch (Exception e) when (IsWriteRefused(e) && !replace && File.Exists(dbPath))
+            {
+                // On read-only media or a share a catalogue can still be read, as it is
+                using var db = Open(dbPath, readOnly: true);
+                readOnly = true;
+            }
+            catch (Exception e) when (IsWriteRefused(e))
+            {
+                throw new CatalogueReadOnlyException(dbPath, e);
+            }
 
             // Taken up only once the file has been opened, so a failed open leaves the
             // application on the database it already had rather than on one it never read
             _dbPath = dbPath;
+            _readOnly = readOnly;
         });
     }
 
-    private LiteDatabase Open(string dbPath) => WhileBusy(dbPath, () => new LiteDatabase(dbPath, Mapper));
+    private LiteDatabase Open(string dbPath, bool? readOnly = null)
+    {
+        var connection = new ConnectionString { Filename = dbPath, ReadOnly = readOnly ?? _readOnly };
+        return WhileBusy(dbPath, () => new LiteDatabase(connection, Mapper));
+    }
+
+    private static bool IsWriteRefused(Exception exception)
+    {
+        const int writeProtected = unchecked((int)0x80070013);
+
+        return exception is UnauthorizedAccessException
+            || exception is IOException { HResult: writeProtected };
+    }
 
     private void WhileBusy(string dbPath, Action touch)
     {
@@ -239,7 +292,7 @@ public class DatabaseService : IDatabaseService
 
     public Task InsertItemsAsync<T>(IReadOnlyCollection<T> items)
     {
-        return ExclusiveWriteAsync(() =>
+        return WriteAsync(() =>
         {
             using var db = Open(_dbPath);
             db.GetCollection<T>(TableName<T>()).InsertBulk(items);
@@ -248,7 +301,7 @@ public class DatabaseService : IDatabaseService
 
     public Task UpdateItemsAsync<T>(IReadOnlyCollection<T> items)
     {
-        return ExclusiveWriteAsync(() =>
+        return WriteAsync(() =>
         {
             using var db = Open(_dbPath);
             db.GetCollection<T>(TableName<T>()).Update(items);
@@ -257,7 +310,7 @@ public class DatabaseService : IDatabaseService
 
     public Task RemoveItemsAsync<T>(IReadOnlyCollection<Guid> itemIds) where T : IHasId
     {
-        return ExclusiveWriteAsync(() =>
+        return WriteAsync(() =>
         {
             using var db = Open(_dbPath);
             db.GetCollection<IHasId>(TableName<T>()).DeleteMany(x => itemIds.Contains(x.Id));
@@ -266,7 +319,7 @@ public class DatabaseService : IDatabaseService
 
     public Task RemoveItemsAsync<T>(Expression<Func<T, bool>> predicate)
     {
-        return ExclusiveWriteAsync(() =>
+        return WriteAsync(() =>
         {
             using var db = Open(_dbPath);
             db.GetCollection<T>(TableName<T>()).DeleteMany(predicate);
@@ -307,7 +360,7 @@ public class DatabaseService : IDatabaseService
         IProgress<string>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        return ExclusiveWriteAsync(() =>
+        return WriteAsync(() =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -390,7 +443,7 @@ public class DatabaseService : IDatabaseService
 
     public Task TransactionAsync(Func<LiteDatabase, Task> actionAsync)
     {
-        return ExclusiveWriteAsync(() =>
+        return WriteAsync(() =>
         {
             // LiteDB ties a transaction to the thread that opened it: a commit issued from
             // anywhere else finds no transaction and the writes are dropped on dispose. Every

@@ -914,4 +914,148 @@ public class DatabaseServiceTests : IDisposable
 
         Assert.True(waited.Elapsed < TimeSpan.FromSeconds(1), $"Took {waited.Elapsed}.");
     }
+
+    #region Read-only catalogues
+
+    private async Task<string> ReadOnlyCatalogueAsync()
+    {
+        await _service.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "kept", Path = _dbPath }]);
+        File.SetAttributes(_dbPath, File.GetAttributes(_dbPath) | FileAttributes.ReadOnly);
+        return _dbPath;
+    }
+
+    private void Writable() => File.SetAttributes(_dbPath, File.GetAttributes(_dbPath) & ~FileAttributes.ReadOnly);
+
+    [Fact]
+    public async Task AReadOnlyCatalogueOpensForReading()
+    {
+        var path = await ReadOnlyCatalogueAsync();
+        var before = File.ReadAllBytes(path);
+        try
+        {
+            var service = new DatabaseService();
+            await service.EnsureDatabaseReadyAsync(path);
+
+            Assert.True(service.IsReadOnly);
+            Assert.Equal("kept", Assert.Single(await service.ReadItemsAsync<DatabaseMetadata>()).Name);
+            Assert.Equal(1, await service.CountItemsAsync<DatabaseMetadata>());
+            Assert.Equal(before, File.ReadAllBytes(path));
+        }
+        finally
+        {
+            Writable();
+        }
+    }
+
+    [Fact]
+    public async Task EveryWriteToAReadOnlyCatalogueIsRefusedAndChangesNothing()
+    {
+        var path = await ReadOnlyCatalogueAsync();
+        var before = File.ReadAllBytes(path);
+        try
+        {
+            var service = new DatabaseService();
+            await service.EnsureDatabaseReadyAsync(path);
+            var announced = 0;
+            service.Modified += (_, _) => announced++;
+
+            var item = new DatabaseMetadata { Id = Guid.NewGuid(), Name = "new", Path = path };
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.InsertItemsAsync([item]));
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.UpdateItemsAsync([item]));
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.RemoveItemsAsync<DatabaseMetadata>([item.Id]));
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.RemoveItemsAsync<DatabaseMetadata>(x => x.Name == "kept"));
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.TransactionAsync(_ => { }));
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.ShrinkDatabaseAsync());
+
+            Assert.Equal(0, announced);
+            Assert.Equal(before, File.ReadAllBytes(path));
+        }
+        finally
+        {
+            Writable();
+        }
+    }
+
+    [Fact]
+    public async Task ReplacingAReadOnlyCatalogueIsRefused()
+    {
+        var path = await ReadOnlyCatalogueAsync();
+        var before = File.ReadAllBytes(path);
+        try
+        {
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(
+                () => new DatabaseService().EnsureDatabaseReadyAsync(path, replace: true));
+
+            Assert.Equal(before, File.ReadAllBytes(path));
+        }
+        finally
+        {
+            Writable();
+        }
+    }
+
+    [Fact]
+    public async Task OpeningAWritableCatalogueAfterAReadOnlyOneWritesAgain()
+    {
+        var readOnly = await ReadOnlyCatalogueAsync();
+        try
+        {
+            var service = new DatabaseService();
+            await service.EnsureDatabaseReadyAsync(readOnly);
+
+            var writable = SpilledPath();
+            await service.EnsureDatabaseReadyAsync(writable);
+            await service.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "w", Path = writable }]);
+
+            Assert.False(service.IsReadOnly);
+        }
+        finally
+        {
+            Writable();
+        }
+    }
+
+    // A share or a disc: the file itself allows writing, the place it is kept does not
+    [Fact]
+    public async Task ACatalogueInAFolderThatCannotBeWrittenIsReadOnly()
+    {
+        if (!OperatingSystem.IsWindows())
+            return;
+
+        var folder = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), $"VVO_ReadOnlyFolder_{Guid.NewGuid()}"));
+        var path = Path.Combine(folder.FullName, "catalogue.vvo");
+        var writer = new DatabaseService();
+        await writer.EnsureDatabaseReadyAsync(path);
+        await writer.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "kept", Path = path }]);
+
+        var user = System.Security.Principal.WindowsIdentity.GetCurrent().User!;
+        var denial = new System.Security.AccessControl.FileSystemAccessRule(
+            user,
+            System.Security.AccessControl.FileSystemRights.CreateFiles | System.Security.AccessControl.FileSystemRights.WriteData,
+            System.Security.AccessControl.InheritanceFlags.ContainerInherit | System.Security.AccessControl.InheritanceFlags.ObjectInherit,
+            System.Security.AccessControl.PropagationFlags.None,
+            System.Security.AccessControl.AccessControlType.Deny);
+        var security = folder.GetAccessControl();
+        security.AddAccessRule(denial);
+        folder.SetAccessControl(security);
+
+        try
+        {
+            var service = new DatabaseService();
+            await service.EnsureDatabaseReadyAsync(path);
+
+            Assert.True(service.IsReadOnly);
+            Assert.Single(await service.ReadItemsAsync<DatabaseMetadata>());
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() =>
+                service.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "x", Path = path }]));
+        }
+        finally
+        {
+            security.RemoveAccessRule(denial);
+            folder.SetAccessControl(security);
+            try { folder.Delete(true); } catch { }
+        }
+    }
+
+    #endregion
 }

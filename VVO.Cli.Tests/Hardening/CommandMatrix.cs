@@ -7,11 +7,13 @@ namespace VVO.Cli.Tests.Hardening;
 /// <param name="Valid">Arguments that make the command succeed against a fresh fixture, --db included.</param>
 /// <param name="Destructive">Asks the user before it changes anything, even with valid arguments.</param>
 /// <param name="ConfirmationWord">What the user types to go ahead, for a destructive command.</param>
+/// <param name="Writes">Changes the catalogue named by --db.</param>
 public sealed record MatrixCase(
     string Path,
     Func<MatrixFixture, string[]> Valid,
     bool Destructive = false,
-    string? ConfirmationWord = null)
+    string? ConfirmationWord = null,
+    bool Writes = false)
 {
     public override string ToString() => Path;
 }
@@ -28,34 +30,34 @@ public static class CommandMatrix
         new("db new", f => ["db", "new", f.ScratchPath("new.vvo")]),
         new("db info", f => ["db", "info", "--db", f.Catalogue.Path]),
         new("db copy", f => ["db", "copy", f.ScratchPath("copy.vvo"), "--db", f.Catalogue.Path]),
-        new("db shrink", f => ["db", "shrink", "--db", f.Catalogue.Path]),
+        new("db shrink", f => ["db", "shrink", "--db", f.Catalogue.Path], Writes: true),
         new("db export", f => ["db", "export", f.ScratchPath("out.json"), "--db", f.Catalogue.Path]),
         new("db import", f => ["db", "import", f.ExportPath, "--db", f.ScratchPath("imported.vvo")]),
 
         new("volume list", f => ["volume", "list", "--db", f.Catalogue.Path]),
-        new("volume create", f => ["volume", "create", "New", "--db", f.Catalogue.Path]),
-        new("volume update", f => ["volume", "update", f.Archive.Id.ToString(), "--name", "Old", "--db", f.Catalogue.Path]),
+        new("volume create", f => ["volume", "create", "New", "--db", f.Catalogue.Path], Writes: true),
+        new("volume update", f => ["volume", "update", f.Archive.Id.ToString(), "--name", "Old", "--db", f.Catalogue.Path], Writes: true),
         new("volume delete", f => ["volume", "delete", f.Archive.Id.ToString(), "--db", f.Catalogue.Path],
-            Destructive: true, ConfirmationWord: "delete"),
+            Destructive: true, ConfirmationWord: "delete", Writes: true),
 
         new("folder list", f => ["folder", "list", "--db", f.Catalogue.Path]),
-        new("folder scan", f => ["folder", "scan", f.Disk.Root, "--volume", f.Archive.Id.ToString(), "--db", f.Catalogue.Path]),
-        new("folder update", f => ["folder", "update", f.Folder.Id.ToString(), "--label", "Docs", "--db", f.Catalogue.Path]),
-        new("folder copy", f => ["folder", "copy", f.Folder.Id.ToString(), "--to", f.Archive.Id.ToString(), "--db", f.Catalogue.Path]),
-        new("folder move", f => ["folder", "move", f.Folder.Id.ToString(), "--to", f.Archive.Id.ToString(), "--db", f.Catalogue.Path]),
+        new("folder scan", f => ["folder", "scan", f.Disk.Root, "--volume", f.Archive.Id.ToString(), "--db", f.Catalogue.Path], Writes: true),
+        new("folder update", f => ["folder", "update", f.Folder.Id.ToString(), "--label", "Docs", "--db", f.Catalogue.Path], Writes: true),
+        new("folder copy", f => ["folder", "copy", f.Folder.Id.ToString(), "--to", f.Archive.Id.ToString(), "--db", f.Catalogue.Path], Writes: true),
+        new("folder move", f => ["folder", "move", f.Folder.Id.ToString(), "--to", f.Archive.Id.ToString(), "--db", f.Catalogue.Path], Writes: true),
         new("folder delete", f => ["folder", "delete", f.Copy.Id.ToString(), "--db", f.Catalogue.Path],
-            Destructive: true, ConfirmationWord: "delete"),
+            Destructive: true, ConfirmationWord: "delete", Writes: true),
         new("folder rescan", f => ["folder", "rescan", f.Folder.Id.ToString(), "--db", f.Catalogue.Path],
-            Destructive: true, ConfirmationWord: "update"),
+            Destructive: true, ConfirmationWord: "update", Writes: true),
 
         new("ls", f => ["ls", f.Folder.Id.ToString(), "--db", f.Catalogue.Path]),
         new("tree", f => ["tree", f.Folder.Id.ToString(), "--db", f.Catalogue.Path]),
         new("stat", f => ["stat", f.File.Id.ToString(), "--db", f.Catalogue.Path]),
         new("search", f => ["search", "beach", "--db", f.Catalogue.Path]),
         new("compare", f => ["compare", f.Folder.Id.ToString(), "--disk", f.Disk.Root, "--db", f.Catalogue.Path]),
-        new("add", f => ["add", f.SubFolder.Id.ToString(), f.Disk.PathOf("readme.txt"), "--db", f.Catalogue.Path]),
+        new("add", f => ["add", f.SubFolder.Id.ToString(), f.Disk.PathOf("readme.txt"), "--db", f.Catalogue.Path], Writes: true),
         new("rm", f => ["rm", f.File.Id.ToString(), "--db", f.Catalogue.Path],
-            Destructive: true, ConfirmationWord: "delete"),
+            Destructive: true, ConfirmationWord: "delete", Writes: true),
 
         new("about", _ => ["about"])
     ];
@@ -64,6 +66,14 @@ public static class CommandMatrix
 
     public static IEnumerable<object[]> TakingDb => Cases
         .Where(item => TakesDb(item.Path))
+        .Select(item => new object[] { item });
+
+    /// <summary>
+    /// The commands that open the fixture's catalogue as an existing one; db new and db import
+    /// create theirs.
+    /// </summary>
+    public static IEnumerable<object[]> OpeningTheCatalogue => Cases
+        .Where(item => TakesDb(item.Path) && item.Path != "db import")
         .Select(item => new object[] { item });
 
     public static IEnumerable<object[]> DestructiveCases => Cases

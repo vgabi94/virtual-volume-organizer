@@ -16,6 +16,12 @@ public interface IDatabaseService
     string DbPath { get; }
 
     /// <summary>
+    /// The open catalogue can be read but not written: every write ends in
+    /// <see cref="CatalogueReadOnlyException"/> with nothing changed.
+    /// </summary>
+    bool IsReadOnly { get; }
+
+    /// <summary>
     /// Sets current working database file and ensures the tables are initialized. Anything the
     /// file already holds is cleared out first when <paramref name="replace"/> is asked for.
     /// </summary>

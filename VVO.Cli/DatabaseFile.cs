@@ -32,6 +32,21 @@ public static class DatabaseFile
     }
 
     /// <summary>
+    /// Opens a catalogue a command is about to change. One that can only be read is refused here,
+    /// before the command scans anything or asks the user anything.
+    /// </summary>
+    /// <returns>The full path of the catalogue.</returns>
+    public static async Task<string> OpenForWritingAsync(CommandContext context, Option<string> option)
+    {
+        var path = await OpenExistingAsync(context, option);
+
+        if (context.Service<IDatabaseService>().IsReadOnly)
+            throw new CatalogueReadOnlyException(path);
+
+        return path;
+    }
+
+    /// <summary>
     /// Creates a catalogue, replacing whatever file is at the path once the user has agreed to it.
     /// </summary>
     /// <returns>The full path of the catalogue.</returns>

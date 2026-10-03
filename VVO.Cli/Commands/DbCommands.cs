@@ -126,7 +126,7 @@ public static class DbCommands
 
         command.SetJsonAction(services, async context =>
         {
-            var path = await DatabaseFile.OpenExistingAsync(context, db);
+            var path = await DatabaseFile.OpenForWritingAsync(context, db);
             var database = context.Service<IDatabaseService>();
 
             var before = new FileInfo(path).Length;

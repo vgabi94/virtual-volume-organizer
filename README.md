@@ -84,6 +84,8 @@ vvo search holiday --db D:\Catalogues\backup.vvo --format table
 - Volumes, folders and records are named by id. Every listing returns the ids to act on.
 - Progress goes to stderr; `--quiet` silences it. `--format table` prints for people instead of JSON.
 - A failure is JSON too: `{ "error": { "code": "...", "message": "..." } }`.
+- A catalogue that can't be written (read-only file, share or disc) can still be read; commands
+  that would change it end in `read_only` without changing anything.
 
 **Commands**
 
@@ -104,7 +106,7 @@ vvo search holiday --db D:\Catalogues\backup.vvo --format table
 | Code | Error code | Meaning |
 |---|---|---|
 | 0 | | Success |
-| 1 | `error`, `invalid_database`, `invalid_file` | Something went wrong, the file is not a catalogue, or an export cannot be read. Also differences found, for `compare --exit-code` |
+| 1 | `error`, `invalid_database`, `invalid_file`, `read_only` | Something went wrong, the file is not a catalogue, an export cannot be read, or a change was asked of a catalogue that can only be read. Also differences found, for `compare --exit-code` |
 | 2 | `usage` | Bad arguments |
 | 3 | `not_found` | No such catalogue, id, file or folder |
 | 4 | `confirmation_required` | A destructive command run without a terminal (see below) |

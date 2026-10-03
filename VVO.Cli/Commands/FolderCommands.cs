@@ -85,7 +85,7 @@ public static class FolderCommands
         {
             var chosen = appearance.Read(context);
 
-            await DatabaseFile.OpenExistingAsync(context, db);
+            await DatabaseFile.OpenForWritingAsync(context, db);
 
             // Before the scan, which can take a long time to find out about a mistyped id
             var volumeId = (await Catalogue.VolumeAsync(context, context.ParseResult.GetValue(volume))).Id;
@@ -130,7 +130,7 @@ public static class FolderCommands
             if (!chosen.Any)
                 throw CliException.Usage("Give at least one of --label, --description, --icon or --color.");
 
-            await DatabaseFile.OpenExistingAsync(context, db);
+            await DatabaseFile.OpenForWritingAsync(context, db);
 
             var entry = await Catalogue.EntryAsync(context, context.ParseResult.GetValue(id));
             var updated = await context.Service<IVirtualVolumeService>().UpdateFolderAsync(
@@ -162,7 +162,7 @@ public static class FolderCommands
 
         command.SetJsonAction(services, async context =>
         {
-            await DatabaseFile.OpenExistingAsync(context, db);
+            await DatabaseFile.OpenForWritingAsync(context, db);
 
             var copy = await context.Service<IVirtualVolumeService>().CopyFolderAsync(
                 context.ParseResult.GetValue(id),
@@ -185,7 +185,7 @@ public static class FolderCommands
 
         command.SetJsonAction(services, async context =>
         {
-            await DatabaseFile.OpenExistingAsync(context, db);
+            await DatabaseFile.OpenForWritingAsync(context, db);
 
             var entryId = context.ParseResult.GetValue(id);
             await context.Service<IVirtualVolumeService>().MoveFolderAsync(entryId, context.ParseResult.GetValue(to));
@@ -211,7 +211,7 @@ public static class FolderCommands
 
         command.SetJsonAction(services, async context =>
         {
-            await DatabaseFile.OpenExistingAsync(context, db);
+            await DatabaseFile.OpenForWritingAsync(context, db);
 
             var entry = await Catalogue.EntryAsync(context, context.ParseResult.GetValue(id));
             var folder = await Catalogue.DescribeAsync(context, entry);
@@ -251,7 +251,7 @@ public static class FolderCommands
 
         command.SetJsonAction(services, async context =>
         {
-            var dbPath = await DatabaseFile.OpenExistingAsync(context, db);
+            var dbPath = await DatabaseFile.OpenForWritingAsync(context, db);
 
             var entry = await Catalogue.EntryAsync(context, context.ParseResult.GetValue(id));
             var source = context.ParseResult.GetValue(path) ?? entry.Path;

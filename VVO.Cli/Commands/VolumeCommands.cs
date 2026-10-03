@@ -55,7 +55,7 @@ public static class VolumeCommands
             var chosenIcon = Appearance.VolumeIcon(context.ParseResult.GetValue(icon) ?? IconKeys.DefaultVolume);
             var chosenColor = context.ParseResult.GetValue(color) is { } value ? Appearance.Color(value) : null;
 
-            await DatabaseFile.OpenExistingAsync(context, db);
+            await DatabaseFile.OpenForWritingAsync(context, db);
 
             var volume = await context.Service<IVirtualVolumeService>().CreateVirtualVolumeAsync(
                 context.ParseResult.GetRequiredValue(name).Trim(), chosenIcon, chosenColor);
@@ -93,7 +93,7 @@ public static class VolumeCommands
             var chosenIcon = newIcon != null ? Appearance.VolumeIcon(newIcon) : null;
             var chosenColor = newColor != null ? Appearance.Color(newColor) : null;
 
-            await DatabaseFile.OpenExistingAsync(context, db);
+            await DatabaseFile.OpenForWritingAsync(context, db);
 
             var volume = await Catalogue.VolumeAsync(context, context.ParseResult.GetValue(id));
             var updated = volume with
@@ -127,7 +127,7 @@ public static class VolumeCommands
 
         command.SetJsonAction(services, async context =>
         {
-            await DatabaseFile.OpenExistingAsync(context, db);
+            await DatabaseFile.OpenForWritingAsync(context, db);
 
             var volume = await Catalogue.VolumeAsync(context, context.ParseResult.GetValue(id));
             var folderCount = (await FolderCountsAsync(context)).GetValueOrDefault(volume.Id);
