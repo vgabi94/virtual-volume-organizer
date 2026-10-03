@@ -226,7 +226,13 @@ public class DatabaseService : IDatabaseService
     {
         return ExclusiveAsync<object?>(() =>
         {
-            WhileBusy(_dbPath, () => File.Copy(_dbPath, targetPath, overwrite: true));
+            // Only the catalogue is waited on: a target another program holds is that program's
+            // business, and reporting it as the catalogue being busy would name the wrong file
+            using var source = WhileBusy(_dbPath, () =>
+                new FileStream(_dbPath, FileMode.Open, FileAccess.Read, FileShare.Read));
+            using var target = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.None);
+
+            source.CopyTo(target);
             return null;
         });
     }

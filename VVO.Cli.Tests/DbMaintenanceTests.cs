@@ -81,6 +81,22 @@ public class DbMaintenanceTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task ATargetHeldByAnotherProgramIsNotReportedAsTheCatalogueBeingBusy()
+    {
+        var target = PathOf("held.vvo");
+        File.WriteAllText(target, "old");
+        using var hold = new FileStream(target, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        var waited = System.Diagnostics.Stopwatch.StartNew();
+
+        var result = await RunAsync(ScriptedTerminal.Typing("replace"), "db", "copy", target);
+
+        Assert.Equal(1, result.ExitCode);
+        Assert.Equal("error", result.ErrorCode);
+        Assert.Contains("held.vvo", result.Error.GetProperty("message").GetString());
+        Assert.True(waited.Elapsed < TimeSpan.FromSeconds(2), $"Took {waited.Elapsed}.");
+    }
+
+    [Fact]
     public async Task CopyingOntoItselfIsAUsageError()
     {
         var before = File.ReadAllBytes(_catalogue.Path);
@@ -162,6 +178,30 @@ public class DbMaintenanceTests : IAsyncLifetime
         using var copy = await TempCatalogue.CreateAsync();
         File.Copy(imported, copy.Path, overwrite: true);
         Assert.Equal(await _catalogue.SnapshotAsync(), await copy.SnapshotAsync());
+    }
+
+    [Fact]
+    public async Task ExportingOverTheCatalogueItselfIsAUsageError()
+    {
+        var before = File.ReadAllBytes(_catalogue.Path);
+
+        var result = await RunAsync(ScriptedTerminal.Typing("replace"), "db", "export", _catalogue.Path);
+
+        Assert.Equal(2, result.ExitCode);
+        Assert.Equal(before, File.ReadAllBytes(_catalogue.Path));
+    }
+
+    [Fact]
+    public async Task ImportingAnExportOverItselfIsAUsageError()
+    {
+        var json = PathOf("export.json");
+        await RunAsync("db", "export", json);
+        var before = File.ReadAllBytes(json);
+
+        var result = await CliRunner.RunAsync(["db", "import", json, "--db", json], terminal: ScriptedTerminal.Typing("replace"));
+
+        Assert.Equal(2, result.ExitCode);
+        Assert.Equal(before, File.ReadAllBytes(json));
     }
 
     [Fact]

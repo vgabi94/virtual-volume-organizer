@@ -153,9 +153,12 @@ public static class DbCommands
 
         command.SetJsonAction(services, async context =>
         {
-            await DatabaseFile.OpenExistingAsync(context, db);
+            var catalogue = await DatabaseFile.OpenExistingAsync(context, db);
 
             var path = Path.GetFullPath(context.ParseResult.GetRequiredValue(json));
+            if (string.Equals(path, catalogue, StringComparison.OrdinalIgnoreCase))
+                throw CliException.Usage("A catalogue cannot be exported over itself.");
+
             if (Directory.Exists(path))
                 throw CliException.Usage($"'{path}' is a folder. Give the file to write the export to.");
 
@@ -183,6 +186,9 @@ public static class DbCommands
                 throw CliException.NotFound($"There is no export at '{source}'.");
 
             var path = DatabaseFile.FullPath(context, db);
+            if (string.Equals(path, source, StringComparison.OrdinalIgnoreCase))
+                throw CliException.Usage("An export cannot be imported over itself. Give --db a catalogue to build.");
+
             DatabaseFile.ConfirmReplacing(context, path);
 
             // The export is read in full before the catalogue is replaced, so a bad one costs nothing
