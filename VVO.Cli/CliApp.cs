@@ -23,11 +23,18 @@ public static class CliApp
         Recursive = true
     };
 
+    // An argument starting with '@' is just text: a search term, a label or a file name. Read as
+    // a response file it would fail, or worse, pull in arguments nobody typed
+    private static readonly ParserConfiguration Parser = new() { ResponseFileTokenReplacer = null };
+
     public static RootCommand BuildRoot(IServiceProvider services)
     {
         var root = new RootCommand(
             "Virtual Volume Organizer command line. Reads and edits .vvo catalogues; "
             + "output is JSON on stdout.");
+
+        // Directives such as [suggest] write plain text to stdout, which has to hold JSON alone
+        root.Directives.Clear();
 
         root.Options.Add(QuietOption);
         root.Options.Add(FormatOption);
@@ -60,7 +67,7 @@ public static class CliApp
         TextWriter error,
         CancellationToken cancellationToken = default)
     {
-        var parseResult = root.Parse(args);
+        var parseResult = root.Parse(args, Parser);
 
         if (parseResult.Errors.Count > 0)
         {
@@ -68,7 +75,7 @@ public static class CliApp
             Json.Write(output, CliException.Usage(message).ToEnvelope());
 
             // Help for the command that was being typed, kept off stdout so the JSON stays alone there
-            var help = root.Parse([.. CommandPath(parseResult), "--help"]);
+            var help = root.Parse([.. CommandPath(parseResult), "--help"], Parser);
             await help.InvokeAsync(new InvocationConfiguration { Output = error, Error = error });
 
             return (int)ExitCode.Usage;
