@@ -3,6 +3,7 @@ using System.CommandLine.Parsing;
 using System.Runtime.CompilerServices;
 using System.Text;
 using VVO.Cli.Output;
+using VVO.Core;
 
 namespace VVO.Cli;
 
@@ -57,6 +58,15 @@ public static class Confirmation
             throw new CliException(
                 ExitCode.Cancelled, ErrorCodes.Cancelled, "Not confirmed. Nothing was changed.");
         }
+    }
+
+    /// <summary>
+    /// Asks about a deletion in the words the GUI's delete dialog uses.
+    /// </summary>
+    public static void RequireDeletion(CommandContext context, DeletionWarning warning)
+    {
+        Require(context, new ConfirmationRequest(
+            warning.Title, warning.ItemName, warning.Message, DeletionWarnings.ConfirmationWord));
     }
 
     /// <summary>
