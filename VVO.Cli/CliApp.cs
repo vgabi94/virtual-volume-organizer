@@ -32,6 +32,8 @@ public static class CliApp
             root.Subcommands.Add(command);
         }
 
+        root.Subcommands.Add(SearchCommand.Create(services));
+
         return root;
     }
 

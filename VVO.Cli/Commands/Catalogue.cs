@@ -91,6 +91,43 @@ public static class Catalogue
     }
 
     /// <summary>
+    /// The given records together with every folder above them, read a level at a time so that
+    /// records sharing folders cost a query per level rather than one per record.
+    /// </summary>
+    public static async Task<IReadOnlyCollection<FileRecord>> WithAncestorsAsync(
+        CommandContext context, IEnumerable<FileRecord> records)
+    {
+        var database = context.Service<IDatabaseService>();
+        var known = records.ToDictionary(record => record.Id);
+
+        var missing = MissingParents(known, known.Values);
+        while (missing.Count > 0)
+        {
+            var ids = missing;
+            var parents = await database.FindItemsAsync<FileRecord>(record => ids.Contains(record.Id));
+
+            if (parents.Count < ids.Count)
+                throw new InvalidOperationException("A catalogue record has lost its parent.");
+
+            foreach (var parent in parents)
+            {
+                known[parent.Id] = parent;
+            }
+
+            missing = MissingParents(known, parents);
+        }
+
+        return known.Values;
+    }
+
+    private static List<Guid> MissingParents(Dictionary<Guid, FileRecord> known, IEnumerable<FileRecord> records) =>
+        records
+            .Where(record => record.ParentId is { } parentId && !known.ContainsKey(parentId))
+            .Select(record => record.ParentId!.Value)
+            .Distinct()
+            .ToList();
+
+    /// <summary>
     /// Places records the way each of the given entries does.
     /// </summary>
     /// <param name="records">
@@ -120,4 +157,10 @@ public sealed class Placer(IReadOnlyList<(RootFolderMetadata Entry, EntryPaths P
 {
     public RecordDto Describe(FileRecord record) =>
         RecordDto.From(record, entries.Select(item => PlacementDto.From(item.Entry, item.Paths, record.Id)).ToList());
+
+    /// <summary>
+    /// The record once for each entry, carrying only the place that entry puts it.
+    /// </summary>
+    public IEnumerable<RecordDto> DescribeEach(FileRecord record) =>
+        entries.Select(item => RecordDto.From(record, [PlacementDto.From(item.Entry, item.Paths, record.Id)]));
 }
