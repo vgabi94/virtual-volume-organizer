@@ -81,13 +81,7 @@ public static class CompareCommand
                 Left = Side(leftEntry, leftRecords),
                 Right = rightSide,
                 SkippedFolders = skippedFolders,
-                Counts = new
-                {
-                    Added = Count(results, ComparisonStatus.Added),
-                    Removed = Count(results, ComparisonStatus.Removed),
-                    Changed = Count(results, ComparisonStatus.Changed),
-                    Unchanged = Count(results, ComparisonStatus.Unchanged)
-                },
+                Counts = DifferenceCounts.From(results),
                 Rows = rows
             };
         });
@@ -113,7 +107,4 @@ public static class CompareCommand
         var root = records.Single(record => record.Id == entry.TreeId);
         return new { EntryId = (Guid?)entry.Id, Title = (string?)EntryPaths.TitleOf(entry, root), entry.Path };
     }
-
-    private static int Count(IEnumerable<ComparisonResult> results, ComparisonStatus status) =>
-        results.Count(result => result.Status == status);
 }

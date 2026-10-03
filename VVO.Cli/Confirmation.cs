@@ -8,7 +8,15 @@ using VVO.Core;
 namespace VVO.Cli;
 
 /// <param name="Word">What the user has to type, exactly, to go ahead.</param>
-public sealed record ConfirmationRequest(string Title, string ItemName, string Message, string Word);
+/// <param name="Explanation">Shown at the terminal ahead of the warning, such as what a rescan would change.</param>
+/// <param name="Facts">Given to an agent with confirmation_required, so it can tell the user what is at stake.</param>
+public sealed record ConfirmationRequest(
+    string Title,
+    string ItemName,
+    string Message,
+    string Word,
+    IReadOnlyList<string>? Explanation = null,
+    IReadOnlyDictionary<string, object?>? Facts = null);
 
 /// <summary>
 /// The terminal's counterpart to the GUI's confirm dialogs: the same warning, and a word the
@@ -38,14 +46,24 @@ public static class Confirmation
 
         if (!terminal.IsInteractive)
         {
+            var details = new Dictionary<string, object?>(request.Facts ?? new Dictionary<string, object?>())
+            {
+                ["command"] = CommandLine(context.ParseResult)
+            };
+
             throw new CliException(
                 ExitCode.ConfirmationRequired,
                 ErrorCodes.ConfirmationRequired,
                 $"{request.Message} Run the command in a terminal to confirm.",
-                new Dictionary<string, object?> { ["command"] = CommandLine(context.ParseResult) });
+                details);
         }
 
         // Written even under --quiet: a prompt nobody can see would look like a hang
+        foreach (var line in request.Explanation ?? [])
+        {
+            context.Error.WriteLine(line);
+        }
+
         context.Error.WriteLine(request.Title);
         context.Error.WriteLine(request.ItemName);
         context.Error.WriteLine(request.Message);
@@ -113,6 +131,12 @@ public static class Confirmation
 
         return tokens;
     }
+
+    /// <summary>
+    /// Another command for the user or agent to run, written the same way.
+    /// </summary>
+    public static string CommandLine(params string[] args) =>
+        string.Join(' ', args.Prepend("vvo").Select((arg, index) => index == 0 ? arg : Quote(arg)));
 
     // The Windows command-line convention, which is what vvo.exe parses its arguments with
     private static string Quote(string value)

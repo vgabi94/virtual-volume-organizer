@@ -123,6 +123,11 @@ public class CompareCommandTests : IAsyncLifetime
         Assert.Equal(1, result.ExitCode);
         Assert.Null(result.ErrorCode);
         Assert.Equal("added", Row(result, "new.txt").GetProperty("status").GetString());
+
+        // The root is listed as changed for holding the new file, but is not counted as a change
+        Assert.Equal("changed", Row(result, "").GetProperty("status").GetString());
+        Assert.Equal(0, result.Json.GetProperty("counts").GetProperty("changed").GetInt32());
+        Assert.Equal(1, result.Json.GetProperty("counts").GetProperty("added").GetInt32());
     }
 
     [Fact]

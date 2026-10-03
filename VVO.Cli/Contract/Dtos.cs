@@ -132,3 +132,24 @@ public sealed record ComparisonRowDto(
         return list;
     }
 }
+
+/// <summary>
+/// How many things differ. A folder reported as changed only because something below it did is
+/// left out, as the GUI leaves it out: it is there to give its rows a parent, not a change itself.
+/// </summary>
+public sealed record DifferenceCounts(int Added, int Removed, int Changed, int Unchanged)
+{
+    public static bool IsOnlyAParent(ComparisonResult row) =>
+        row.Status == ComparisonStatus.Changed && row.Changes == ChangeKind.None;
+
+    public static DifferenceCounts From(IEnumerable<ComparisonResult> results)
+    {
+        var counted = results.Where(row => !IsOnlyAParent(row)).ToList();
+
+        return new DifferenceCounts(
+            counted.Count(row => row.Status == ComparisonStatus.Added),
+            counted.Count(row => row.Status == ComparisonStatus.Removed),
+            counted.Count(row => row.Status == ComparisonStatus.Changed),
+            counted.Count(row => row.Status == ComparisonStatus.Unchanged));
+    }
+}

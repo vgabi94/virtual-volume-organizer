@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Collections;
+using VVO.Core;
 using VVO.Core.Models;
 
 namespace VVO.UI.ViewModels;
@@ -52,9 +53,7 @@ public class CompareResultsViewModel
     // Turning the update down and closing the window are the same button
     public string CloseText => IsUpdate ? "Cancel" : "Close";
 
-    public string Proposal => IsUpdate
-        ? "Rescanning replaces what is catalogued for this folder with what was just scanned."
-        : string.Empty;
+    public string Proposal => IsUpdate ? ScanWarnings.RescanProposal : string.Empty;
 
     public bool HasDifferences => Rows.Count > 0;
 

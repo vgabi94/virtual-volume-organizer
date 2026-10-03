@@ -2,6 +2,7 @@ using System.CommandLine;
 using VVO.Cli.Contract;
 using VVO.Cli.Output;
 using VVO.Core;
+using VVO.Core.Models;
 using VVO.Core.Services;
 
 namespace VVO.Cli.Commands;
@@ -17,7 +18,8 @@ public static class FolderCommands
             Update(services),
             Copy(services),
             Move(services),
-            Delete(services)
+            Delete(services),
+            Rescan(services)
         };
     }
 
@@ -223,6 +225,131 @@ public static class FolderCommands
         });
 
         return command;
+    }
+
+    private const int ShownDifferences = 50;
+
+    private static Command Rescan(IServiceProvider services)
+    {
+        var db = DatabaseFile.CreateOption();
+        var id = new Argument<Guid>("id") { Description = "The folder entry to rescan." };
+        var path = new Argument<string?>("path")
+        {
+            Description = "Where to read it from. Where it was last scanned from when left out.",
+            Arity = ArgumentArity.ZeroOrOne
+        }.TakesPath();
+        var hidden = Scanning.CreateHiddenOption();
+
+        var command = new Command(
+            "rescan",
+            "Read a folder from disk again and replace what is catalogued for it. Shows what would change "
+            + "and asks the user to type 'update' first. 'compare <id> --disk <path>' shows the same "
+            + "differences without asking.")
+        {
+            id, path, db, hidden
+        };
+
+        command.SetJsonAction(services, async context =>
+        {
+            var dbPath = await DatabaseFile.OpenExistingAsync(context, db);
+
+            var entry = await Catalogue.EntryAsync(context, context.ParseResult.GetValue(id));
+            var source = context.ParseResult.GetValue(path) ?? entry.Path;
+            if (string.IsNullOrWhiteSpace(source))
+                throw CliException.Usage("The folder has no path on disk recorded. Give the one to read it from.");
+
+            var treeId = entry.TreeId;
+            var catalogued = await context.Service<IDatabaseService>()
+                .FindItemsAsync<FileRecord>(record => record.RootFolderId == treeId);
+            var title = EntryPaths.TitleOf(entry, catalogued.Single(record => record.Id == treeId));
+
+            var scan = await Scanning.ScanAsync(context, source, hidden);
+            var differences = await context.Service<IFolderCompareService>().CompareAsync(
+                entry, catalogued, scan.Metadata, scan.Records,
+                includeUnchanged: false, context.Progress, context.CancellationToken);
+
+            var counts = DifferenceCounts.From(differences);
+
+            Confirmation.Require(context, new ConfirmationRequest(
+                "Rescan Folder",
+                title,
+                $"{ScanWarnings.RescanProposal} This cannot be undone.",
+                "update",
+                Explanation(scan, differences, counts),
+                new Dictionary<string, object?>
+                {
+                    ["path"] = scan.Metadata.Path,
+                    ["counts"] = counts,
+                    ["skippedFolders"] = scan.SkippedFolders,
+                    ["preview"] = Confirmation.CommandLine(
+                        "compare", entry.Id.ToString(), "--disk", scan.Metadata.Path, "--db", dbPath)
+                }));
+
+            var updated = await context.Service<IVirtualVolumeService>().UpdateFolderContentsAsync(
+                entry.Id, scan.Metadata, scan.Records, context.Progress, context.CancellationToken);
+
+            return new
+            {
+                Folder = await Catalogue.DescribeAsync(context, updated),
+                Counts = counts,
+                scan.SkippedFolders
+            };
+        });
+
+        return command;
+    }
+
+    // What the GUI shows before an update: the warning about what was not read, then the changes
+    private static List<string> Explanation(
+        ScanResult scan, IReadOnlyList<ComparisonResult> differences, DifferenceCounts counts)
+    {
+        var lines = new List<string>();
+
+        if (scan.SkippedFolders > 0)
+        {
+            lines.Add(ScanWarnings.SkippedTitle);
+            lines.Add(ScanWarnings.DescribeSkipped(scan.SkippedFolders, scan.Metadata.Path));
+            lines.Add(string.Empty);
+        }
+
+        var shown = differences.Where(row => !DifferenceCounts.IsOnlyAParent(row)).ToList();
+
+        lines.Add(shown.Count == 0
+            ? "Nothing has changed since the last scan."
+            : $"{counts.Added} added, {counts.Removed} removed, {counts.Changed} changed:");
+
+        foreach (var row in shown.Take(ShownDifferences))
+        {
+            lines.Add($"  {Describe(row)}");
+        }
+
+        if (shown.Count > ShownDifferences)
+        {
+            lines.Add($"  and {shown.Count - ShownDifferences} more");
+        }
+
+        lines.Add(string.Empty);
+        return lines;
+    }
+
+    private static string Describe(ComparisonResult row)
+    {
+        var mark = row.Status switch
+        {
+            ComparisonStatus.Added => "+",
+            ComparisonStatus.Removed => "-",
+            _ => "~"
+        };
+
+        var isFolder = (row.Left ?? row.Right)?.IsFolder == true;
+        var name = isFolder ? $"{row.RelativePath}{CataloguePath.Separator}" : row.RelativePath;
+
+        var details = new List<string>();
+        if (row.Changes.HasFlag(ChangeKind.Size)) details.Add("size");
+        if (row.Changes.HasFlag(ChangeKind.Modified)) details.Add("modified");
+        if (row.DescendantCount is > 0) details.Add($"{row.DescendantCount} inside");
+
+        return details.Count == 0 ? $"{mark} {name}" : $"{mark} {name} ({string.Join(", ", details)})";
     }
 
     private static string? Blank(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
