@@ -64,13 +64,18 @@ public static class SearchCommand
                     .ToList();
             }
 
-            var known = await Catalogue.WithAncestorsAsync(context, found);
+            var known = (await Catalogue.WithAncestorsAsync(context, found)).ToDictionary(record => record.Id);
+
+            // A record whose folders above are gone can't be placed; one such does not sink the search
+            var placed = found.Where(record => Catalogue.IsPlaced(record, known)).ToList();
+            var unplaced = found.Count - placed.Count;
+            found = placed;
 
             var hits = new List<RecordDto>();
             foreach (var tree in found.GroupBy(record => record.RootFolderId))
             {
                 var placer = await Catalogue.PlacerAsync(
-                    context, entries.Where(entry => entry.TreeId == tree.Key).ToList(), known);
+                    context, entries.Where(entry => entry.TreeId == tree.Key).ToList(), known.Values);
 
                 hits.AddRange(tree.SelectMany(placer.DescribeEach));
             }
@@ -85,7 +90,8 @@ public static class SearchCommand
             {
                 Hits = ordered.Take(most).ToList(),
                 Total = ordered.Count,
-                Truncated = ordered.Count > most
+                Truncated = ordered.Count > most,
+                Unplaced = unplaced
             };
         }, TableFormat.Search);
 

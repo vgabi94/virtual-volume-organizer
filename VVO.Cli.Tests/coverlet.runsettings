@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Coverage of our own code: generated sources and the process entry point are left out.
-     Program.cs is exercised through a real process by the hardening tests instead. -->
+     Program.cs is exercised through a real process by the hardening tests instead.
+     dotnet test VVO.Cli.Tests --settings VVO.Cli.Tests/coverlet.runsettings -->
 <RunSettings>
   <DataCollectionRunSettings>
     <DataCollectors>

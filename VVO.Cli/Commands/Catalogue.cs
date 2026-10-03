@@ -11,8 +11,21 @@ namespace VVO.Cli.Commands;
 /// </summary>
 public static class Catalogue
 {
-    public static Task<IReadOnlyCollection<RootFolderMetadata>> EntriesAsync(CommandContext context) =>
-        context.Service<IDatabaseService>().ReadItemsAsync<RootFolderMetadata>();
+    /// <summary>
+    /// The folder entries the GUI would list: those whose virtual volume and scanned tree are both
+    /// still there. One that lost either is damage, and is left out of what is read, as the
+    /// sidebar leaves it out.
+    /// </summary>
+    public static async Task<IReadOnlyCollection<RootFolderMetadata>> EntriesAsync(CommandContext context)
+    {
+        var database = context.Service<IDatabaseService>();
+        var volumes = (await database.ReadItemsAsync<VirtualVolumeRecord>()).Select(volume => volume.Id).ToHashSet();
+        var trees = (await RootsAsync(context)).Keys.ToHashSet();
+
+        return (await database.ReadItemsAsync<RootFolderMetadata>())
+            .Where(entry => volumes.Contains(entry.VirtualVolumeId) && trees.Contains(entry.TreeId))
+            .ToList();
+    }
 
     public static async Task<VirtualVolumeRecord> VolumeAsync(CommandContext context, Guid volumeId)
     {
@@ -38,10 +51,13 @@ public static class Catalogue
     public static async Task<FolderEntryDto> DescribeAsync(CommandContext context, RootFolderMetadata entry)
     {
         var treeId = entry.TreeId;
-        var roots = await context.Service<IDatabaseService>().FindItemsAsync<FileRecord>(record => record.Id == treeId);
+        var root = (await context.Service<IDatabaseService>().FindItemsAsync<FileRecord>(record => record.Id == treeId))
+            .SingleOrDefault();
 
-        return FolderEntryDto.From(
-            entry, RootOf(roots.ToDictionary(root => root.Id), entry), await RecordCountAsync(context, treeId));
+        // An entry whose tree is gone can still be deleted, and is described by what it still has
+        return root == null
+            ? FolderEntryDto.From(entry, new FileRecord { Id = treeId, Name = Path.GetFileName(entry.Path) }, 0)
+            : FolderEntryDto.From(entry, root, await RecordCountAsync(context, treeId));
     }
 
     /// <summary>
@@ -77,7 +93,9 @@ public static class Catalogue
     {
         var database = context.Service<IDatabaseService>();
 
-        var entry = (await database.FindItemsAsync<RootFolderMetadata>(item => item.Id == id)).SingleOrDefault();
+        var listed = await EntriesAsync(context);
+
+        var entry = listed.SingleOrDefault(item => item.Id == id);
         if (entry != null)
         {
             var roots = await database.FindItemsAsync<FileRecord>(record => record.Id == entry.TreeId);
@@ -87,8 +105,7 @@ public static class Catalogue
         var found = (await database.FindItemsAsync<FileRecord>(record => record.Id == id)).SingleOrDefault()
             ?? throw CliException.NotFound($"There is no folder entry or catalogue record '{id}'.");
 
-        var entries = await database.FindItemsAsync<RootFolderMetadata>(item => item.TreeId == found.RootFolderId);
-        return new Located(found, entries.ToList());
+        return new Located(found, listed.Where(item => item.TreeId == found.RootFolderId).ToList());
     }
 
     /// <summary>
@@ -113,7 +130,8 @@ public static class Catalogue
 
     /// <summary>
     /// The given records together with every folder above them, read a level at a time so that
-    /// records sharing folders cost a query per level rather than one per record.
+    /// records sharing folders cost a query per level rather than one per record. A folder that is
+    /// gone is simply not there; <see cref="IsPlaced"/> tells which records reach their root.
     /// </summary>
     public static async Task<IReadOnlyCollection<FileRecord>> WithAncestorsAsync(
         CommandContext context, IEnumerable<FileRecord> records)
@@ -127,9 +145,6 @@ public static class Catalogue
             var ids = missing;
             var parents = await database.FindItemsAsync<FileRecord>(record => ids.Contains(record.Id));
 
-            if (parents.Count < ids.Count)
-                throw new InvalidOperationException("A catalogue record has lost its parent.");
-
             foreach (var parent in parents)
             {
                 known[parent.Id] = parent;
@@ -139,6 +154,24 @@ public static class Catalogue
         }
 
         return known.Values;
+    }
+
+    /// <summary>
+    /// Whether every folder above the record is among <paramref name="known"/>, all the way up to
+    /// the root of its tree.
+    /// </summary>
+    public static bool IsPlaced(FileRecord record, IReadOnlyDictionary<Guid, FileRecord> known)
+    {
+        var visited = new HashSet<Guid>();
+        for (var current = record; current.ParentId is { } parentId; )
+        {
+            if (!visited.Add(current.Id) || !known.TryGetValue(parentId, out var parent))
+                return false;
+
+            current = parent;
+        }
+
+        return true;
     }
 
     private static List<Guid> MissingParents(Dictionary<Guid, FileRecord> known, IEnumerable<FileRecord> records) =>
