@@ -24,6 +24,8 @@ public static class CliApp
 
         root.Options.Add(QuietOption);
         root.Subcommands.Add(DbCommands.Create(services));
+        root.Subcommands.Add(VolumeCommands.Create(services));
+        root.Subcommands.Add(FolderCommands.Create(services));
 
         return root;
     }
