@@ -33,6 +33,7 @@ public static class CliApp
         }
 
         root.Subcommands.Add(SearchCommand.Create(services));
+        root.Subcommands.Add(CompareCommand.Create(services));
 
         return root;
     }
