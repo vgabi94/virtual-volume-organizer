@@ -35,6 +35,11 @@ public static class CliApp
         root.Subcommands.Add(SearchCommand.Create(services));
         root.Subcommands.Add(CompareCommand.Create(services));
 
+        foreach (var command in RecordCommands.Create(services))
+        {
+            root.Subcommands.Add(command);
+        }
+
         return root;
     }
 
