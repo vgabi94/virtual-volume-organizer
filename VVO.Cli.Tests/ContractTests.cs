@@ -91,14 +91,12 @@ public class ContractTests
     }
 
     [Fact]
-    public void TreeNode()
+    public void TreeEntry()
     {
         var paths = new Core.EntryPaths(Entry, "Backups", [Root, File]);
-        var describe = (FileRecord record) => RecordDto.From(record, [PlacementDto.From(Entry, paths, record.Id)]);
 
-        var node = new TreeNodeDto(describe(Root), [new TreeNodeDto(describe(File), null)]);
-
-        AssertMatchesSnapshot(node, "tree-node");
+        AssertMatchesSnapshot(
+            new TreeEntryDto(1, RecordDto.From(File, [PlacementDto.From(Entry, paths, FileId)])), "tree-entry");
     }
 
     [Fact]

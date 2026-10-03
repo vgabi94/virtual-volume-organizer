@@ -42,6 +42,20 @@ public static class TableFormat
         return heading + Environment.NewLine + Records(listing.GetProperty("children"));
     }
 
+    public static string Tree(JsonElement tree)
+    {
+        var lines = new List<string> { PlacesOf(tree.GetProperty("folder")).FirstOrDefault() ?? "" };
+
+        foreach (var entry in tree.GetProperty("below").EnumerateArray())
+        {
+            var record = entry.GetProperty("record");
+            var name = Text(record, "name") + (record.GetProperty("isFolder").GetBoolean() ? "\\" : "");
+            lines.Add(new string(' ', entry.GetProperty("depth").GetInt32() * 2) + name);
+        }
+
+        return string.Join(Environment.NewLine, lines);
+    }
+
     public static string Search(JsonElement search)
     {
         var hits = search.GetProperty("hits");

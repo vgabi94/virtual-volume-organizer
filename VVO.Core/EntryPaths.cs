@@ -41,42 +41,55 @@ public sealed class EntryPaths
     public static string TitleOf(RootFolderMetadata entry, FileRecord root) =>
         !string.IsNullOrWhiteSpace(entry.Label) ? entry.Label : root.Name;
 
-    public string CataloguePathOf(Guid recordId) => PathsOf(recordId, 0).Catalogue;
+    public string CataloguePathOf(Guid recordId) => PathsOf(recordId).Catalogue;
 
     /// <summary>
     /// Where the record was on disk when it was scanned. Empty when the entry carries no path.
     /// </summary>
-    public string PhysicalPathOf(Guid recordId) => PathsOf(recordId, 0).Physical;
+    public string PhysicalPathOf(Guid recordId) => PathsOf(recordId).Physical;
 
-    private (string Catalogue, string Physical) PathsOf(Guid recordId, int depth)
+    private (string Catalogue, string Physical) PathsOf(Guid recordId)
     {
-        if (_paths.TryGetValue(recordId, out var cached))
-            return cached;
-
         if (!_records.TryGetValue(recordId, out var record))
             throw new CatalogueItemNotFoundException($"There is no catalogue record '{recordId}' in this tree.", nameof(recordId));
 
-        (string, string) paths;
-        if (record.Id == _entry.TreeId)
+        // Up to the nearest folder already placed, then back down placing each one on the way. A
+        // walk rather than recursion, which a deep enough chain would run out of stack for
+        var below = new Stack<FileRecord>();
+        var visited = new HashSet<Guid>();
+        var current = record;
+
+        while (!_paths.ContainsKey(current.Id))
         {
-            paths = (CataloguePath.Combine(CataloguePath.RootPath(_volumeName), Title), _entry.Path);
-        }
-        else
-        {
-            // Deeper than the tree has records means the parents run in a circle
-            if (record.ParentId is not { } parentId || !_records.ContainsKey(parentId) || depth > _records.Count)
+            if (current.Id == _entry.TreeId)
             {
-                throw new InvalidOperationException(
-                    $"The catalogue record '{record.Id}' has lost its parent '{record.ParentId}' in this tree.");
+                _paths[current.Id] = (CataloguePath.Combine(CataloguePath.RootPath(_volumeName), Title), _entry.Path);
+                break;
             }
 
-            var parent = PathsOf(parentId, depth + 1);
-            paths = (
-                CataloguePath.Combine(parent.Catalogue, record.Name),
-                parent.Physical.Length == 0 ? string.Empty : Path.Combine(parent.Physical, record.Name));
+            // A folder met twice means the parents run in a circle
+            if (!visited.Add(current.Id)
+                || current.ParentId is not { } parentId
+                || !_records.TryGetValue(parentId, out var parent))
+            {
+                throw new InvalidOperationException(
+                    $"The catalogue record '{current.Id}' has lost its parent '{current.ParentId}' in this tree.");
+            }
+
+            below.Push(current);
+            current = parent;
         }
 
-        _paths[recordId] = paths;
+        var paths = _paths[current.Id];
+        while (below.TryPop(out var next))
+        {
+            paths = (
+                CataloguePath.Combine(paths.Catalogue, next.Name),
+                paths.Physical.Length == 0 ? string.Empty : Path.Combine(paths.Physical, next.Name));
+
+            _paths[next.Id] = paths;
+        }
+
         return paths;
     }
 }

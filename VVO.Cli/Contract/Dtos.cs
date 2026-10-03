@@ -83,10 +83,12 @@ public sealed record RecordDto(
             entries);
 }
 
-/// <param name="Children">
-/// What the folder holds, folders first. Null for a file, and for a folder below the depth asked for.
-/// </param>
-public sealed record TreeNodeDto(RecordDto Record, IReadOnlyList<TreeNodeDto>? Children);
+/// <summary>
+/// One record below a folder that tree lists. The list is flat rather than nested, since JSON
+/// readers give up at a nesting depth that a deep enough folder would pass.
+/// </summary>
+/// <param name="Depth">1 for what the folder holds directly, 2 for what that holds, and so on.</param>
+public sealed record TreeEntryDto(int Depth, RecordDto Record);
 
 /// <summary>
 /// One side of a compared pair. A side read from disk was never stored, so it has no id.

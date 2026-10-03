@@ -1,4 +1,5 @@
 using VVO.Core;
+using VVO.Core.Models;
 using VVO.Core.Services;
 
 namespace VVO.Tests;
@@ -122,6 +123,27 @@ public class EntryPathsTests
         var paths = new EntryPaths(Code.Metadata, "test", circular);
 
         Assert.Throws<InvalidOperationException>(() => paths.CataloguePathOf(Code.Record("day1.cs").Id));
+    }
+
+    // Recursing once per folder above would run out of stack long before a chain this deep
+    [Fact]
+    public void AVeryDeepChainIsPlacedWithoutRunningOutOfStack()
+    {
+        const int depth = 5_000;
+        var root = Code.Metadata.TreeId;
+        var records = new List<FileRecord> { Code.Records.Single(record => record.Id == root) };
+
+        var parent = root;
+        for (var level = 1; level <= depth; level++)
+        {
+            var id = Guid.NewGuid();
+            records.Add(new FileRecord { Id = id, RootFolderId = root, ParentId = parent, IsFolder = true, Name = "d" });
+            parent = id;
+        }
+
+        var paths = new EntryPaths(Code.Metadata, "test", records);
+
+        Assert.Equal(@"test:\Code".Length + depth * 2, paths.CataloguePathOf(parent).Length);
     }
 
     [Fact]

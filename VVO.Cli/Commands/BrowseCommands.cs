@@ -60,7 +60,13 @@ public static class BrowseCommands
             Description = "How many levels below the folder to go. Everything below it when left out."
         };
 
-        var command = new Command("tree", "Show everything below a folder, nested.") { id, db, depth };
+        var command = new Command(
+            "tree",
+            "List everything below a folder, in the order a tree view shows it: each folder followed by what it "
+            + "holds. Each entry carries its depth and its parentId, so the list stays flat however deep the folder.")
+        {
+            id, db, depth
+        };
 
         command.SetJsonAction(services, async context =>
         {
@@ -83,19 +89,32 @@ public static class BrowseCommands
 
             var placer = await Catalogue.PlacerAsync(context, entries, records);
 
-            TreeNodeDto Node(FileRecord record, int level)
-            {
-                var expanded = record.IsFolder && (levels == null || level < levels);
+            // Walked with a stack of its own rather than by recursion, which a deep enough folder
+            // would run out of
+            var below = new List<TreeEntryDto>();
+            var pending = new Stack<(FileRecord Record, int Depth)>();
+            PushChildren(folder, 0);
 
-                return new TreeNodeDto(
-                    placer.Describe(record),
-                    expanded
-                        ? Catalogue.InExplorerOrder(children[record.Id]).Select(child => Node(child, level + 1)).ToList()
-                        : null);
+            while (pending.TryPop(out var next))
+            {
+                below.Add(new TreeEntryDto(next.Depth, placer.Describe(next.Record)));
+
+                if (next.Record.IsFolder && (levels == null || next.Depth < levels))
+                {
+                    PushChildren(next.Record, next.Depth);
+                }
             }
 
-            return Node(folder, 0);
-        });
+            return new { Folder = placer.Describe(folder), Below = below };
+
+            void PushChildren(FileRecord parent, int depthOfParent)
+            {
+                foreach (var child in Catalogue.InExplorerOrder(children[parent.Id]).Reverse())
+                {
+                    pending.Push((child, depthOfParent + 1));
+                }
+            }
+        }, TableFormat.Tree);
 
         return command;
     }

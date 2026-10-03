@@ -150,41 +150,60 @@ public class BrowseCommandTests : IAsyncLifetime
 
     #region tree
 
+    private static List<(int Depth, string? Name)> Below(JsonElement tree) =>
+        tree.GetProperty("below").EnumerateArray()
+            .Select(entry => (entry.GetProperty("depth").GetInt32(), entry.GetProperty("record").GetProperty("name").GetString()))
+            .ToList();
+
+    [Fact]
+    public async Task EverythingBelowIsListedInTreeOrderWithItsDepth()
+    {
+        var tree = (await RunAsync("tree", _entry.Id.ToString())).Json;
+
+        Assert.Equal("photos", tree.GetProperty("folder").GetProperty("name").GetString());
+        Assert.Equal(
+            [(1, "2024"), (2, "Trip"), (3, "d.jpg"), (2, "c.jpg"), (1, "empty"), (1, "A.jpg"), (1, "b.jpg")],
+            Below(tree));
+    }
+
+    [Fact]
+    public async Task EachEntryCarriesItsParentAndPaths()
+    {
+        var tree = (await RunAsync("tree", _entry.Id.ToString())).Json;
+
+        var d = tree.GetProperty("below").EnumerateArray()
+            .Single(entry => entry.GetProperty("record").GetProperty("name").GetString() == "d.jpg")
+            .GetProperty("record");
+
+        Assert.Equal(Photos.Record("Trip").Id, d.GetProperty("parentId").GetGuid());
+        Assert.Equal(@"Backups:\photos\2024\Trip\d.jpg", OnlyPlacement(d).GetProperty("cataloguePath").GetString());
+    }
+
     [Fact]
     public async Task DepthOneIsWhatLsLists()
     {
         var tree = (await RunAsync("tree", _entry.Id.ToString(), "--depth", "1")).Json;
         var ls = (await RunAsync("ls", _entry.Id.ToString())).Json;
 
-        var children = tree.GetProperty("children").EnumerateArray().ToList();
-        Assert.Equal(Names(ls.GetProperty("children")), children.Select(child => child.GetProperty("record").GetProperty("name").GetString()));
-
-        // Nothing below the first level is expanded
-        Assert.All(children, child => Assert.Equal(JsonValueKind.Null, child.GetProperty("children").ValueKind));
+        Assert.Equal(Names(ls.GetProperty("children")), Below(tree).Select(entry => entry.Name));
+        Assert.All(Below(tree), entry => Assert.Equal(1, entry.Depth));
     }
 
     [Fact]
-    public async Task WithoutADepthTheWholeSubtreeIsNested()
+    public async Task DepthTwoStopsBelowTheSecondLevel()
     {
-        var tree = (await RunAsync("tree", _entry.Id.ToString())).Json;
+        var tree = (await RunAsync("tree", _entry.Id.ToString(), "--depth", "2")).Json;
 
-        var year = tree.GetProperty("children").EnumerateArray()
-            .Single(child => child.GetProperty("record").GetProperty("name").GetString() == "2024");
-        var trip = year.GetProperty("children").EnumerateArray()
-            .Single(child => child.GetProperty("record").GetProperty("name").GetString() == "Trip");
-        var d = Assert.Single(trip.GetProperty("children").EnumerateArray());
-
-        Assert.Equal("d.jpg", d.GetProperty("record").GetProperty("name").GetString());
-        Assert.Equal(@"Backups:\photos\2024\Trip\d.jpg", OnlyPlacement(d.GetProperty("record")).GetProperty("cataloguePath").GetString());
-        Assert.Equal(JsonValueKind.Null, d.GetProperty("children").ValueKind);
+        Assert.DoesNotContain(Below(tree), entry => entry.Name == "d.jpg");
+        Assert.Contains((2, "Trip"), Below(tree));
     }
 
     [Fact]
-    public async Task AnEmptyFolderInATreeHasAnEmptyListRatherThanNone()
+    public async Task AnEmptyFolderHasNothingBelow()
     {
         var tree = (await RunAsync("tree", Id("empty"))).Json;
 
-        Assert.Equal(0, tree.GetProperty("children").GetArrayLength());
+        Assert.Empty(Below(tree));
     }
 
     [Fact]
@@ -192,8 +211,8 @@ public class BrowseCommandTests : IAsyncLifetime
     {
         var tree = (await RunAsync("tree", Id("Trip"))).Json;
 
-        Assert.Equal("Trip", tree.GetProperty("record").GetProperty("name").GetString());
-        Assert.Single(tree.GetProperty("children").EnumerateArray());
+        Assert.Equal("Trip", tree.GetProperty("folder").GetProperty("name").GetString());
+        Assert.Equal([(1, "d.jpg")], Below(tree));
     }
 
     [Theory]

@@ -77,6 +77,15 @@ public class TableFormatTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task ATreeIsIndentedByDepth()
+    {
+        var lines = Lines(await TableAsync("tree", _photos.Id.ToString()));
+
+        Assert.Equal(@"Backups:\photos", lines[0]);
+        Assert.Equal(["  2024\\", "    beach-2.jpg", "  beach.jpg"], lines[1..]);
+    }
+
+    [Fact]
     public async Task ACutSearchSaysHowManyThereWere()
     {
         var lines = Lines(await TableAsync("search", "beach", "--limit", "1"));
