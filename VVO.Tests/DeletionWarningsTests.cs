@@ -1,4 +1,4 @@
-using VVO.Core;
+﻿using VVO.Core;
 
 namespace VVO.Tests;
 
@@ -66,6 +66,18 @@ public class DeletionWarningsTests
         Assert.Equal("Delete Virtual Volume", warning.Title);
         Assert.Equal("Backups", warning.ItemName);
         Assert.Equal(message, warning.Message);
+    }
+
+    [Fact]
+    public void ItemsInASharedScanSayWhereElseTheyGo()
+    {
+        Assert.Contains("It goes from the other folder listing the same scan too.",
+            DeletionWarnings.ForCatalogueFile("a.jpg", otherFolders: 1).Message);
+        Assert.Contains("It goes from the 2 other folders listing the same scan too.",
+            DeletionWarnings.ForCatalogueFolder("2024", otherFolders: 2).Message);
+        Assert.Contains("They go from the 3 other folders listing the same scan too.",
+            DeletionWarnings.ForCatalogueItems(4, includesFolder: false, otherFolders: 3).Message);
+        Assert.EndsWith("This cannot be undone.", DeletionWarnings.ForCatalogueItems(4, true, 3).Message);
     }
 
     [Fact]

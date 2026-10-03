@@ -83,6 +83,7 @@ public static class SearchCommand
             var ordered = hits
                 .OrderByDescending(hit => hit.IsFolder)
                 .ThenBy(hit => hit.Name, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(hit => hit.Name, StringComparer.Ordinal)
                 .ThenBy(hit => hit.Entries[0].CataloguePath, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 

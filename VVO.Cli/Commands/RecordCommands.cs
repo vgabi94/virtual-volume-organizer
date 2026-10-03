@@ -140,11 +140,17 @@ public static class RecordCommands
             }
 
             var records = found.ToList();
+
+            // Each tree is listed by one folder the user has in mind; any further one loses the records too
+            var trees = records.Select(record => record.RootFolderId).ToHashSet();
+            var listing = (await Catalogue.EntriesAsync(context)).Count(entry => trees.Contains(entry.TreeId));
+            var otherFolders = Math.Max(0, listing - trees.Count);
+
             Confirmation.RequireDeletion(context, records.Count == 1
                 ? records[0].IsFolder
-                    ? DeletionWarnings.ForCatalogueFolder(records[0].Name)
-                    : DeletionWarnings.ForCatalogueFile(records[0].Name)
-                : DeletionWarnings.ForCatalogueItems(records.Count, records.Any(record => record.IsFolder)));
+                    ? DeletionWarnings.ForCatalogueFolder(records[0].Name, otherFolders)
+                    : DeletionWarnings.ForCatalogueFile(records[0].Name, otherFolders)
+                : DeletionWarnings.ForCatalogueItems(records.Count, records.Any(record => record.IsFolder), otherFolders));
 
             var roots = await context.Service<IVirtualVolumeService>()
                 .RemoveRecordsAsync(wanted, context.Progress, context.CancellationToken);

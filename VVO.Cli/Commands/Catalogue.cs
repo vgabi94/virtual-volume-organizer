@@ -202,7 +202,9 @@ public static class Catalogue
     public static IEnumerable<FileRecord> InExplorerOrder(IEnumerable<FileRecord> records) =>
         records
             .OrderByDescending(record => record.IsFolder)
-            .ThenBy(record => record.Name, StringComparer.OrdinalIgnoreCase);
+            .ThenBy(record => record.Name, StringComparer.OrdinalIgnoreCase)
+            // Names a case-sensitive disk keeps apart would otherwise come out in whatever order
+            .ThenBy(record => record.Name, StringComparer.Ordinal);
 }
 
 public sealed record Located(FileRecord Record, IReadOnlyList<RootFolderMetadata> Entries);
