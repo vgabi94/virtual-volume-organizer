@@ -23,6 +23,27 @@ public static class Catalogue
             ?? throw CliException.NotFound($"There is no virtual volume '{volumeId}'.");
     }
 
+    public static async Task<RootFolderMetadata> EntryAsync(CommandContext context, Guid entryId)
+    {
+        var entries = await context.Service<IDatabaseService>()
+            .FindItemsAsync<RootFolderMetadata>(entry => entry.Id == entryId);
+
+        return entries.SingleOrDefault()
+            ?? throw CliException.NotFound($"There is no folder entry '{entryId}'.");
+    }
+
+    /// <summary>
+    /// A folder entry as the folder commands report it.
+    /// </summary>
+    public static async Task<FolderEntryDto> DescribeAsync(CommandContext context, RootFolderMetadata entry)
+    {
+        var treeId = entry.TreeId;
+        var roots = await context.Service<IDatabaseService>().FindItemsAsync<FileRecord>(record => record.Id == treeId);
+
+        return FolderEntryDto.From(
+            entry, RootOf(roots.ToDictionary(root => root.Id), entry), await RecordCountAsync(context, treeId));
+    }
+
     /// <summary>
     /// The root record of each tree, which carries the scanned name and the size of the whole.
     /// </summary>
