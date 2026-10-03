@@ -9,6 +9,7 @@ public static class ErrorMapper
         return exception switch
         {
             CliException cli => cli,
+            DatabaseBusyException => new CliException(ExitCode.DatabaseBusy, ErrorCodes.DatabaseBusy, exception.Message),
             CatalogueItemNotFoundException notFound => CliException.NotFound(MessageOf(notFound)),
             FileNotFoundException or DirectoryNotFoundException => CliException.NotFound(exception.Message),
             ArgumentException argument => CliException.Usage(MessageOf(argument)),

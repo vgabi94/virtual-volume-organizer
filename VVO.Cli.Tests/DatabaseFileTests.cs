@@ -100,6 +100,18 @@ public class DatabaseFileTests : IDisposable
     }
 
     [Fact]
+    public async Task ACatalogueHeldByAnotherProgramIsDatabaseBusy()
+    {
+        using var catalogue = await TempCatalogue.CreateAsync();
+        using var hold = new FileStream(catalogue.Path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+
+        var result = await RunAsync(["open", "--db", catalogue.Path]);
+
+        Assert.Equal(5, result.ExitCode);
+        Assert.Equal("database_busy", result.ErrorCode);
+    }
+
+    [Fact]
     public async Task AFolderIsAUsageError()
     {
         var result = await RunAsync(["open", "--db", _directory]);

@@ -817,4 +817,81 @@ public class DatabaseServiceTests : IDisposable
         Assert.Equal(1, announced);
     }
 
+    // How the other program holds it: a second LiteDB, which is what the CLI or the GUI would be
+    private FileStream HoldTheFile() =>
+        new(_dbPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+
+    [Fact]
+    public void AFileHeldElsewhereFailsToOpenWithASharingViolation()
+    {
+        // The retry recognises a busy file by this exception; if LiteDB changes it, this says so
+        using var hold = HoldTheFile();
+
+        var thrown = Assert.ThrowsAny<IOException>(() => new LiteDatabase(_dbPath));
+
+        Assert.Equal(unchecked((int)0x80070020), thrown.HResult);
+    }
+
+    [Fact]
+    public async Task AFileReleasedWhileWaitingIsReadOnceItIsFree()
+    {
+        await _service.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "a", Path = _dbPath }]);
+        var hold = HoldTheFile();
+
+        var read = _service.ReadItemsAsync<DatabaseMetadata>();
+        await Task.Delay(300);
+        hold.Dispose();
+
+        Assert.Single(await read);
+    }
+
+    [Fact]
+    public async Task AFileWriteWaitsForTheFileToBeFree()
+    {
+        var hold = HoldTheFile();
+
+        var write = _service.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "a", Path = _dbPath }]);
+        await Task.Delay(300);
+        hold.Dispose();
+        await write;
+
+        Assert.Single(await _service.ReadItemsAsync<DatabaseMetadata>());
+    }
+
+    [Fact]
+    public async Task AFileHeldThroughoutEndsInDatabaseBusy()
+    {
+        using var hold = HoldTheFile();
+        var waited = System.Diagnostics.Stopwatch.StartNew();
+
+        var thrown = await Assert.ThrowsAsync<DatabaseBusyException>(
+            () => _service.ReadItemsAsync<DatabaseMetadata>());
+
+        // 100 + 200 + 400 + 800 + 1600 ms between the attempts
+        Assert.True(waited.Elapsed >= TimeSpan.FromSeconds(3), $"Gave up after {waited.Elapsed}.");
+        Assert.Contains(Path.GetFileName(_dbPath), thrown.Message);
+        Assert.IsAssignableFrom<IOException>(thrown.InnerException);
+    }
+
+    [Fact]
+    public async Task OpeningAHeldCatalogueEndsInDatabaseBusy()
+    {
+        using var hold = HoldTheFile();
+
+        await Assert.ThrowsAsync<DatabaseBusyException>(
+            () => new DatabaseService().EnsureDatabaseReadyAsync(_dbPath));
+    }
+
+    [Fact]
+    public async Task AFileThatIsNotACatalogueIsRefusedWithoutWaiting()
+    {
+        var path = SpilledPath();
+        File.WriteAllText(path, "This is not a catalogue.");
+        var waited = System.Diagnostics.Stopwatch.StartNew();
+
+        await Assert.ThrowsAsync<InvalidDataException>(
+            () => new DatabaseService().EnsureDatabaseReadyAsync(path));
+
+        Assert.True(waited.Elapsed < TimeSpan.FromSeconds(1), $"Took {waited.Elapsed}.");
+    }
 }

@@ -18,6 +18,27 @@ public class DatabaseService : IDatabaseService
     // from landing in the middle of one.
     private readonly SemaphoreSlim _gate = new(1, 1);
 
+    // The program holding the file, such as the GUI beside the CLI, holds it for one operation
+    // at a time, so it is waited out for a few seconds before giving up
+    private static readonly TimeSpan[] DefaultBusyRetryDelays =
+        [.. new[] { 100, 200, 400, 800, 1600 }.Select(ms => TimeSpan.FromMilliseconds(ms))];
+
+    private readonly IReadOnlyList<TimeSpan> _busyRetryDelays;
+
+    public DatabaseService()
+        : this(DefaultBusyRetryDelays)
+    {
+    }
+
+    /// <param name="busyRetryDelays">
+    /// The waits between attempts to open a file another program is holding. A test that takes
+    /// the file away on purpose passes none, to hear about it at once.
+    /// </param>
+    public DatabaseService(IReadOnlyList<TimeSpan> busyRetryDelays)
+    {
+        _busyRetryDelays = busyRetryDelays;
+    }
+
     private string _dbPath = string.Empty;
     public string DbPath => _dbPath;
 
@@ -65,7 +86,7 @@ public class DatabaseService : IDatabaseService
         {
             if (replace && File.Exists(dbPath))
             {
-                File.Delete(dbPath);
+                WhileBusy(dbPath, () => File.Delete(dbPath));
             }
 
             if (File.Exists(dbPath))
@@ -73,13 +94,54 @@ public class DatabaseService : IDatabaseService
                 RequireCatalogue(dbPath);
             }
 
-            using var db = new LiteDatabase(dbPath, Mapper);
+            using var db = Open(dbPath);
             EnsureIndexes(db);
 
             // Taken up only once the file has been opened, so a failed open leaves the
             // application on the database it already had rather than on one it never read
             _dbPath = dbPath;
         });
+    }
+
+    private LiteDatabase Open(string dbPath) => WhileBusy(dbPath, () => new LiteDatabase(dbPath, Mapper));
+
+    private void WhileBusy(string dbPath, Action touch)
+    {
+        WhileBusy<object?>(dbPath, () =>
+        {
+            touch();
+            return null;
+        });
+    }
+
+    /// <summary>
+    /// Retries a step that opens the file while another program holds it. Only such steps are
+    /// passed here, and they come before anything is written, so trying one again is harmless.
+    /// </summary>
+    private T WhileBusy<T>(string dbPath, Func<T> touch)
+    {
+        for (var attempt = 0; ; attempt++)
+        {
+            try
+            {
+                return touch();
+            }
+            catch (IOException e) when (IsHeldByAnotherProgram(e))
+            {
+                if (attempt == _busyRetryDelays.Count)
+                    throw new DatabaseBusyException(dbPath, e);
+
+                Thread.Sleep(_busyRetryDelays[attempt]);
+            }
+        }
+    }
+
+    private static bool IsHeldByAnotherProgram(IOException exception)
+    {
+        const int sharingViolation = unchecked((int)0x80070020);
+        const int lockViolation = unchecked((int)0x80070021);
+
+        return exception.HResult is sharingViolation or lockViolation;
     }
 
     // Written by LiteDB at the head of its first page
@@ -94,13 +156,13 @@ public class DatabaseService : IDatabaseService
     /// by being opened. A file of no length is what a save picker leaves behind and holds nothing
     /// to lose, so it is left to be filled in.
     /// </summary>
-    private static void RequireCatalogue(string dbPath)
+    private void RequireCatalogue(string dbPath)
     {
         var length = new FileInfo(dbPath).Length;
         if (length == 0)
             return;
 
-        if (length < PageSize || !HasHeader(dbPath))
+        if (length < PageSize || !WhileBusy(dbPath, () => HasHeader(dbPath)))
         {
             throw new InvalidDataException(
                 $"'{Path.GetFileName(dbPath)}' is not a VVO catalogue, or it is damaged.");
@@ -164,7 +226,7 @@ public class DatabaseService : IDatabaseService
     {
         return ExclusiveAsync<object?>(() =>
         {
-            File.Copy(_dbPath, targetPath, overwrite: true);
+            WhileBusy(_dbPath, () => File.Copy(_dbPath, targetPath, overwrite: true));
             return null;
         });
     }
@@ -173,7 +235,7 @@ public class DatabaseService : IDatabaseService
     {
         return ExclusiveWriteAsync(() =>
         {
-            using var db = new LiteDatabase(_dbPath, Mapper);
+            using var db = Open(_dbPath);
             db.GetCollection<T>(TableName<T>()).InsertBulk(items);
         });
     }
@@ -182,7 +244,7 @@ public class DatabaseService : IDatabaseService
     {
         return ExclusiveWriteAsync(() =>
         {
-            using var db = new LiteDatabase(_dbPath, Mapper);
+            using var db = Open(_dbPath);
             db.GetCollection<T>(TableName<T>()).Update(items);
         });
     }
@@ -191,7 +253,7 @@ public class DatabaseService : IDatabaseService
     {
         return ExclusiveWriteAsync(() =>
         {
-            using var db = new LiteDatabase(_dbPath, Mapper);
+            using var db = Open(_dbPath);
             db.GetCollection<IHasId>(TableName<T>()).DeleteMany(x => itemIds.Contains(x.Id));
         });
     }
@@ -200,7 +262,7 @@ public class DatabaseService : IDatabaseService
     {
         return ExclusiveWriteAsync(() =>
         {
-            using var db = new LiteDatabase(_dbPath, Mapper);
+            using var db = Open(_dbPath);
             db.GetCollection<T>(TableName<T>()).DeleteMany(predicate);
         });
     }
@@ -209,7 +271,7 @@ public class DatabaseService : IDatabaseService
     {
         return ExclusiveAsync<IReadOnlyCollection<T>>(() =>
         {
-            using var db = new LiteDatabase(_dbPath, Mapper);
+            using var db = Open(_dbPath);
             var collection = db.GetCollection<T>(TableName<T>());
             return collection.FindAll().ToList();
         });
@@ -219,7 +281,7 @@ public class DatabaseService : IDatabaseService
     {
         return ExclusiveAsync<IReadOnlyCollection<T>>(() =>
         {
-            using var db = new LiteDatabase(_dbPath, Mapper);
+            using var db = Open(_dbPath);
             var collection = db.GetCollection<T>(TableName<T>());
             return collection.Find(predicate).ToList();
         });
@@ -233,7 +295,7 @@ public class DatabaseService : IDatabaseService
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            using var db = new LiteDatabase(_dbPath, Mapper);
+            using var db = Open(_dbPath);
 
             // Rebuild throws 'Detected loop in FindAll' rebuilding a secondary index over a
             // collection of more than a few thousand documents, which is every catalogue worth
@@ -323,7 +385,7 @@ public class DatabaseService : IDatabaseService
 
             try
             {
-                using var db = new LiteDatabase(_dbPath, Mapper);
+                using var db = Open(_dbPath);
 
                 db.BeginTrans();
                 try

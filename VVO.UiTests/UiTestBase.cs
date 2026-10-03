@@ -38,7 +38,8 @@ public abstract class UiTestBase : IDisposable
         _dbPath = TempPath("vvo");
         SettingsPath = TempPath("json");
 
-        Database = new DatabaseService();
+        // A database taken away on purpose is reported at once rather than waited on
+        Database = new DatabaseService(busyRetryDelays: []);
         Database.EnsureDatabaseReadyAsync(_dbPath).GetAwaiter().GetResult();
         Volumes = new VirtualVolumeService(Database);
         Transfer = new DatabaseTransferService(Database);

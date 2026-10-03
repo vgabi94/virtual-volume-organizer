@@ -30,6 +30,7 @@ public class OutputTests
             "argument" => new ArgumentException("A virtual volume needs a name.", "name"),
             "invalid-data" => new InvalidDataException("'x.vvo' is not a catalogue."),
             "cancelled" => new OperationCanceledException(),
+            "busy" => new DatabaseBusyException("x.vvo", new IOException()),
             _ => new InvalidOperationException("Something broke.")
         }));
         root.Subcommands.Add(fail);
@@ -96,6 +97,7 @@ public class OutputTests
     [InlineData("argument", 2, "usage", "A virtual volume needs a name.")]
     [InlineData("invalid-data", 1, "invalid_database", "'x.vvo' is not a catalogue.")]
     [InlineData("cancelled", 6, "cancelled", "The operation was cancelled.")]
+    [InlineData("busy", 5, "database_busy", "'x.vvo' is in use by another program. Try again once it is done.")]
     [InlineData("other", 1, "error", "Something broke.")]
     public async Task ExceptionsMapToTheirErrorAndExitCodes(string kind, int exitCode, string code, string message)
     {
