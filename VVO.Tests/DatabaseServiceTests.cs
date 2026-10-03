@@ -760,8 +760,7 @@ public class DatabaseServiceTests : IDisposable
         await GivenACatalogueOfAsync(2_000);
         var reported = new List<string>();
 
-        await _service.ShrinkDatabaseAsync(new Progress<string>(reported.Add));
-        await Task.Yield();
+        await _service.ShrinkDatabaseAsync(new ReportedProgress(reported));
 
         Assert.Contains(reported, message => message.StartsWith("Removing indexes..."));
         Assert.Contains(reported, message => message.StartsWith("Compacting"));

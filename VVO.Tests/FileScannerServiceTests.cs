@@ -537,10 +537,9 @@ public class FileScannerServiceTests : IDisposable
         CreateFile("a.txt", 10);
         var reported = new List<string>();
 
-        await _service.ScanDirectoryAsync(_testRoot, new Progress<string>(reported.Add));
+        await _service.ScanDirectoryAsync(_testRoot, new ReportedProgress(reported));
 
         // Progress arrives on the captured context, so give the posted callbacks a turn
-        await Task.Yield();
         Assert.NotEmpty(reported);
     }
 
@@ -554,8 +553,7 @@ public class FileScannerServiceTests : IDisposable
         }
 
         var reported = new List<string>();
-        await _service.ScanDirectoryAsync(_testRoot, new Progress<string>(reported.Add));
-        await Task.Yield();
+        await _service.ScanDirectoryAsync(_testRoot, new ReportedProgress(reported));
 
         Assert.Contains(reported, message => message.Contains("50") && message.Contains("entries"));
     }

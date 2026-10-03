@@ -145,13 +145,12 @@ public class DatabaseTransferServiceTests : IDisposable
         await AddFolderAsync(volume.Id);
 
         var exporting = new List<string>();
-        await _transfer.ExportAsync(_jsonPath, new Progress<string>(exporting.Add));
+        await _transfer.ExportAsync(_jsonPath, new ReportedProgress(exporting));
 
         var importing = new List<string>();
-        await _transfer.ImportAsync(_jsonPath, TempPath("vvo"), new Progress<string>(importing.Add));
+        await _transfer.ImportAsync(_jsonPath, TempPath("vvo"), new ReportedProgress(importing));
 
         // Progress arrives on the captured context, so give the posted callbacks a turn
-        await Task.Yield();
         Assert.NotEmpty(exporting);
         Assert.NotEmpty(importing);
     }

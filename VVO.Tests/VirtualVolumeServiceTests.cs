@@ -492,8 +492,7 @@ public class VirtualVolumeServiceTests : IDisposable
         await AddFolderAsync(volume.Id, "two");
         var reported = new List<string>();
 
-        await _service.DeleteVirtualVolumeAsync(volume.Id, new Progress<string>(reported.Add));
-        await Task.Yield();
+        await _service.DeleteVirtualVolumeAsync(volume.Id, new ReportedProgress(reported));
 
         Assert.Contains(reported, message => message.Contains("2 of 2"));
     }
@@ -538,8 +537,7 @@ public class VirtualVolumeServiceTests : IDisposable
         await _service.CopyFolderAsync(entry.Id, other.Id);
         var reported = new List<string>();
 
-        await _service.RemoveFolderAsync(entry.Id, new Progress<string>(reported.Add));
-        await Task.Yield();
+        await _service.RemoveFolderAsync(entry.Id, new ReportedProgress(reported));
 
         Assert.DoesNotContain(reported, message => message.StartsWith("Deleting files"));
         Assert.NotEmpty(await FilesOfAsync(entry.TreeId));
@@ -870,9 +868,8 @@ public class VirtualVolumeServiceTests : IDisposable
         var reported = new List<string>();
 
         await _service.AddFolderAsync(
-            volume.Id, tree.Metadata, tree.Records.ToList(), new Progress<string>(reported.Add));
+            volume.Id, tree.Metadata, tree.Records.ToList(), new ReportedProgress(reported));
 
-        await Task.Yield();
         Assert.Contains(reported, message => message.Contains("3 of 3"));
     }
 
@@ -1074,9 +1071,8 @@ public class VirtualVolumeServiceTests : IDisposable
         var reported = new List<string>();
 
         await _service.UpdateFolderContentsAsync(
-            folder.Id, rescanned.Metadata, rescanned.Records.ToList(), new Progress<string>(reported.Add));
+            folder.Id, rescanned.Metadata, rescanned.Records.ToList(), new ReportedProgress(reported));
 
-        await Task.Yield();
         Assert.Contains(reported, message => message.Contains("Removing"));
         Assert.Contains(reported, message => message.Contains("3 of 3"));
     }
