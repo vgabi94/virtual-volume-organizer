@@ -36,7 +36,7 @@ public static class VolumeCommands
                 .ThenBy(volume => volume.Id)
                 .Select(volume => VolumeDto.From(volume, folderCounts.GetValueOrDefault(volume.Id)))
                 .ToList();
-        });
+        }, TableFormat.Volumes);
 
         return command;
     }

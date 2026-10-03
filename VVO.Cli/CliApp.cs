@@ -16,6 +16,13 @@ public static class CliApp
         Recursive = true
     };
 
+    public static Option<OutputFormat> FormatOption { get; } = new("--format")
+    {
+        Description = "json (the default) for programs and agents, or table for people. Errors are JSON either way.",
+        DefaultValueFactory = _ => OutputFormat.Json,
+        Recursive = true
+    };
+
     public static RootCommand BuildRoot(IServiceProvider services)
     {
         var root = new RootCommand(
@@ -23,6 +30,7 @@ public static class CliApp
             + "output is JSON on stdout.");
 
         root.Options.Add(QuietOption);
+        root.Options.Add(FormatOption);
         root.Subcommands.Add(DbCommands.Create(services));
         root.Subcommands.Add(VolumeCommands.Create(services));
         root.Subcommands.Add(FolderCommands.Create(services));

@@ -46,7 +46,7 @@ public static class BrowseCommands
                 Folder = placer.Describe(folder),
                 Children = Catalogue.InExplorerOrder(children).Select(placer.Describe).ToList()
             };
-        });
+        }, TableFormat.Listing);
 
         return command;
     }

@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using VVO.Cli.Output;
 
@@ -31,11 +32,15 @@ public sealed class CommandContext(ParseResult parseResult, IServiceProvider ser
 public static class CommandActions
 {
     /// <summary>
-    /// Runs the action and writes what it returns, or the error it ended in, as the one JSON
-    /// document on stdout.
+    /// Runs the action and writes what it returns to stdout, as one JSON document or as the table
+    /// asked for. An error it ends in is written as JSON whatever the format.
     /// </summary>
+    /// <param name="table">How --format table shows the result. A plain summary of it otherwise.</param>
     public static void SetJsonAction(
-        this Command command, IServiceProvider services, Func<CommandContext, Task<object?>> action)
+        this Command command,
+        IServiceProvider services,
+        Func<CommandContext, Task<object?>> action,
+        Func<JsonElement, string>? table = null)
     {
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -44,7 +49,17 @@ public static class CommandActions
             try
             {
                 var result = await action(context);
-                Json.Write(context.Output, result);
+
+                if (parseResult.GetValue(CliApp.FormatOption) == OutputFormat.Table)
+                {
+                    var element = JsonSerializer.SerializeToElement(result, Json.Options);
+                    context.Output.WriteLine((table ?? TableFormat.Summary)(element));
+                }
+                else
+                {
+                    Json.Write(context.Output, result);
+                }
+
                 return (int)context.ExitCode;
             }
             catch (Exception e)

@@ -84,7 +84,7 @@ public static class CompareCommand
                 Counts = DifferenceCounts.From(results),
                 Rows = rows
             };
-        });
+        }, TableFormat.Comparison);
 
         return command;
     }

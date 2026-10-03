@@ -62,7 +62,7 @@ public static class FolderCommands
                 .ThenBy(folder => folder.Title, StringComparer.CurrentCultureIgnoreCase)
                 .ThenBy(folder => folder.Id)
                 .ToList();
-        });
+        }, TableFormat.Folders);
 
         return command;
     }

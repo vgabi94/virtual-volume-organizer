@@ -90,7 +90,7 @@ public static class SearchCommand
                 Total = ordered.Count,
                 Truncated = ordered.Count > most
             };
-        });
+        }, TableFormat.Search);
 
         return command;
     }
