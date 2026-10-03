@@ -154,7 +154,7 @@ public class OutputTests
     {
         using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
 
-        var result = await CliRunner.RunAsync(["wait"], AddTestCommands, cancellation.Token);
+        var result = await CliRunner.RunAsync(["wait"], AddTestCommands, cancellationToken: cancellation.Token);
 
         Assert.Equal(6, result.ExitCode);
         Assert.Equal("cancelled", result.Error.GetProperty("code").GetString());

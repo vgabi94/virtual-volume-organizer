@@ -1,5 +1,6 @@
 using System.CommandLine;
 using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using VVO.Cli;
 
 namespace VVO.Cli.Tests;
@@ -9,6 +10,10 @@ public sealed record CliResult(int ExitCode, string Stdout, string Stderr)
     public JsonElement Json => JsonDocument.Parse(Stdout).RootElement;
 
     public JsonElement Error => Json.GetProperty("error");
+
+    public string? ErrorCode => Json.TryGetProperty("error", out var error)
+        ? error.GetProperty("code").GetString()
+        : null;
 }
 
 /// <summary>
@@ -19,13 +24,18 @@ public static class CliRunner
     public static Task<CliResult> RunAsync(params string[] args) => RunAsync(args, extend: null);
 
     /// <param name="extend">Adds commands that exist only for a test, built on the same services.</param>
+    /// <param name="terminal">
+    /// The person at the keyboard. Left out, there is nobody: input is redirected, as it is for an agent.
+    /// </param>
     public static async Task<CliResult> RunAsync(
         string[] args,
-        Action<RootCommand, IServiceProvider>? extend,
+        Action<RootCommand, IServiceProvider>? extend = null,
+        ITerminal? terminal = null,
         CancellationToken cancellationToken = default)
     {
         // Fresh per run: the database service remembers the file it was last pointed at
-        using var services = ServiceConfiguration.ConfigureServices();
+        using var services = ServiceConfiguration.ConfigureServices(collection =>
+            collection.AddSingleton(terminal ?? ScriptedTerminal.Redirected()));
 
         var root = CliApp.BuildRoot(services);
         extend?.Invoke(root, services);

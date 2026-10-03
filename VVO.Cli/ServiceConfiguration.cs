@@ -9,7 +9,8 @@ namespace VVO.Cli;
 /// </summary>
 public static class ServiceConfiguration
 {
-    public static ServiceProvider ConfigureServices()
+    /// <param name="configure">Replaces registrations, which is how the tests stand in for the terminal.</param>
+    public static ServiceProvider ConfigureServices(Action<IServiceCollection>? configure = null)
     {
         var services = new ServiceCollection();
 
@@ -18,6 +19,9 @@ public static class ServiceConfiguration
         services.AddSingleton<IDatabaseService, DatabaseService>();
         services.AddSingleton<IVirtualVolumeService, VirtualVolumeService>();
         services.AddSingleton<IDatabaseTransferService, DatabaseTransferService>();
+        services.AddSingleton<ITerminal, ConsoleTerminal>();
+
+        configure?.Invoke(services);
 
         return services.BuildServiceProvider();
     }
