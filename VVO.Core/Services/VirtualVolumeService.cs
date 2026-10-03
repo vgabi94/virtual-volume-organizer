@@ -357,7 +357,7 @@ public class VirtualVolumeService : IVirtualVolumeService
             var record = files.FindById(id);
             if (record == null)
             {
-                throw new ArgumentException($"There is no catalogue record '{id}'.", nameof(recordIds));
+                throw new CatalogueItemNotFoundException($"There is no catalogue record '{id}'.", nameof(recordIds));
             }
 
             if (record.ParentId == null)
@@ -454,7 +454,7 @@ public class VirtualVolumeService : IVirtualVolumeService
         var parent = files.FindById(parentId);
         if (parent == null)
         {
-            throw new ArgumentException($"There is no catalogue record '{parentId}'.", nameof(parentId));
+            throw new CatalogueItemNotFoundException($"There is no catalogue record '{parentId}'.", nameof(parentId));
         }
 
         if (!parent.IsFolder)
@@ -596,7 +596,7 @@ public class VirtualVolumeService : IVirtualVolumeService
         var volume = volumes.FindById(virtualVolumeId);
         if (volume == null)
         {
-            throw new ArgumentException($"There is no virtual volume '{virtualVolumeId}'.", paramName);
+            throw new CatalogueItemNotFoundException($"There is no virtual volume '{virtualVolumeId}'.", paramName);
         }
 
         return volume;
@@ -608,7 +608,7 @@ public class VirtualVolumeService : IVirtualVolumeService
         var entry = entries.FindById(entryId);
         if (entry == null)
         {
-            throw new ArgumentException($"There is no folder entry '{entryId}'.", paramName);
+            throw new CatalogueItemNotFoundException($"There is no folder entry '{entryId}'.", paramName);
         }
 
         return entry;
