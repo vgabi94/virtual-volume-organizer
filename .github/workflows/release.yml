@@ -55,6 +55,20 @@ jobs:
         Move-Item publish/win-x64/VirtualVolumeOrganizer.exe
         publish/win-x64/VirtualVolumeOrganizer-${{ steps.version.outputs.version }}-win-x64.exe
 
+    # A folder of its own, so neither publish can leave anything in the other's output
+    - name: Publish the command line as a self-contained executable
+      run: >
+        dotnet publish VVO.Cli/VVO.Cli.csproj -c Release -r win-x64 --self-contained true
+        -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true
+        -p:DebugType=none -p:DebugSymbols=false
+        -p:SourceRevisionId=${{ github.sha }}
+        -o publish/cli-win-x64
+
+    - name: Name the command line for the release
+      run: >
+        Move-Item publish/cli-win-x64/vvo.exe
+        publish/win-x64/vvo-${{ steps.version.outputs.version }}-win-x64.exe
+
     # Drafted rather than published, so the generated notes can be read before anyone downloads it
     - name: Draft the release
       run: >
@@ -63,5 +77,6 @@ jobs:
         --generate-notes
         --title "Virtual Volume Organizer ${{ steps.version.outputs.version }}"
         publish/win-x64/VirtualVolumeOrganizer-${{ steps.version.outputs.version }}-win-x64.exe
+        publish/win-x64/vvo-${{ steps.version.outputs.version }}-win-x64.exe
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

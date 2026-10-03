@@ -48,6 +48,8 @@ public static class CliApp
             root.Subcommands.Add(command);
         }
 
+        root.Subcommands.Add(AboutCommand.Create(services));
+
         return root;
     }
 

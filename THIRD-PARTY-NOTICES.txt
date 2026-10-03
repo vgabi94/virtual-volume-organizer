@@ -68,5 +68,9 @@ Microsoft.Extensions.DependencyInjection -- MIT License
 https://github.com/dotnet/runtime
 Copyright (c) .NET Foundation and Contributors
 
+System.CommandLine (vvo, the command line) -- MIT License
+https://github.com/dotnet/command-line-api
+Copyright (c) .NET Foundation and Contributors
+
 LoadingIndicators.Avalonia -- The Unlicense (public domain)
 https://github.com/Der-Floh/LoadingIndicators.Avalonia
