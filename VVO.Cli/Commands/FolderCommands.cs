@@ -361,7 +361,7 @@ public static class FolderCommands
     private sealed class AppearanceOptions
     {
         private readonly Option<string> _label = new("--label") { Description = "The name to list the folder under." };
-        private readonly Option<string> _description = new("--description");
+        private readonly Option<string> _description = new("--description") { Description = "A note shown with the folder." };
         private readonly Option<string> _icon = new("--icon")
         {
             Description = $"One of: {string.Join(", ", IconKeys.Folders)}."

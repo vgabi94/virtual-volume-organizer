@@ -44,7 +44,7 @@ public static class VolumeCommands
     private static Command CreateVolume(IServiceProvider services)
     {
         var db = DatabaseFile.CreateOption();
-        var name = new Argument<string>("name");
+        var name = new Argument<string>("name") { Description = "What to call the virtual volume." };
         var icon = IconOption($"Defaults to {IconKeys.DefaultVolume}.");
         var color = ColorOption();
 
@@ -69,8 +69,8 @@ public static class VolumeCommands
     private static Command Update(IServiceProvider services)
     {
         var db = DatabaseFile.CreateOption();
-        var id = new Argument<Guid>("id");
-        var name = new Option<string>("--name");
+        var id = new Argument<Guid>("id") { Description = "The virtual volume to change." };
+        var name = new Option<string>("--name") { Description = "A new name for it." };
         var icon = IconOption();
         var color = ColorOption();
 
@@ -116,7 +116,7 @@ public static class VolumeCommands
     private static Command Delete(IServiceProvider services)
     {
         var db = DatabaseFile.CreateOption();
-        var id = new Argument<Guid>("id");
+        var id = new Argument<Guid>("id") { Description = "The virtual volume to delete." };
 
         var command = new Command(
             "delete",
