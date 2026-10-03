@@ -99,7 +99,8 @@ public static class RecordCommands
     private static Command Remove(IServiceProvider services)
     {
         var db = DatabaseFile.CreateOption();
-        var ids = new Argument<Guid[]>("ids")
+        // Read as text: given a list, the parser turns a value that is not a GUID into an empty one
+        var ids = new Argument<string[]>("ids")
         {
             Description = "Catalogue record ids of the files and folders to remove.",
             Arity = ArgumentArity.OneOrMore
@@ -117,7 +118,12 @@ public static class RecordCommands
         {
             await DatabaseFile.OpenForWritingAsync(context, db);
 
-            var wanted = context.ParseResult.GetRequiredValue(ids).Distinct().ToList();
+            var wanted = context.ParseResult.GetRequiredValue(ids)
+                .Select(id => Guid.TryParse(id, out var parsed)
+                    ? parsed
+                    : throw CliException.Usage($"'{id}' is not a catalogue record id."))
+                .Distinct()
+                .ToList();
             var found = await context.Service<IDatabaseService>()
                 .FindItemsAsync<FileRecord>(record => wanted.Contains(record.Id));
 

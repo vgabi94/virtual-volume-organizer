@@ -27,6 +27,11 @@ public static class DatabaseFile
         if (!File.Exists(path))
             throw CliException.NotFound($"There is no catalogue at '{path}'.");
 
+        // Core fills an empty file in as a new catalogue, which is right for a save dialog and wrong
+        // for a command that was asked to read one
+        if (new FileInfo(path).Length == 0)
+            throw new CliException(ExitCode.Error, ErrorCodes.InvalidDatabase, $"'{path}' is empty: it holds no catalogue.");
+
         await context.Service<IDatabaseService>().EnsureDatabaseReadyAsync(path);
         return path;
     }
