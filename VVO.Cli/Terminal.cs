@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace VVO.Cli;
 
 /// <summary>
@@ -15,6 +17,8 @@ public interface ITerminal
     string? ReadLine();
 }
 
+// Only a real process has a console to read; the hardening process tests run it there
+[ExcludeFromCodeCoverage]
 public sealed class ConsoleTerminal : ITerminal
 {
     public bool IsInteractive => !Console.IsInputRedirected;

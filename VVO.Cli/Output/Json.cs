@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -32,6 +33,8 @@ public static class Json
     // shifted by the local offset
     private sealed class UtcDateTimeConverter : JsonConverter<DateTime>
     {
+        // The CLI only writes JSON; reading is here because a converter has to offer it
+        [ExcludeFromCodeCoverage]
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             return reader.GetDateTime().ToUniversalTime();

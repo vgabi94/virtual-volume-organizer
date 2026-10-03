@@ -42,8 +42,31 @@ public sealed class DiskTree : IDisposable
         return this;
     }
 
-    public void Dispose()
+    public DiskTree ReadOnly(string relativePath)
     {
-        try { Directory.Delete(Root, true); } catch { }
+        var path = PathOf(relativePath);
+        System.IO.File.SetAttributes(path, System.IO.File.GetAttributes(path) | FileAttributes.ReadOnly);
+        return this;
+    }
+
+    public void Dispose() => DeleteWritable(Root);
+
+    /// <summary>
+    /// Deletes a directory even where a test made something in it read-only.
+    /// </summary>
+    public static void DeleteWritable(string directory)
+    {
+        try
+        {
+            foreach (var entry in new DirectoryInfo(directory).EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
+            {
+                entry.Attributes &= ~FileAttributes.ReadOnly;
+            }
+
+            Directory.Delete(directory, true);
+        }
+        catch
+        {
+        }
     }
 }

@@ -60,8 +60,10 @@ public sealed class TempCatalogue : IDisposable
         return JsonSerializer.Serialize(snapshot);
     }
 
-    public void Dispose()
-    {
-        try { Directory.Delete(_directory, true); } catch { }
-    }
+    /// <summary>
+    /// Marks the catalogue file read-only, as one on a read-only share or disc would be.
+    /// </summary>
+    public void MakeReadOnly() => File.SetAttributes(Path, File.GetAttributes(Path) | FileAttributes.ReadOnly);
+
+    public void Dispose() => DiskTree.DeleteWritable(_directory);
 }
