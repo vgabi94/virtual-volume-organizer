@@ -129,7 +129,8 @@ public class AppResourceTests
             "DialogSubjectFontSize", "DialogTextFontSize", "DialogTitleFontSize", "DialogTitleSpacing",
             "DocumentFontSize", "IconChoiceSize", "ItemSubtitleFontSize", "ItemSubtitleOpacity",
             "OptionsNumberWidth", "OptionsSpacing", "StatusIndicatorHeight", "StatusMessageMinWidth",
-            "StatusSpacing", "VolumeExplorerSplitterWidth"
+            "StatusSpacing", "VolumeExplorerSplitterWidth", "StatusBarHeight", "StatusBarFontSize", "TitleBarHeight",
+            "VolumeChipSpacing", "VolumeChipIconSize", "TintOpacity", "ExtensionTagFontSize"
         ];
         string[] thicknesses =
         [
@@ -138,12 +139,15 @@ public class AppResourceTests
             "DialogBrowseButtonPadding", "DialogButtonPadding", "DialogButtonRowMargin", "DialogLabelMargin",
             "DialogListItemMargin", "DialogMargin", "DialogSectionMargin", "DialogSmallButtonPadding",
             "DialogTextBoxPadding", "DocumentPadding", "FrameThickness", "IconChoicesPadding",
-            "OptionNoteMargin", "ShortcutRowMargin", "StatusButtonPadding", "StatusItemMargin"
+            "OptionNoteMargin", "ShortcutRowMargin", "StatusButtonPadding", "StatusItemMargin",
+            "StatusBarStartMargin", "StatusBarEndMargin", "TitleBarIconMargin", "PanelBorderThickness",
+            "VolumeChipMargin", "VolumeChipPadding", "ExtensionTagPadding", "CellTextMargin"
         ];
 
         Assert.All(lengths, key => Assert.IsType<double>(Resource(key)));
         Assert.All(thicknesses, key => Assert.IsType<Thickness>(Resource(key)));
-        Assert.IsType<CornerRadius>(Resource("FrameCornerRadius"));
+        Assert.All(["FrameCornerRadius", "PanelCornerRadius", "TagCornerRadius"],
+            key => Assert.IsType<CornerRadius>(Resource(key)));
     }
 
     private static object? Resource(string key)

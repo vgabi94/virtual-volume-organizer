@@ -1,5 +1,7 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:VVO.UI.Views"
+        xmlns:vm="using:VVO.UI.ViewModels">
 
     <Design.PreviewWith>
         <TextBox Classes="SearchBox" PlaceholderText="Search all..." />
@@ -87,6 +89,78 @@
     <Style Selector="Border.PathViewStyle TextBlock.BreadcrumbSeparator">
         <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- A tint of whatever colour its parent stands in; only the Modern layout shows one -->
+    <Style Selector="Border.Tint">
+        <Setter Property="IsVisible" Value="False"/>
+        <Setter Property="Opacity" Value="{StaticResource TintOpacity}"/>
+    </Style>
+    <Style Selector="Window.Modern Border.Tint">
+        <Setter Property="IsVisible" Value="True"/>
+    </Style>
+
+    <Style Selector="StackPanel.VolumeChip">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="Spacing" Value="{StaticResource VolumeChipSpacing}"/>
+    </Style>
+    <Style Selector="PathIcon.VolumeChip">
+        <Setter Property="IsVisible" Value="False"/>
+        <Setter Property="Width" Value="{StaticResource VolumeChipIconSize}"/>
+        <Setter Property="Height" Value="{StaticResource VolumeChipIconSize}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="Window.Modern views|VolumeExplorerView">
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource PanelBorderThickness}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource PanelCornerRadius}"/>
+    </Style>
+    <Style Selector="Window.Modern Panel.VolumeChip">
+        <Setter Property="Margin" Value="{StaticResource VolumeChipMargin}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Window.Modern Panel.VolumeChip > Border.Tint">
+        <Setter Property="CornerRadius" Value="{StaticResource TagCornerRadius}"/>
+    </Style>
+    <Style Selector="Window.Modern StackPanel.VolumeChip">
+        <Setter Property="Margin" Value="{StaticResource VolumeChipPadding}"/>
+    </Style>
+    <Style Selector="Window.Modern PathIcon.VolumeChip">
+        <Setter Property="IsVisible" Value="True"/>
+    </Style>
+    <Style Selector="Window.Modern Border.PathViewStyle TextBlock.VolumePrefix" x:DataType="vm:VolumeExplorerViewModel">
+        <Setter Property="Foreground" Value="{Binding VolumeIconBrush}"/>
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+
+    <Style Selector="Panel.ExtensionTag > TextBlock">
+        <Setter Property="Margin" Value="{StaticResource CellTextMargin}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Window.Modern Panel.ExtensionTag">
+        <Setter Property="Margin" Value="{StaticResource CellTextMargin}"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Window.Modern Panel.ExtensionTag > Border.Tint">
+        <Setter Property="CornerRadius" Value="{StaticResource TagCornerRadius}"/>
+    </Style>
+    <Style Selector="Window.Modern Panel.ExtensionTag > TextBlock">
+        <Setter Property="Margin" Value="{StaticResource ExtensionTagPadding}"/>
+        <Setter Property="FontSize" Value="{StaticResource ExtensionTagFontSize}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+
+    <Style Selector="Window.Modern DataGridCell TextBlock.Folder">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <Style Selector="Window.Modern DataGridCell.Size TextBlock">
+        <Setter Property="TextAlignment" Value="Right"/>
+        <Setter Property="FontFeatures" Value="+tnum"/>
+    </Style>
+    <Style Selector="Window.Modern DataGridRow:selected">
+        <Setter Property="Background" Value="{DynamicResource SelectionBackground}" />
     </Style>
     
 </Styles>

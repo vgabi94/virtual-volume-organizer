@@ -15,7 +15,11 @@ public record FolderAddedMessage(RootFolderMetadata Entry, FileRecord RootRecord
 /// tree, the name it is listed under, the virtual volume holding it and the path it was scanned
 /// from. An empty root path leaves the explorer listing catalogue paths alone.
 /// </summary>
-public record FolderSelectedMessage(Guid TreeId, string Name, string VolumeName, string RootPath = "");
+public record FolderSelectedMessage(
+    Guid TreeId, string Name, string VolumeName, string RootPath = "", VirtualVolumeRecord? Volume = null);
+
+/// <summary>Sent by the SidebarViewModel once a virtual volume's name, icon or colour is changed.</summary>
+public record VirtualVolumeChangedMessage(VirtualVolumeRecord Record);
 
 public record HideStartPage();
 
@@ -43,7 +47,8 @@ public record FocusFileSearchMessage();
 /// One scanned tree a search covers, under the name the sidebar lists it by, the virtual volume
 /// holding it and the path it was scanned from.
 /// </summary>
-public record SearchScope(Guid TreeId, string Name, string VolumeName, string RootPath = "");
+public record SearchScope(
+    Guid TreeId, string Name, string VolumeName, string RootPath = "", VirtualVolumeRecord? Volume = null);
 
 /// <summary>
 /// Sent by the sidebar's Search all box. An empty term calls the search off and puts the

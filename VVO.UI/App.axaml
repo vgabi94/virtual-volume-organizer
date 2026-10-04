@@ -47,6 +47,19 @@
         <sys:Double x:Key="VolumeExplorerCellSpacing">10</sys:Double>
         <!-- Wide enough to grab, narrow enough not to read as a rule between the crumbs and the search -->
         <sys:Double x:Key="VolumeExplorerSplitterWidth">2</sys:Double>
+        <!-- The Modern explorer: a raised panel, the volume as a chip and each extension as a tag -->
+        <CornerRadius x:Key="PanelCornerRadius">8,0,0,0</CornerRadius>
+        <Thickness x:Key="PanelBorderThickness">1,1,0,0</Thickness>
+        <Thickness x:Key="VolumeChipMargin">4,0,0,0</Thickness>
+        <Thickness x:Key="VolumeChipPadding">8,2</Thickness>
+        <sys:Double x:Key="VolumeChipSpacing">6</sys:Double>
+        <sys:Double x:Key="VolumeChipIconSize">14</sys:Double>
+        <sys:Double x:Key="TintOpacity">0.14</sys:Double>
+        <CornerRadius x:Key="TagCornerRadius">5</CornerRadius>
+        <Thickness x:Key="ExtensionTagPadding">7,2</Thickness>
+        <sys:Double x:Key="ExtensionTagFontSize">11</sys:Double>
+        <!-- Where the grid's own text columns put their text -->
+        <Thickness x:Key="CellTextMargin">12,0</Thickness>
 
         <!-- Shared by every row with a title over a fainter line: a sidebar folder, a folder to compare against -->
         <sys:Double x:Key="ItemSubtitleFontSize">11</sys:Double>

@@ -242,7 +242,7 @@ public partial class SidebarViewModel : ViewModelBase
 
         WeakReferenceMessenger.Default.Send(new FolderSelectedMessage(
             node.SelectedFolder.Entry.TreeId, node.SelectedFolder.Title, node.Name,
-            node.SelectedFolder.Entry.Path));
+            node.SelectedFolder.Entry.Path, node.Record));
     }
 
     #region Search
@@ -280,7 +280,7 @@ public partial class SidebarViewModel : ViewModelBase
         return VirtualVolumes
             .SelectMany(node => node.Folders.Select(
                 folder => new SearchScope(
-                    folder.Entry.TreeId, folder.Title, node.Name, folder.Entry.Path)))
+                    folder.Entry.TreeId, folder.Title, node.Name, folder.Entry.Path, node.Record)))
             .GroupBy(scope => scope.TreeId)
             .Select(group => group.First())
             .ToList();
@@ -482,6 +482,8 @@ public partial class SidebarViewModel : ViewModelBase
         {
             node.Record = record;
         }
+
+        WeakReferenceMessenger.Default.Send(new VirtualVolumeChangedMessage(record));
     }
 
     #endregion
