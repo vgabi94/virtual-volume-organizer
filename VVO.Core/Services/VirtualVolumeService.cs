@@ -21,6 +21,7 @@ public class VirtualVolumeService : IVirtualVolumeService
     public async Task<VirtualVolumeRecord> CreateVirtualVolumeAsync(string name, string icon, string? color = null)
     {
         RequireName(name);
+        RequireUsableName(name, nameof(name));
         RequireIcon(icon);
 
         var record = new VirtualVolumeRecord
@@ -121,6 +122,7 @@ public class VirtualVolumeService : IVirtualVolumeService
         CancellationToken cancellationToken = default)
     {
         RequireRoot(scanned, records, nameof(records));
+        RequireUsableName(scanned.Label, nameof(scanned));
 
         var entry = scanned with { VirtualVolumeId = virtualVolumeId };
 
@@ -224,6 +226,8 @@ public class VirtualVolumeService : IVirtualVolumeService
 
     public async Task<RootFolderMetadata> CopyFolderAsync(Guid entryId, Guid targetVirtualVolumeId, string? label = null)
     {
+        RequireUsableName(label, nameof(label));
+
         RootFolderMetadata? copy = null;
 
         await _databaseService.TransactionAsync(db =>
@@ -597,6 +601,16 @@ public class VirtualVolumeService : IVirtualVolumeService
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException("A virtual volume needs a name.", nameof(name));
+        }
+    }
+
+    // Only where a name is new: an update also puts back what undo remembers, which a catalogue
+    // written before the rule may hold
+    private static void RequireUsableName(string? name, string paramName)
+    {
+        if (CataloguePath.NameProblem(name) is { } problem)
+        {
+            throw new ArgumentException(problem, paramName);
         }
     }
 

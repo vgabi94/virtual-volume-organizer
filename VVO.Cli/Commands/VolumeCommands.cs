@@ -52,13 +52,14 @@ public static class VolumeCommands
 
         command.SetJsonAction(services, async context =>
         {
+            var chosenName = Appearance.Name(context.ParseResult.GetRequiredValue(name).Trim())!;
             var chosenIcon = Appearance.VolumeIcon(context.ParseResult.GetValue(icon) ?? IconKeys.DefaultVolume);
             var chosenColor = context.ParseResult.GetValue(color) is { } value ? Appearance.Color(value) : null;
 
             await DatabaseFile.OpenForWritingAsync(context, db);
 
             var volume = await context.Service<IVirtualVolumeService>().CreateVirtualVolumeAsync(
-                context.ParseResult.GetRequiredValue(name).Trim(), chosenIcon, chosenColor);
+                chosenName, chosenIcon, chosenColor);
 
             return VolumeDto.From(volume, 0);
         });
@@ -83,7 +84,7 @@ public static class VolumeCommands
 
         command.SetJsonAction(services, async context =>
         {
-            var newName = context.ParseResult.GetValue(name);
+            var newName = Appearance.Name(context.ParseResult.GetValue(name)?.Trim());
             var newIcon = context.ParseResult.GetValue(icon);
             var newColor = context.ParseResult.GetValue(color);
 
@@ -98,7 +99,7 @@ public static class VolumeCommands
             var volume = await Catalogue.VolumeAsync(context, context.ParseResult.GetValue(id));
             var updated = volume with
             {
-                Name = newName?.Trim() ?? volume.Name,
+                Name = newName ?? volume.Name,
                 Icon = chosenIcon ?? volume.Icon,
                 Color = newColor != null ? chosenColor : volume.Color
             };

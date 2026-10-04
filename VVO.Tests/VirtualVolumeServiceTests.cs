@@ -71,6 +71,55 @@ public class VirtualVolumeServiceTests : IDisposable
         await Assert.ThrowsAsync<ArgumentException>(() => _service.CreateVirtualVolumeAsync(name, "HardDrive"));
     }
 
+    #region Names that would read as deeper paths
+
+    [Theory]
+    [InlineData(@"C:\Backups")]
+    [InlineData("Backups:2")]
+    public async Task AVolumeNameWithASeparatorIsRefused(string name)
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("Backups", "HardDrive");
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.CreateVirtualVolumeAsync(name, "HardDrive"));
+        Assert.Equal(volume, Assert.Single(await _service.GetVirtualVolumesAsync()));
+    }
+
+    [Theory]
+    [InlineData(@"2024\summer")]
+    [InlineData("photos:old")]
+    public async Task AFolderLabelWithASeparatorIsRefused(string label)
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("Backups", "HardDrive");
+        var entry = await AddFolderAsync(volume.Id);
+        var tree = TestTree.Root("other").Build();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.CopyFolderAsync(entry.Id, volume.Id, label));
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _service.AddFolderAsync(volume.Id, tree.Metadata with { Label = label }, tree.Records.ToList()));
+
+        var stored = Assert.Single(await _database.ReadItemsAsync<RootFolderMetadata>());
+        Assert.Null(stored.Label);
+    }
+
+    // Catalogues written before the rule keep their names, and undo puts back what was there:
+    // through a restore, or through an update for a rename or a new label
+    [Fact]
+    public async Task WhatIsAlreadyStoredCanBePutBack()
+    {
+        var volume = new VirtualVolumeRecord { Id = Guid.NewGuid(), Name = @"C:\Backups", Icon = "HardDrive" };
+        await _service.RestoreVirtualVolumeAsync(volume);
+        var entry = await AddFolderAsync(volume.Id);
+
+        await _service.UpdateVirtualVolumeAsync(volume.Id, "Backups", "HardDrive", null);
+        await _service.UpdateVirtualVolumeAsync(volume.Id, @"C:\Backups", "HardDrive", null);
+        var labelled = await _service.UpdateFolderAsync(entry.Id, @"2024\summer", null, null, null);
+
+        Assert.Equal(@"C:\Backups", Assert.Single(await _service.GetVirtualVolumesAsync()).Name);
+        Assert.Equal(@"2024\summer", labelled.Label);
+    }
+
+    #endregion
+
     [Fact]
     public async Task CreateVirtualVolume_StoresItsAppearance()
     {

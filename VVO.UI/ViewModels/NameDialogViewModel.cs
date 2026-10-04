@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using VVO.Core;
 
 namespace VVO.UI.ViewModels;
 
@@ -8,10 +9,12 @@ public partial class NameDialogViewModel : ObservableObject
     public string ConfirmText { get; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanConfirm))]
+    [NotifyPropertyChangedFor(nameof(CanConfirm), nameof(NameProblem))]
     public partial string Name { get; set; }
 
-    public bool CanConfirm => !string.IsNullOrWhiteSpace(Name);
+    public string? NameProblem => CataloguePath.NameProblem(Name);
+
+    public bool CanConfirm => !string.IsNullOrWhiteSpace(Name) && NameProblem == null;
 
     public NameDialogViewModel(string header, string confirmText, string name = "")
     {

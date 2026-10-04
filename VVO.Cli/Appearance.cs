@@ -5,8 +5,8 @@ using VVO.Core;
 namespace VVO.Cli;
 
 /// <summary>
-/// The icons and colours a command accepts: the ones the GUI offers, so nothing the CLI writes
-/// shows up blank there.
+/// The names, icons and colours a command accepts: the ones the GUI offers, so nothing the CLI
+/// writes shows up blank there.
 /// </summary>
 public static partial class Appearance
 {
@@ -14,6 +14,12 @@ public static partial class Appearance
     /// Given for --color, puts the icon back on the application's own colour.
     /// </summary>
     public const string NoColor = "none";
+
+    /// <summary>
+    /// A volume name or folder label as given, once it is known not to read as a deeper path.
+    /// </summary>
+    public static string? Name(string? name) =>
+        CataloguePath.NameProblem(name) is { } problem ? throw CliException.Usage(problem) : name;
 
     public static string VolumeIcon(string key) => Icon(key, IconKeys.Volumes, "virtual volume");
 

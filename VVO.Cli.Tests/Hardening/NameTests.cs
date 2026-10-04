@@ -98,7 +98,9 @@ public class NameTests
     public async Task NamesNoDiskAllowsStillMakeValidJson()
     {
         using var catalogue = await TempCatalogue.CreateAsync();
-        var volume = await catalogue.AddVolumeAsync("Back\"ups\\");
+        // Stored as a catalogue from before names were checked could hold it, to escape a '\' too
+        var volume = new VirtualVolumeRecord { Id = Guid.NewGuid(), Name = "Back\"ups\\", Icon = "HardDrive" };
+        await catalogue.Volumes.RestoreVirtualVolumeAsync(volume);
         string[] names = [.. Awkward.Names, "bell\u0007.txt", "nul\u0000.txt", "trailing dot.", "trailing space "];
         var entry = await catalogue.AddFolderAsync(volume.Id, Awkward.Tree(names));
 
@@ -108,12 +110,49 @@ public class NameTests
         Assert.Equal(names.Order(), Children(result).Select(child => child.GetProperty("name").GetString()!).Order());
     }
 
-    // A ':' or '\' in a volume or folder name reads like a deeper path; pinned so it is noticed
-    [Fact]
-    public async Task SeparatorsInNamesAreKeptAsTheyAre()
+    public static TheoryData<string, string> NamingCommands => new()
+    {
+        { "volume create", @"C:\Backups" },
+        { "volume update", "Backups:2" },
+        { "folder scan", @"2024\summer" },
+        { "folder update", "photos:old" },
+        { "folder copy", @"2024\summer" }
+    };
+
+    // A ':' or '\' would read as a deeper path: a volume 'C:\Backups' heads 'C:\Backups:\summer'
+    [Theory]
+    [MemberData(nameof(NamingCommands))]
+    public async Task ANameWithASeparatorIsRefusedBeforeAnythingIsWritten(string command, string name)
     {
         using var catalogue = await TempCatalogue.CreateAsync();
-        var volume = await catalogue.AddVolumeAsync(@"C:\Backups");
+        var volume = await catalogue.AddVolumeAsync("Backups");
+        var entry = await catalogue.AddFolderAsync(volume.Id, TestTree.Root("photos").File("a.jpg").Build());
+        using var disk = new DiskTree().File("a.jpg", 1);
+        var before = await catalogue.SnapshotAsync();
+
+        string[] args = command switch
+        {
+            "volume create" => ["volume", "create", name],
+            "volume update" => ["volume", "update", volume.Id.ToString(), "--name", name],
+            "folder scan" => ["folder", "scan", disk.Root, "--volume", volume.Id.ToString(), "--label", name],
+            "folder update" => ["folder", "update", entry.Id.ToString(), "--label", name],
+            _ => ["folder", "copy", entry.Id.ToString(), "--to", volume.Id.ToString(), "--label", name]
+        };
+        var result = await CliRunner.RunAsync([.. args, "--db", catalogue.Path]);
+
+        Assert.Equal(2, result.ExitCode);
+        Assert.Equal("usage", result.ErrorCode);
+        Assert.Contains("can't contain", result.Error.GetProperty("message").GetString());
+        Assert.Equal(before, await catalogue.SnapshotAsync());
+    }
+
+    // Catalogues written before the rule keep their names, and read as they always did
+    [Fact]
+    public async Task SeparatorsAlreadyStoredStillRead()
+    {
+        using var catalogue = await TempCatalogue.CreateAsync();
+        var volume = new VirtualVolumeRecord { Id = Guid.NewGuid(), Name = @"C:\Backups", Icon = "HardDrive" };
+        await catalogue.Volumes.RestoreVirtualVolumeAsync(volume);
         var entry = await catalogue.AddFolderAsync(volume.Id, TestTree.Root("photos").File("a.jpg").Build());
         await catalogue.Volumes.UpdateFolderAsync(entry.Id, @"2024\summer", null, null, null);
 

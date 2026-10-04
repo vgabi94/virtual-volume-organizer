@@ -162,12 +162,12 @@ public static class FolderCommands
 
         command.SetJsonAction(services, async context =>
         {
+            var chosenLabel = Appearance.Name(context.ParseResult.GetValue(label)?.Trim());
+
             await DatabaseFile.OpenForWritingAsync(context, db);
 
             var copy = await context.Service<IVirtualVolumeService>().CopyFolderAsync(
-                context.ParseResult.GetValue(id),
-                context.ParseResult.GetValue(to),
-                context.ParseResult.GetValue(label)?.Trim());
+                context.ParseResult.GetValue(id), context.ParseResult.GetValue(to), chosenLabel);
 
             return await Catalogue.DescribeAsync(context, copy);
         });
@@ -388,7 +388,7 @@ public static class FolderCommands
             var color = context.ParseResult.GetValue(_color);
 
             return new Chosen(
-                label, context.ParseResult.GetValue(_label),
+                label, Appearance.Name(context.ParseResult.GetValue(_label)),
                 description, context.ParseResult.GetValue(_description),
                 icon != null, icon != null ? Appearance.FolderIcon(icon) : null,
                 color != null, color != null ? Appearance.Color(color) : null);

@@ -3,7 +3,7 @@
         xmlns:vm="using:VVO.UI.ViewModels"
         x:Class="VVO.UI.Views.NameDialogView"
         x:DataType="vm:NameDialogViewModel"
-        Title="Name" Width="420" Height="190"
+        Title="Name" Width="420" Height="215"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         ShowInTaskbar="False"
@@ -13,6 +13,11 @@
         <StackPanel Grid.Row="0" Spacing="6" VerticalAlignment="Center">
             <TextBlock Text="{Binding Header}" FontWeight="Medium" FontSize="13"/>
             <TextBox Text="{Binding Name, Mode=TwoWay}" Padding="10,8"/>
+            <TextBlock Text="{Binding NameProblem}"
+                       IsVisible="{Binding NameProblem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                       Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                       TextWrapping="Wrap"
+                       FontSize="12"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">

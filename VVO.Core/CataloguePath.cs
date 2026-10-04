@@ -10,6 +10,15 @@ public static class CataloguePath
     public const char Separator = '\\';
 
     /// <summary>
+    /// Why a volume name or folder label can't be used, or null when it can. A ':' or '\' in one
+    /// would read as a deeper path: a volume 'C:\Backups' heads 'C:\Backups:\summer'.
+    /// </summary>
+    public static string? NameProblem(string? name) =>
+        name != null && name.AsSpan().IndexOfAny(':', Separator) >= 0
+            ? @"A name can't contain ':' or '\', which separate the parts of a catalogue path."
+            : null;
+
+    /// <summary>
     /// The top of a tree as a crumb reads it, the way a drive is written 'C:'.
     /// </summary>
     public static string Root(string name) => $"{name}:";
