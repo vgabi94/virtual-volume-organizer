@@ -155,6 +155,21 @@ public class ShapeTests : IAsyncLifetime
         Assert.Equal(0, (await RunAsync("ls", copy.Id.ToString())).Json.GetProperty("children").GetArrayLength());
     }
 
+    // A tree no folder lists must not cancel out the other folder of a shared one
+    [Fact]
+    public async Task RemovingFromASharedScanAndAnUnlistedOneStillCountsTheOtherFolder()
+    {
+        var tree = TestTree.Root("files").File("a.txt").Build();
+        var entry = await _catalogue.AddFolderAsync(_volume.Id, tree);
+        await _catalogue.Volumes.CopyFolderAsync(entry.Id, _volume.Id);
+        var stray = await Awkward.OrphanTreeAsync(_catalogue);
+
+        var asked = await RunAsync("rm", tree.Record("a.txt").Id.ToString(), stray.Record("stray.txt").Id.ToString());
+
+        Assert.Contains("They go from the other folder listing the same scan too.",
+            asked.Error.GetProperty("message").GetString());
+    }
+
     [Fact]
     public async Task RemovingFromAScanOneFolderListsSaysNothingMore()
     {

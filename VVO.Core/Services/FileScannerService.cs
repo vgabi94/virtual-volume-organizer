@@ -33,7 +33,8 @@ public class FileScannerService : IFileScannerService
 
         // A junction or symbolic link is catalogued as the folder it is on disk, but its contents
         // live elsewhere and may be an ancestor, which the walk would go round until the path is
-        // too long. Other reparse points, cloud placeholders among them, are walked as usual.
+        // too long. Other reparse points, cloud placeholders among them, are walked as usual, and
+        // so is a disk mounted in a folder: its target is a whole volume, as Explorer shows it.
         protected override bool ShouldRecurseIntoEntry(ref FileSystemEntry entry)
         {
             if ((entry.Attributes & FileAttributes.ReparsePoint) == 0)
@@ -41,7 +42,8 @@ public class FileScannerService : IFileScannerService
 
             try
             {
-                return new DirectoryInfo(entry.ToFullPath()).LinkTarget == null;
+                var target = new DirectoryInfo(entry.ToFullPath()).LinkTarget;
+                return target == null || target.Contains("Volume{", StringComparison.OrdinalIgnoreCase);
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {

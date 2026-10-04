@@ -141,10 +141,13 @@ public static class RecordCommands
 
             var records = found.ToList();
 
-            // Each tree is listed by one folder the user has in mind; any further one loses the records too
+            // Each tree is listed by one folder the user has in mind; any further one loses the records
+            // too. A tree no folder lists has none to spare.
             var trees = records.Select(record => record.RootFolderId).ToHashSet();
-            var listing = (await Catalogue.EntriesAsync(context)).Count(entry => trees.Contains(entry.TreeId));
-            var otherFolders = Math.Max(0, listing - trees.Count);
+            var otherFolders = (await Catalogue.EntriesAsync(context))
+                .Where(entry => trees.Contains(entry.TreeId))
+                .GroupBy(entry => entry.TreeId)
+                .Sum(listing => listing.Count() - 1);
 
             Confirmation.RequireDeletion(context, records.Count == 1
                 ? records[0].IsFolder
