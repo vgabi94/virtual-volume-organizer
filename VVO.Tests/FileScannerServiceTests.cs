@@ -709,4 +709,44 @@ public class FileScannerServiceTests : IDisposable
     }
 
     #endregion
+
+    #region Links
+
+    private static bool MakeJunction(string link, string target)
+    {
+        var start = new System.Diagnostics.ProcessStartInfo("cmd", $"/c mklink /J \"{link}\" \"{target}\"")
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+
+        using var process = System.Diagnostics.Process.Start(start)!;
+        process.WaitForExit();
+        return process.ExitCode == 0;
+    }
+
+    // Every profile has junctions back up the tree (Application Data among them), which a walk
+    // that follows them goes round until the path is too long
+    [Fact]
+    public async Task AJunctionIsCataloguedButNotWalkedInto()
+    {
+        if (!OperatingSystem.IsWindows())
+            return;
+
+        CreateFile(Path.Combine("inner", "a.txt"), 10);
+        Assert.True(MakeJunction(Path.Combine(_testRoot, "inner", "loop"), _testRoot));
+
+        var scan = await _service.ScanDirectoryAsync(_testRoot, includeHiddenAndSystem: true);
+        var loop = scan.Records.Single(record => record.Name == "loop");
+
+        Assert.Equal(["a.txt", "inner", "loop"], scan.Records.Where(record => record.ParentId != null).Select(record => record.Name).Order());
+        Assert.True(loop.IsFolder);
+        Assert.Equal(0, loop.Size);
+        Assert.Equal(10, scan.Records.Single(record => record.ParentId == null).Size);
+        Assert.Equal(0, scan.SkippedFolders);
+    }
+
+    #endregion
 }
