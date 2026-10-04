@@ -55,6 +55,19 @@ public class ThemeTests : UiTestBase
             Assert.True(Application.Current!.TryGetResource(key, variant, out _), $"missing '{key}'"));
     }
 
+    // Mica is drawn over the plain theme it inherits, so whatever it does not name is that theme's
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void AMicaThemeFallsBackToItsPlainOneForEveryColour(bool dark)
+    {
+        var plain = Theme.VariantFor(dark, mica: false);
+        var mica = Theme.VariantFor(dark, mica: true);
+
+        Assert.All(OwnBrushes.Concat(FluentBrushes), key =>
+            Assert.Equal(ColourOf(key, plain), ColourOf(key, mica)));
+    }
+
     // Two variants resolving to one colour is a value that was never given a second reading
     [AvaloniaFact]
     public void TheTwoThemesAgreeOnNothingTheApplicationDefinesForItself()
@@ -97,6 +110,30 @@ public class ThemeTests : UiTestBase
 
     #region Choosing one
 
+    [AvaloniaTheory]
+    [InlineData(true, false, "Dark")]
+    [InlineData(false, false, "Light")]
+    [InlineData(true, true, "MicaDark")]
+    [InlineData(false, true, "MicaLight")]
+    public void ApplyingPutsOnTheVariantForEachChoice(bool dark, bool mica, string expected)
+    {
+        var application = Application.Current!;
+        var before = application.RequestedThemeVariant;
+
+        try
+        {
+            Theme.Apply(dark, mica);
+
+            Assert.Equal(expected, application.ActualThemeVariant.Key);
+            Assert.Equal(dark ? ThemeVariant.Dark : ThemeVariant.Light,
+                application.ActualThemeVariant.InheritVariant ?? application.ActualThemeVariant);
+        }
+        finally
+        {
+            application.RequestedThemeVariant = before;
+        }
+    }
+
     [AvaloniaFact]
     public void TheApplicationOpensDarkUntilItIsToldOtherwise()
     {
@@ -118,7 +155,7 @@ public class ThemeTests : UiTestBase
     public void ChoosingTheLightThemePutsItOnAndRemembersIt()
     {
         var applied = new List<bool>();
-        Theme.Applying = dark => applied.Add(dark);
+        Theme.Applying = (dark, _) => applied.Add(dark);
 
         var options = new OptionsDialogViewModel(Settings) { DarkTheme = false };
         options.Apply();
@@ -134,7 +171,7 @@ public class ThemeTests : UiTestBase
         Settings.SetDarkTheme(false);
 
         var applied = new List<bool>();
-        Theme.Applying = dark => applied.Add(dark);
+        Theme.Applying = (dark, _) => applied.Add(dark);
 
         new OptionsDialogViewModel(Settings) { DarkTheme = true }.Apply();
 
@@ -146,7 +183,7 @@ public class ThemeTests : UiTestBase
     public void CancellingTheOptionsDialogLeavesTheThemeAlone()
     {
         var applied = new List<bool>();
-        Theme.Applying = dark => applied.Add(dark);
+        Theme.Applying = (dark, _) => applied.Add(dark);
 
         // Filled in and never applied, which is what pressing Cancel amounts to
         _ = new OptionsDialogViewModel(Settings) { DarkTheme = false };

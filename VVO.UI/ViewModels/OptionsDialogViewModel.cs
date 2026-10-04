@@ -40,6 +40,6 @@ public partial class OptionsDialogViewModel : ObservableObject
 
         // Nothing else owns the theme, so it is put on here rather than handed to a caller
         _settings.SetDarkTheme(DarkTheme);
-        Theme.Apply(DarkTheme);
+        Theme.Apply(DarkTheme, _settings.IsMicaTheme);
     }
 }

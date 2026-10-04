@@ -21,7 +21,8 @@ public partial class App : Application
             var serviceProvider = ServiceConfiguration.ConfigureServices();
 
             // Before the window is built, so it is never painted in one theme and then repainted
-            Theme.Apply(serviceProvider.GetRequiredService<Settings>().IsDarkTheme);
+            var settings = serviceProvider.GetRequiredService<Settings>();
+            Theme.Apply(settings.IsDarkTheme, settings.IsMicaTheme);
 
             var mainWindowVm = serviceProvider.GetRequiredService<MainWindowViewModel>();
 
