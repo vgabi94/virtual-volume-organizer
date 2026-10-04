@@ -1,0 +1,44 @@
+[
+  {
+    "id": "00000000-0000-0000-0000-000000000010",
+    "volumeId": "00000000-0000-0000-0000-000000000001",
+    "treeId": "00000000-0000-0000-0000-000000000100",
+    "title": "Holidays",
+    "label": "Holidays",
+    "description": "Summer, mostly",
+    "path": "<disk>",
+    "icon": null,
+    "color": null,
+    "lastScanned": "2026-01-01T00:00:00Z",
+    "size": 6155,
+    "recordCount": 6
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000020",
+    "volumeId": "00000000-0000-0000-0000-000000000002",
+    "treeId": "00000000-0000-0000-0000-000000000100",
+    "title": "ice",
+    "label": "ice",
+    "description": null,
+    "path": "<disk>",
+    "icon": null,
+    "color": null,
+    "lastScanned": "2026-01-01T00:00:00Z",
+    "size": 6155,
+    "recordCount": 6
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000030",
+    "volumeId": "00000000-0000-0000-0000-000000000002",
+    "treeId": "00000000-0000-0000-0000-000000000200",
+    "title": "Ivy",
+    "label": "Ivy",
+    "description": null,
+    "path": "E:\\Photos",
+    "icon": null,
+    "color": null,
+    "lastScanned": "2025-06-30T23:30:00Z",
+    "size": 2056,
+    "recordCount": 3
+  }
+]

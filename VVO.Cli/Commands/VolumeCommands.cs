@@ -32,7 +32,7 @@ public static class VolumeCommands
             var folderCounts = await FolderCountsAsync(context);
 
             return volumes
-                .OrderBy(volume => volume.Name, StringComparer.CurrentCultureIgnoreCase)
+                .OrderBy(volume => volume.Name, StringComparer.InvariantCultureIgnoreCase)
                 .ThenBy(volume => volume.Id)
                 .Select(volume => VolumeDto.From(volume, folderCounts.GetValueOrDefault(volume.Id)))
                 .ToList();

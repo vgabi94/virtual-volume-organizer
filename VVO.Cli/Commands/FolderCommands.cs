@@ -59,7 +59,7 @@ public static class FolderCommands
 
             return folders
                 .OrderBy(folder => folder.VolumeId)
-                .ThenBy(folder => folder.Title, StringComparer.CurrentCultureIgnoreCase)
+                .ThenBy(folder => folder.Title, StringComparer.InvariantCultureIgnoreCase)
                 .ThenBy(folder => folder.Id)
                 .ToList();
         }, TableFormat.Folders);
@@ -264,11 +264,12 @@ public static class FolderCommands
             var title = EntryPaths.TitleOf(entry, catalogued.Single(record => record.Id == treeId));
 
             var scan = await Scanning.ScanAsync(context, source, hidden);
-            var differences = await context.Service<IFolderCompareService>().CompareAsync(
+            var compared = await context.Service<IFolderCompareService>().CompareAsync(
                 entry, catalogued, scan.Metadata, scan.Records,
-                includeUnchanged: false, context.Progress, context.CancellationToken);
+                includeUnchanged: true, context.Progress, context.CancellationToken);
 
-            var counts = DifferenceCounts.From(differences);
+            var counts = DifferenceCounts.From(compared);
+            var differences = compared.Where(row => row.Status != ComparisonStatus.Unchanged).ToList();
 
             Confirmation.Require(context, new ConfirmationRequest(
                 "Rescan Folder",

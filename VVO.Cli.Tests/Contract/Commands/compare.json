@@ -1,0 +1,120 @@
+{
+  "left": {
+    "entryId": "00000000-0000-0000-0000-000000000030",
+    "title": "Ivy",
+    "path": "E:\\Photos"
+  },
+  "right": {
+    "entryId": "00000000-0000-0000-0000-000000000010",
+    "title": "Holidays",
+    "path": "<disk>"
+  },
+  "skippedFolders": 0,
+  "counts": {
+    "added": 2,
+    "removed": 0,
+    "changed": 1,
+    "unchanged": 1
+  },
+  "rows": [
+    {
+      "relativePath": "",
+      "status": "changed",
+      "changes": [],
+      "descendantCount": null,
+      "left": {
+        "id": "00000000-0000-0000-0000-000000000200",
+        "isFolder": true,
+        "name": "Photos",
+        "size": 2056,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2026-01-01T00:00:00Z"
+      },
+      "right": {
+        "id": "00000000-0000-0000-0000-000000000100",
+        "isFolder": true,
+        "name": "Photos",
+        "size": 6155,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2026-01-01T00:00:00Z"
+      }
+    },
+    {
+      "relativePath": "old notes.txt",
+      "status": "added",
+      "changes": [],
+      "descendantCount": null,
+      "left": null,
+      "right": {
+        "id": "00000000-0000-0000-0000-000000000102",
+        "isFolder": false,
+        "name": "old notes.txt",
+        "size": 1,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2026-01-01T00:00:00Z"
+      }
+    },
+    {
+      "relativePath": "photos",
+      "status": "changed",
+      "changes": [],
+      "descendantCount": null,
+      "left": {
+        "id": "00000000-0000-0000-0000-000000000202",
+        "isFolder": true,
+        "name": "photos",
+        "size": 2048,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2026-01-01T00:00:00Z"
+      },
+      "right": {
+        "id": "00000000-0000-0000-0000-000000000103",
+        "isFolder": true,
+        "name": "photos",
+        "size": 6144,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2026-01-01T00:00:00Z"
+      }
+    },
+    {
+      "relativePath": "photos\\trip",
+      "status": "added",
+      "changes": [],
+      "descendantCount": 1,
+      "left": null,
+      "right": {
+        "id": "00000000-0000-0000-0000-000000000105",
+        "isFolder": true,
+        "name": "trip",
+        "size": 4096,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2026-01-01T00:00:00Z"
+      }
+    },
+    {
+      "relativePath": "readme.txt",
+      "status": "changed",
+      "changes": [
+        "size",
+        "modified"
+      ],
+      "descendantCount": null,
+      "left": {
+        "id": "00000000-0000-0000-0000-000000000201",
+        "isFolder": false,
+        "name": "readme.txt",
+        "size": 8,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2025-06-30T23:30:00Z"
+      },
+      "right": {
+        "id": "00000000-0000-0000-0000-000000000101",
+        "isFolder": false,
+        "name": "readme.txt",
+        "size": 10,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2026-01-01T00:00:00Z"
+      }
+    }
+  ]
+}

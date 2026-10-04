@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using VVO.Cli.Contract;
 using VVO.Cli.Output;
@@ -7,8 +6,7 @@ using VVO.Core.Models;
 namespace VVO.Cli.Tests;
 
 /// <summary>
-/// The JSON agents read, held against checked-in snapshots under Contract/. A failure here means
-/// the contract changed: if that was meant, update the snapshot in the same commit.
+/// The parts of the JSON agents read, each held against its snapshot.
 /// </summary>
 public class ContractTests
 {
@@ -44,20 +42,8 @@ public class ContractTests
         Name = "beach.jpg", Size = 2048, Created = Written, Modified = Written
     };
 
-    private static void AssertMatchesSnapshot(object value, string name, [CallerFilePath] string here = "")
-    {
-        var actual = JsonSerializer.Serialize(value, Json.Options).ReplaceLineEndings("\n");
-        var path = Path.Combine(Path.GetDirectoryName(here)!, "Contract", $"{name}.json");
-
-        if (!System.IO.File.Exists(path))
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            System.IO.File.WriteAllText(path, actual + "\n");
-            Assert.Fail($"No snapshot for {name}; wrote one to {path}. Review it and run again.");
-        }
-
-        Assert.Equal(System.IO.File.ReadAllText(path).ReplaceLineEndings("\n").TrimEnd(), actual);
-    }
+    private static void AssertMatchesSnapshot(object value, string name) =>
+        Snapshot.AssertMatches(JsonSerializer.Serialize(value, Json.Options), $"{name}.json");
 
     [Fact]
     public void Volume()

@@ -1,0 +1,92 @@
+{
+  "hits": [
+    {
+      "id": "00000000-0000-0000-0000-000000000104",
+      "parentId": "00000000-0000-0000-0000-000000000103",
+      "treeId": "00000000-0000-0000-0000-000000000100",
+      "isFolder": false,
+      "name": "beach.jpg",
+      "size": 2048,
+      "created": "2026-01-01T00:00:00Z",
+      "modified": "2026-01-01T00:00:00Z",
+      "entries": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000020",
+          "cataloguePath": "Archive:\\ice\\photos\\beach.jpg",
+          "physicalPath": "<disk>\\photos\\beach.jpg"
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000203",
+      "parentId": "00000000-0000-0000-0000-000000000202",
+      "treeId": "00000000-0000-0000-0000-000000000200",
+      "isFolder": false,
+      "name": "beach.jpg",
+      "size": 2048,
+      "created": "2026-01-01T00:00:00Z",
+      "modified": "2026-01-01T00:00:00Z",
+      "entries": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000030",
+          "cataloguePath": "Archive:\\Ivy\\photos\\beach.jpg",
+          "physicalPath": "E:\\Photos\\photos\\beach.jpg"
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000104",
+      "parentId": "00000000-0000-0000-0000-000000000103",
+      "treeId": "00000000-0000-0000-0000-000000000100",
+      "isFolder": false,
+      "name": "beach.jpg",
+      "size": 2048,
+      "created": "2026-01-01T00:00:00Z",
+      "modified": "2026-01-01T00:00:00Z",
+      "entries": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000010",
+          "cataloguePath": "Backups:\\Holidays\\photos\\beach.jpg",
+          "physicalPath": "<disk>\\photos\\beach.jpg"
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000106",
+      "parentId": "00000000-0000-0000-0000-000000000105",
+      "treeId": "00000000-0000-0000-0000-000000000100",
+      "isFolder": false,
+      "name": "day1.jpg",
+      "size": 4096,
+      "created": "2026-01-01T00:00:00Z",
+      "modified": "2026-01-01T00:00:00Z",
+      "entries": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000020",
+          "cataloguePath": "Archive:\\ice\\photos\\trip\\day1.jpg",
+          "physicalPath": "<disk>\\photos\\trip\\day1.jpg"
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000106",
+      "parentId": "00000000-0000-0000-0000-000000000105",
+      "treeId": "00000000-0000-0000-0000-000000000100",
+      "isFolder": false,
+      "name": "day1.jpg",
+      "size": 4096,
+      "created": "2026-01-01T00:00:00Z",
+      "modified": "2026-01-01T00:00:00Z",
+      "entries": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000010",
+          "cataloguePath": "Backups:\\Holidays\\photos\\trip\\day1.jpg",
+          "physicalPath": "<disk>\\photos\\trip\\day1.jpg"
+        }
+      ]
+    }
+  ],
+  "total": 5,
+  "truncated": false,
+  "unplaced": 0
+}

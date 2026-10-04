@@ -63,11 +63,13 @@ public static class CompareCommand
                 rightSide = new { EntryId = (Guid?)null, Title = (string?)null, scan.Metadata.Path };
             }
 
+            // Unchanged rows are always compared for, so they are counted whether listed or not
             var results = await context.Service<IFolderCompareService>().CompareAsync(
                 leftEntry, leftRecords, rightEntry, rightRecords,
-                context.ParseResult.GetValue(includeUnchanged), context.Progress, context.CancellationToken);
+                includeUnchanged: true, context.Progress, context.CancellationToken);
 
             var rows = results
+                .Where(result => context.ParseResult.GetValue(includeUnchanged) || result.Status != ComparisonStatus.Unchanged)
                 .Select(result => ComparisonRowDto.From(result, leftStored: true, rightStored: otherId != null))
                 .ToList();
 

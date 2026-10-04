@@ -152,6 +152,21 @@ public class CompareCommandTests : IAsyncLifetime
         Assert.True(result.Json.GetProperty("counts").GetProperty("unchanged").GetInt32() > 0);
     }
 
+    // The counts describe the comparison, not the rows chosen for listing
+    [Fact]
+    public async Task UnchangedIsCountedWhenNotListed()
+    {
+        var left = await AddAsync(Code().Build());
+        var right = await AddAsync(Code().File("new.txt", 1).Build());
+
+        var listed = await CompareAsync(left.Id.ToString(), right.Id.ToString(), "--include-unchanged");
+        var unlisted = await CompareAsync(left.Id.ToString(), right.Id.ToString());
+
+        Assert.DoesNotContain(unlisted.Json.GetProperty("rows").EnumerateArray(),
+            row => row.GetProperty("status").GetString() == "unchanged");
+        Assert.Equal(listed.Json.GetProperty("counts").ToString(), unlisted.Json.GetProperty("counts").ToString());
+    }
+
     #endregion
 
     #region A catalogued folder and the disk
