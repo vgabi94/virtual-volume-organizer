@@ -34,7 +34,32 @@
         <Setter Property="Background" Value="{DynamicResource WindowFallbackBackground}"/>
     </Style>
 
-    <!-- The Modern layout draws the menu row as the title bar, beside the system caption buttons -->
+    <Styles.Resources>
+        <!-- Avalonia draws the title bar of a window extended into it: only its caption buttons
+             are kept, since the menu row is the title bar and the window's title would be
+             written over the menu -->
+        <ControlTheme x:Key="MenuTitleBarDecorations"
+                      TargetType="WindowDrawnDecorations"
+                      BasedOn="{StaticResource {x:Type WindowDrawnDecorations}}">
+            <!-- Keyed on a pseudo-class: only a triggered style outranks the template's own bindings -->
+            <Style Selector="^:has-titlebar /template/ Panel#PART_TitleTextPanel">
+                <Setter Property="IsVisible" Value="False"/>
+            </Style>
+            <Style Selector="^:has-titlebar /template/ Panel#PART_TitleBar">
+                <Setter Property="Background" Value="Transparent"/>
+            </Style>
+            <Style Selector="^:not(:has-border) /template/ StackPanel#PART_OverlayPanel">
+                <Setter Property="Margin" Value="{StaticResource CaptionButtonsMargin}"/>
+            </Style>
+        </ControlTheme>
+    </Styles.Resources>
+
+    <!-- The Modern layout draws the menu row as the title bar, beside the caption buttons -->
+    <!-- Set from the start rather than with the layout: the decorations are built in the theme
+         the window has when it opens, and keep the parts built from it -->
+    <Style Selector="Window.MenuInTitleBar">
+        <Setter Property="WindowDecorationsTheme" Value="{StaticResource MenuTitleBarDecorations}"/>
+    </Style>
     <Style Selector="Window.Modern.MenuInTitleBar">
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True"/>
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="{StaticResource TitleBarHeight}"/>

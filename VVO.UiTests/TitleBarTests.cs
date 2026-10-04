@@ -1,7 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Chrome;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Styling;
 using Avalonia.VisualTree;
 using VVO.UI;
 using VVO.UI.Views;
@@ -74,6 +76,46 @@ public class TitleBarTests : UiTestBase
 
         Assert.False(dialog.ExtendClientAreaToDecorationsHint);
         dialog.Close();
+    }
+
+    // The title would be written over the menu; the theme keeps Avalonia's caption buttons
+    [AvaloniaFact]
+    public void TheModernTitleBarIsDrawnWithoutTheWindowsTitle()
+    {
+        var window = Opened();
+
+        var theme = Assert.IsType<ControlTheme>(window.WindowDecorationsTheme);
+        Assert.Equal(typeof(WindowDrawnDecorations), theme.TargetType);
+        Assert.NotNull(theme.BasedOn);
+        Assert.Contains(theme.Children.OfType<Style>(), style => style.Selector!.ToString().Contains("PART_TitleTextPanel"));
+        window.Close();
+    }
+
+    [AvaloniaTheory]
+    [InlineData(WindowState.Normal)]
+    [InlineData(WindowState.Maximized)]
+    public void EscLeavesFullScreenForWhereTheWindowWasBefore(WindowState before)
+    {
+        var window = Opened();
+        window.WindowState = before;
+        window.WindowState = WindowState.FullScreen;
+
+        window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+
+        Assert.Equal(before, window.WindowState);
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void EscOutsideFullScreenLeavesTheWindowAlone()
+    {
+        var window = Opened();
+        window.WindowState = WindowState.Maximized;
+
+        window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+
+        Assert.Equal(WindowState.Maximized, window.WindowState);
+        window.Close();
     }
 
     [AvaloniaFact]

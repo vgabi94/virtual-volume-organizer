@@ -140,6 +140,8 @@
         <Thickness x:Key="StatusBarEndMargin">0,0,18,0</Thickness>
         <sys:Double x:Key="TitleBarHeight">40</sys:Double>
         <Thickness x:Key="TitleBarIconMargin">12,0,6,0</Thickness>
+        <!-- Clear of the window's right edge, which a hovered Close would otherwise spill past -->
+        <Thickness x:Key="CaptionButtonsMargin">0,0,1,0</Thickness>
     </Application.Resources>
     
     <Application.Styles>
