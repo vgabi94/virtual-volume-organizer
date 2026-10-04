@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Reactive;
 
 namespace VVO.UI;
 
@@ -27,9 +28,42 @@ public static class IconColors
         }
     }
 
+    // Held per application: each headless test runs under one of its own
+    private static Application? _defaultOwner;
+    private static SolidColorBrush? _defaultBrush;
+
+    /// <summary>
+    /// The default shade as one brush that keeps up with the theme, so an icon left in it
+    /// changes along with the theme instead of keeping the shade it was first drawn in.
+    /// </summary>
+    public static IBrush DefaultBrush
+    {
+        get
+        {
+            var application = Application.Current;
+            if (_defaultBrush == null || _defaultOwner != application)
+            {
+                _defaultOwner = application;
+                _defaultBrush = Following(application);
+            }
+
+            return _defaultBrush;
+        }
+    }
+
+    private static SolidColorBrush Following(Application? application)
+    {
+        var brush = new SolidColorBrush(Default);
+        application?.GetResourceObservable("IconBrush")
+            .Subscribe(new AnonymousObserver<object?>(_ => brush.Color = Default));
+
+        return brush;
+    }
+
     public static IBrush Brush(string? color)
     {
-        return new SolidColorBrush(
-            !string.IsNullOrWhiteSpace(color) && Color.TryParse(color, out var parsed) ? parsed : Default);
+        return !string.IsNullOrWhiteSpace(color) && Color.TryParse(color, out var parsed)
+            ? new SolidColorBrush(parsed)
+            : DefaultBrush;
     }
 }

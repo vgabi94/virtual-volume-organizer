@@ -279,6 +279,41 @@ public class ThemeTests : UiTestBase
         window.Close();
     }
 
+    // Options is closed by then, but the Compare window and other dialogs may still be up
+    [AvaloniaFact]
+    public void ThemeAndLayoutChosenWithWindowsOpenReachThemWithoutARestart()
+    {
+        var application = Application.Current!;
+        var before = application.RequestedThemeVariant;
+        var compare = new CompareResultsView
+        {
+            DataContext = new CompareResultsViewModel("Source", @"D:\Source", "Target", @"E:\Target", [])
+        };
+        var dialog = new NameDialogView { DataContext = new NameDialogViewModel("Name", "Save", "Code") };
+        compare.Show();
+        dialog.Show();
+
+        try
+        {
+            Theme.Apply(dark: false, mica: true);
+            Layout.Apply(true);
+
+            Assert.All(new Window[] { compare, dialog }, window =>
+            {
+                Assert.Equal(Theme.MicaLight, window.ActualThemeVariant);
+                Assert.Contains(Layout.ModernClass, window.Classes);
+                Assert.NotEmpty(window.TransparencyLevelHint);
+            });
+            Assert.Equal(Color.Parse("#F3F4F7"), Assert.IsAssignableFrom<ISolidColorBrush>(compare.Background).Color);
+        }
+        finally
+        {
+            application.RequestedThemeVariant = before;
+            compare.Close();
+            dialog.Close();
+        }
+    }
+
     #endregion
 
     #region Choosing one

@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
+using Avalonia.Styling;
 using VVO.UI;
 
 namespace VVO.UiTests;
@@ -105,6 +106,29 @@ public class AppResourceTests
         var brush = Assert.IsType<SolidColorBrush>(IconColors.Brush("#FF3366"));
 
         Assert.Equal(Color.Parse("#FF3366"), brush.Color);
+    }
+
+    // An icon drawn before the theme changes is still on screen after it
+    [AvaloniaFact]
+    public void AnIconWithNoColourOfItsOwnFollowsTheTheme()
+    {
+        var application = Application.Current!;
+        var before = application.RequestedThemeVariant;
+        var brush = Assert.IsAssignableFrom<ISolidColorBrush>(IconColors.Brush(null));
+
+        try
+        {
+            foreach (var variant in new[] { ThemeVariant.Light, Theme.MicaDark, ThemeVariant.Dark })
+            {
+                application.RequestedThemeVariant = variant;
+
+                Assert.Equal(IconColors.Default, brush.Color);
+            }
+        }
+        finally
+        {
+            application.RequestedThemeVariant = before;
+        }
     }
 
     [AvaloniaFact]
