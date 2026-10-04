@@ -42,6 +42,26 @@
             <SolidColorBrush x:Key="DangerBrush" Color="#F85149"/>
             <SolidColorBrush x:Key="ErrorTextBrush" Color="#FFF000"/>
 
+            <!-- Every kind of file in the plain icon colour. A theme that colours them by kind
+                 names its own brush for each; one it leaves out is drawn as here. -->
+            <StaticResource x:Key="FolderSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileImageSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileVideoSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileZipperSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FilePdfSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileWordSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileExcelSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCsvSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FilePowerpointSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileLinesSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCodeSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+
             <!-- Diff row tints, following the green/red a git diff uses on a dark background -->
             <SolidColorBrush x:Key="DiffAddedBackground" Color="#12261E"/>
             <SolidColorBrush x:Key="DiffAddedSelectedBackground" Color="#1D4430"/>
@@ -81,6 +101,24 @@
             <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFF"/>
             <SolidColorBrush x:Key="DangerBrush" Color="#C0362C"/>
             <SolidColorBrush x:Key="ErrorTextBrush" Color="#C50500"/>
+
+            <StaticResource x:Key="FolderSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileImageSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileVideoSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileZipperSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FilePdfSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileWordSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileExcelSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCsvSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FilePowerpointSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileLinesSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCodeSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
 
             <!-- The shade that carries secondary text is too heavy for an edge on paper -->
             <SolidColorBrush x:Key="TextControlBorderBrush" Color="#C9C3BA"/>

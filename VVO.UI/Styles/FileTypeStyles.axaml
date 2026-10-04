@@ -1,0 +1,78 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- A listed file's icon in the colour of its kind, keyed by the icon FileIcons picked for it.
+         Every theme names a brush for every kind (Theme.axaml): a resource that is missing draws
+         the icon black rather than falling back to the style below. -->
+    <Style Selector="PathIcon.FileTypeIcon">
+        <Setter Property="Foreground" Value="{DynamicResource IconBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FolderSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FolderSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileImageSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FileImageSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileAudioSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FileAudioSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileVideoSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FileVideoSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileZipperSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FileZipperSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FilePdfSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FilePdfSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileWordSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FileWordSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileExcelSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FileExcelSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileCsvSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FileCsvSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FilePowerpointSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FilePowerpointSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileLinesSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FileLinesSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileCodeSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FileCodeSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileCog]">
+        <Setter Property="Foreground" Value="{DynamicResource FileCogBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileEarmarkBinaryFill]">
+        <Setter Property="Foreground" Value="{DynamicResource FileEarmarkBinaryFillBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=CompactDiscSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource CompactDiscSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=DatabaseSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource DatabaseSolidBrush}"/>
+    </Style>
+
+    <Style Selector="PathIcon.FileTypeIcon[Tag=FileSolid]">
+        <Setter Property="Foreground" Value="{DynamicResource FileSolidBrush}"/>
+    </Style>
+</Styles>

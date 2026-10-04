@@ -99,7 +99,8 @@
                                           Classes.FlipY="{Binding IsIconFlipped}"
                                           Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"
                                           VerticalAlignment="Center"
-                                          Foreground="{DynamicResource IconBrush}"/>
+                                          Classes="FileTypeIcon"
+                                          Tag="{Binding IconKey}"/>
                                 <TextBlock Text="{Binding Path}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </DataTemplate>
