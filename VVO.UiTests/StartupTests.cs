@@ -13,8 +13,12 @@ namespace VVO.UiTests;
 /// needs. Nothing in the running window reaches this, so a service or a view model wired up
 /// wrongly here would only show up as a blank window on the first real run.
 /// </summary>
-public class StartupTests
+public class StartupTests : IDisposable
 {
+    // Starting up applies the stored layout to the session's windows, which would otherwise
+    // carry it into whichever test runs next
+    public void Dispose() => Layout.Reset();
+
     // A lifetime of its own rather than the one this test session runs under, which is headless
     // and has none: what is under test is what the application makes of being handed one.
     [AvaloniaFact]
