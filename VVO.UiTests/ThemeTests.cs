@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
@@ -89,13 +90,15 @@ public class ThemeTests : UiTestBase
     #region Both themes are complete
 
     [AvaloniaTheory]
-    [InlineData("Dark")]
-    [InlineData("Light")]
-    public void EveryColourTheApplicationNamesResolvesInBothThemes(string variantName)
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    public void EveryColourTheApplicationNamesResolvesInEveryTheme(bool dark, bool mica)
     {
-        var variant = variantName == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+        var variant = Theme.VariantFor(dark, mica);
 
-        Assert.All(OwnBrushes.Concat(FluentBrushes), key =>
+        Assert.All(OwnBrushes.Concat(FluentBrushes).Concat(FileKinds), key =>
             Assert.True(Application.Current!.TryGetResource(key, variant, out _), $"missing '{key}'"));
     }
 
@@ -103,13 +106,27 @@ public class ThemeTests : UiTestBase
     [AvaloniaTheory]
     [InlineData(true)]
     [InlineData(false)]
-    public void AMicaThemeFallsBackToItsPlainOneForEveryColour(bool dark)
+    public void AMicaThemeFallsBackToItsPlainOneForEveryColourItDoesNotName(bool dark)
+    {
+        var plain = Theme.VariantFor(dark, mica: false);
+        var mica = Theme.VariantFor(dark, mica: true);
+        var named = NamedBy(mica);
+
+        Assert.All(OwnBrushes.Concat(FluentBrushes).Where(key => !named.Contains(key)), key =>
+            Assert.Equal(ColourOf(key, plain), ColourOf(key, mica)));
+    }
+
+    // A colour Mica names only to repeat the plain theme's is one that should not be there
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void EveryColourAMicaThemeNamesDiffersFromThePlainOne(bool dark)
     {
         var plain = Theme.VariantFor(dark, mica: false);
         var mica = Theme.VariantFor(dark, mica: true);
 
-        Assert.All(OwnBrushes.Concat(FluentBrushes), key =>
-            Assert.Equal(ColourOf(key, plain), ColourOf(key, mica)));
+        Assert.All(NamedBy(mica).Where(key => Application.Current!.TryGetResource(key, plain, out _)), key =>
+            Assert.NotEqual(ColourOf(key, plain), ColourOf(key, mica)));
     }
 
     // Two variants resolving to one colour is a value that was never given a second reading
@@ -118,6 +135,40 @@ public class ThemeTests : UiTestBase
     {
         Assert.All(OwnBrushes.Except(SharedByBothThemes), key =>
             Assert.NotEqual(ColourOf(key, ThemeVariant.Dark), ColourOf(key, ThemeVariant.Light)));
+    }
+
+    // The surfaces both leave clear for the backdrop are the same nothing, and that is the point
+    [AvaloniaFact]
+    public void TheTwoMicaThemesAgreeOnNothingButTheSurfacesTheyLeaveClear()
+    {
+        Assert.All(NamedBy(Theme.MicaDark), key =>
+        {
+            var dark = ColourOf(key, Theme.MicaDark);
+            if (dark.A == 0 && ColourOf(key, Theme.MicaLight).A == 0)
+                return;
+
+            Assert.NotEqual(dark, ColourOf(key, Theme.MicaLight));
+        });
+    }
+
+    private static readonly string[] FileKinds =
+    [
+        "FolderSolidBrush", "FileImageSolidBrush", "FileAudioSolidBrush", "FileVideoSolidBrush",
+        "FileZipperSolidBrush", "FilePdfSolidBrush", "FileWordSolidBrush", "FileExcelSolidBrush",
+        "FileCsvSolidBrush", "FilePowerpointSolidBrush", "FileLinesSolidBrush", "FileCodeSolidBrush",
+        "FileCogBrush", "FileEarmarkBinaryFillBrush", "CompactDiscSolidBrush", "DatabaseSolidBrush",
+        "FileSolidBrush"
+    ];
+
+    /// <summary>The keys a variant's own dictionary names, as opposed to those it inherits.</summary>
+    private static HashSet<string> NamedBy(ThemeVariant variant)
+    {
+        var theme = Application.Current!.Resources.MergedDictionaries
+            .Select(dictionary => dictionary is ResourceInclude include ? include.Loaded : dictionary)
+            .OfType<IResourceDictionary>()
+            .Single(dictionary => dictionary.ThemeDictionaries.ContainsKey(variant));
+
+        return ((IResourceDictionary)theme.ThemeDictionaries[variant]).Keys.Cast<string>().ToHashSet();
     }
 
     [AvaloniaTheory]

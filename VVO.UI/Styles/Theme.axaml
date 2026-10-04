@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="using:VVO.UI">
 
     <!-- The colours the application picks for itself. Everything else is the Fluent palette,
          which already carries a value for each variant. -->
@@ -134,6 +135,109 @@
             <SolidColorBrush x:Key="DiffChangedBackground" Color="#FBF3DE"/>
             <SolidColorBrush x:Key="DiffChangedSelectedBackground" Color="#F1E3BC"/>
             <SolidColorBrush x:Key="DiffChangedForeground" Color="#8A6116"/>
+        </ResourceDictionary>
+
+        <!-- Drawn over the Mica backdrop: the frame, sidebar and bars let the wallpaper's tint
+             through, and the content sits on one translucent raised layer. Whatever is not named
+             here is the plain theme's. -->
+        <ResourceDictionary x:Key="{x:Static local:Theme.MicaDark}">
+            <SolidColorBrush x:Key="WindowBackground" Color="#00000000"/>
+            <!-- Painted instead when the system draws no Mica: Windows 10, or a remote session -->
+            <SolidColorBrush x:Key="WindowFallbackBackground" Color="#202227"/>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#D127282C"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#1CFFFFFF"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#12FFFFFF"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#C7FFFFFF"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#80FFFFFF"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#C7FFFFFF"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#0EFFFFFF"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#1FFFFFFF"/>
+            <!-- A tint rather than the accent, so a selection reads as quiet as the rest -->
+            <SolidColorBrush x:Key="SelectionBackground" Color="#16FFFFFF"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#16FFFFFF"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="PressedBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="PressedBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#0EFFFFFF"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#14FFFFFF"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#60CDFF"/>
+            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#00253A"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#2B2C30"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#FFC83D"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#EE97C9"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#C3A5F9"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#EFA464"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#73CE95"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+        </ResourceDictionary>
+
+        <!-- Drawn over the Mica backdrop: the frame, sidebar and bars let the wallpaper's tint
+             through, and the content sits on one translucent raised layer. Whatever is not named
+             here is the plain theme's. -->
+        <ResourceDictionary x:Key="{x:Static local:Theme.MicaLight}">
+            <SolidColorBrush x:Key="WindowBackground" Color="#00000000"/>
+            <!-- Painted instead when the system draws no Mica: Windows 10, or a remote session -->
+            <SolidColorBrush x:Key="WindowFallbackBackground" Color="#F3F4F7"/>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#C7FFFFFF"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#1A000000"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#11000000"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1A1A1A"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#B3000000"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#75000000"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#B3000000"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#0A000000"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#14000000"/>
+            <!-- A tint rather than the accent, so a selection reads as quiet as the rest -->
+            <SolidColorBrush x:Key="SelectionBackground" Color="#0E000000"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#1A1A1A"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#0E000000"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="PressedBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="PressedBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#BFFFFFFF"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#1A000000"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#005FB8"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#FAFAFA"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#E9A400"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#AF4A88"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#835CBE"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#B25900"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#008D4B"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
         </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>
