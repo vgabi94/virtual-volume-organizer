@@ -22,7 +22,52 @@ public class ThemeTests : UiTestBase
         "TextControlBackground", "ExplorerBackground", "DialogBackground",
         "DiffAddedBackground", "DiffAddedSelectedBackground", "DiffAddedForeground",
         "DiffRemovedBackground", "DiffRemovedSelectedBackground", "DiffRemovedForeground",
-        "DiffChangedBackground", "DiffChangedSelectedBackground", "DiffChangedForeground"
+        "DiffChangedBackground", "DiffChangedSelectedBackground", "DiffChangedForeground",
+        "WindowBackground", "ChromeBackground", "SidebarBackground", "StartPageBackground",
+        "ContentBackground", "ContentBorderBrush", "StatusBarBackground", "DividerBrush",
+        "TextPrimaryBrush", "TextSecondaryBrush", "TextTertiaryBrush", "IconBrush",
+        "HoverBackground", "PressedBackground", "SelectionBackground", "SelectionForeground",
+        "RowSelectionBackground", "ControlBackground", "ControlBorderBrush",
+        "AccentBrush", "AccentForegroundBrush", "DangerBrush", "ErrorTextBrush"
+    ];
+
+    /// <summary>
+    /// The application's colours that are meant to read the same in both themes: the accent and
+    /// what is drawn on it, which Fluent itself does not vary.
+    /// </summary>
+    private static readonly string[] SharedByBothThemes =
+    [
+        "SelectionBackground", "SelectionForeground", "AccentBrush", "AccentForegroundBrush"
+    ];
+
+    /// <summary>
+    /// Each role and the brush it was drawn with before it had a name. The plain themes keep
+    /// those colours, so naming them changed nothing on screen.
+    /// </summary>
+    private static readonly (string Role, string WasDrawnWith)[] Roles =
+    [
+        ("WindowBackground", "SystemRegionBrush"),
+        ("ChromeBackground", "SystemControlBackgroundChromeMediumBrush"),
+        ("SidebarBackground", "SystemControlBackgroundChromeMediumLowBrush"),
+        ("StartPageBackground", "SystemControlBackgroundChromeMediumLowBrush"),
+        ("ContentBackground", "ExplorerBackground"),
+        ("ContentBorderBrush", "SystemControlForegroundBaseLowBrush"),
+        ("StatusBarBackground", "SystemControlBackgroundChromeMediumBrush"),
+        ("DividerBrush", "SystemControlForegroundBaseLowBrush"),
+        ("TextPrimaryBrush", "SystemControlForegroundBaseHighBrush"),
+        ("TextSecondaryBrush", "SystemControlForegroundBaseMediumBrush"),
+        ("TextTertiaryBrush", "SystemControlForegroundBaseLowBrush"),
+        ("IconBrush", "SystemControlForegroundBaseMediumBrush"),
+        ("HoverBackground", "SystemControlHighlightListLowBrush"),
+        ("PressedBackground", "SystemControlHighlightListMediumBrush"),
+        ("SelectionBackground", "SystemControlHighlightListAccentLowBrush"),
+        ("RowSelectionBackground", "SystemControlHighlightListLowBrush"),
+        ("ControlBackground", "SystemControlBackgroundChromeMediumBrush"),
+        ("ControlBorderBrush", "TextControlBorderBrush"),
+        ("AccentBrush", "AccentButtonBackground"),
+        ("AccentForegroundBrush", "AccentButtonForeground"),
+        ("DangerBrush", "DiffRemovedForeground"),
+        ("ErrorTextBrush", "SystemControlErrorTextForegroundBrush")
     ];
 
     /// <summary>Colours taken from Fluent, which the light palette has to answer for too.</summary>
@@ -72,8 +117,32 @@ public class ThemeTests : UiTestBase
     [AvaloniaFact]
     public void TheTwoThemesAgreeOnNothingTheApplicationDefinesForItself()
     {
-        Assert.All(OwnBrushes, key =>
+        Assert.All(OwnBrushes.Except(SharedByBothThemes), key =>
             Assert.NotEqual(ColourOf(key, ThemeVariant.Dark), ColourOf(key, ThemeVariant.Light)));
+    }
+
+    [AvaloniaTheory]
+    [InlineData("Dark")]
+    [InlineData("Light")]
+    public void EachRoleKeepsTheColourItWasDrawnInBeforeItHadAName(string variantName)
+    {
+        var variant = variantName == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+
+        Assert.All(Roles, pair =>
+        {
+            var role = BrushOf(pair.Role, variant);
+            var was = BrushOf(pair.WasDrawnWith, variant);
+
+            Assert.True(role.Color == was.Color && Math.Abs(role.Opacity - was.Opacity) < 0.001,
+                $"{pair.Role} is {role.Color} at {role.Opacity}, {pair.WasDrawnWith} is {was.Color} at {was.Opacity}");
+        });
+    }
+
+    private static ISolidColorBrush BrushOf(string key, ThemeVariant variant)
+    {
+        Assert.True(Application.Current!.TryGetResource(key, variant, out var found), $"missing '{key}'");
+
+        return Assert.IsAssignableFrom<ISolidColorBrush>(found);
     }
 
     // Light on light or dark on dark is unreadable however elegant the hue

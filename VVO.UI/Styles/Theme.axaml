@@ -17,6 +17,33 @@
                  than as a hole cut in it -->
             <SolidColorBrush x:Key="DialogBackground" Color="#1F1F1F"/>
 
+            <!-- Each surface, text weight and state by what it is for. The plain themes give each
+                 the Fluent colour it was drawn in before it had a name, so a theme that changes one
+                 role leaves the others where they were. -->
+            <SolidColorBrush x:Key="WindowBackground" Color="#000000"/>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#1F1F1F"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#2B2B2B"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#2B2B2B"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#181818"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#33FFFFFF"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#1F1F1F"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#33FFFFFF"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#99FFFFFF"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#33FFFFFF"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#99FFFFFF"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#19FFFFFF"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#33FFFFFF"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#0078D7" Opacity="0.6"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#19FFFFFF"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#1F1F1F"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#99FFFFFF"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#0078D7"/>
+            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="DangerBrush" Color="#F85149"/>
+            <SolidColorBrush x:Key="ErrorTextBrush" Color="#FFF000"/>
+
             <!-- Diff row tints, following the green/red a git diff uses on a dark background -->
             <SolidColorBrush x:Key="DiffAddedBackground" Color="#12261E"/>
             <SolidColorBrush x:Key="DiffAddedSelectedBackground" Color="#1D4430"/>
@@ -33,6 +60,30 @@
             <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFF"/>
             <SolidColorBrush x:Key="ExplorerBackground" Color="#FFFDFB"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#FAF9F7"/>
+
+            <SolidColorBrush x:Key="WindowBackground" Color="#FAF9F7"/>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#EDEBE7"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#F2F0EC"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#F2F0EC"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#FFFDFB"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#CBC6BE"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#EDEBE7"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#CBC6BE"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#22201D"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#6A655D"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#CBC6BE"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#6A655D"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#14000000"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#28000000"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#0078D7" Opacity="0.4"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#14000000"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#EDEBE7"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#C9C3BA"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#0078D7"/>
+            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="DangerBrush" Color="#C0362C"/>
+            <SolidColorBrush x:Key="ErrorTextBrush" Color="#C50500"/>
 
             <!-- The shade that carries secondary text is too heavy for an edge on paper -->
             <SolidColorBrush x:Key="TextControlBorderBrush" Color="#C9C3BA"/>
