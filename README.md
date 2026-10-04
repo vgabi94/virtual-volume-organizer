@@ -18,7 +18,7 @@ Built with C#, .NET 10, and [Avalonia UI](https://avaloniaui.net/).
 - **Virtual volumes** to group folders with custom labels, icons, and colors.
 - **Undo / Redo** for folder and volume edits.
 - **JSON import/export**, database snapshots, and compaction.
-- **Dark, light and Mica themes**, in a modern or classic layout.
+- **Dark, light and Slate themes**, in a modern or classic layout.
 - **Command line** (`vvo`) for scripts and AI agents, with JSON output.
 
 ## Shortcuts

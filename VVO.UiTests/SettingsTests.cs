@@ -317,28 +317,28 @@ public class SettingsTests : UiTestBase
 
     // Written before either choice existed, so it carries no answer for them
     [AvaloniaFact]
-    public void AFileFromBeforeMicaAndTheLayoutReadsAsNoMicaAndTheModernLayout()
+    public void AFileFromBeforeSlateAndTheLayoutReadsAsNoSlateAndTheModernLayout()
     {
         var path = TempPath("json");
         File.WriteAllText(path, """{ "RecentFiles": [], "MaxRecentFiles": 7 }""");
 
         var settings = At(path);
 
-        Assert.False(settings.IsMicaTheme);
+        Assert.False(settings.IsSlateTheme);
         Assert.True(settings.IsModernLayout);
     }
 
     [AvaloniaTheory]
     [InlineData(true)]
     [InlineData(false)]
-    public void MicaIsWhatTheNextStartReads(bool mica)
+    public void SlateIsWhatTheNextStartReads(bool slate)
     {
         var settings = Fresh();
-        settings.SetMicaTheme(!mica);
+        settings.SetSlateTheme(!slate);
 
-        settings.SetMicaTheme(mica);
+        settings.SetSlateTheme(slate);
 
-        Assert.Equal(mica, Reopened(settings).IsMicaTheme);
+        Assert.Equal(slate, Reopened(settings).IsSlateTheme);
     }
 
     [AvaloniaTheory]
@@ -356,18 +356,18 @@ public class SettingsTests : UiTestBase
 
     // The defaults count as held: the file says nothing, and nothing is what it already says
     [AvaloniaFact]
-    public void ChoosingTheMicaAndLayoutTheFileAlreadyHoldsDoesNotRewriteIt()
+    public void ChoosingTheSlateAndLayoutTheFileAlreadyHoldsDoesNotRewriteIt()
     {
         var path = TempPath("json");
         File.WriteAllText(path, """{ "RecentFiles": [], "MaxRecentFiles": 7 }""");
         var settings = At(path);
         var written = File.GetLastWriteTimeUtc(path);
 
-        settings.SetMicaTheme(false);
+        settings.SetSlateTheme(false);
         settings.SetModernLayout(true);
 
         Assert.Equal(written, File.GetLastWriteTimeUtc(path));
-        Assert.DoesNotContain("Mica", File.ReadAllText(path));
+        Assert.DoesNotContain("Slate", File.ReadAllText(path));
     }
 
     [AvaloniaFact]

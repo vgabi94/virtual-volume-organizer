@@ -30,7 +30,7 @@ namespace VVO.UI
 
             // Nullable for the same reason: a file from before either choice existed reads as
             // the theme it was wearing and the layout new users get
-            public bool? MicaTheme { get; init; }
+            public bool? SlateTheme { get; init; }
             public bool? ClassicLayout { get; init; }
         }
 
@@ -77,7 +77,7 @@ namespace VVO.UI
                         ShowFolderDetailsAlways = loaded.ShowFolderDetailsAlways,
                         ScanHiddenAndSystem = loaded.ScanHiddenAndSystem,
                         DarkTheme = loaded.DarkTheme,
-                        MicaTheme = loaded.MicaTheme,
+                        SlateTheme = loaded.SlateTheme,
                         ClassicLayout = loaded.ClassicLayout
                     };
                 }
@@ -147,14 +147,14 @@ namespace VVO.UI
             Save();
         }
 
-        /// <summary>Whether the theme is drawn over the Mica backdrop, off until the user says otherwise.</summary>
-        public bool IsMicaTheme => Data.MicaTheme ?? false;
+        /// <summary>Whether the dark or light theme is its Slate variant, off until the user says otherwise.</summary>
+        public bool IsSlateTheme => Data.SlateTheme ?? false;
 
-        public void SetMicaTheme(bool value)
+        public void SetSlateTheme(bool value)
         {
-            if (IsMicaTheme == value) return;
+            if (IsSlateTheme == value) return;
 
-            Data = Data with { MicaTheme = value };
+            Data = Data with { SlateTheme = value };
             Save();
         }
 

@@ -24,7 +24,7 @@ public class ThemeTests : UiTestBase
         "DiffAddedBackground", "DiffAddedSelectedBackground", "DiffAddedForeground",
         "DiffRemovedBackground", "DiffRemovedSelectedBackground", "DiffRemovedForeground",
         "DiffChangedBackground", "DiffChangedSelectedBackground", "DiffChangedForeground",
-        "WindowBackground", "WindowFallbackBackground", "ChromeBackground", "SidebarBackground", "StartPageBackground",
+        "WindowBackground", "ChromeBackground", "SidebarBackground", "StartPageBackground",
         "ContentBackground", "ContentBorderBrush", "StatusBarBackground", "DividerBrush",
         "TextPrimaryBrush", "TextSecondaryBrush", "TextTertiaryBrush", "IconBrush",
         "HoverBackground", "PressedBackground", "SelectionBackground", "SelectionForeground",
@@ -87,6 +87,19 @@ public class ThemeTests : UiTestBase
         return Assert.IsType<SolidColorBrush>(found).Color;
     }
 
+    // What a brush paints, solid or gradient, for telling two apart
+    private static string PaintOf(string key, ThemeVariant variant)
+    {
+        Assert.True(Application.Current!.TryGetResource(key, variant, out var found), $"missing '{key}'");
+
+        return found switch
+        {
+            SolidColorBrush solid => solid.Color.ToString(),
+            GradientBrush gradient => string.Join(" ", gradient.GradientStops.Select(stop => stop.Color)),
+            _ => throw new InvalidOperationException($"'{key}' is neither solid nor a gradient")
+        };
+    }
+
     #region Both themes are complete
 
     [AvaloniaTheory]
@@ -94,39 +107,39 @@ public class ThemeTests : UiTestBase
     [InlineData(false, false)]
     [InlineData(true, true)]
     [InlineData(false, true)]
-    public void EveryColourTheApplicationNamesResolvesInEveryTheme(bool dark, bool mica)
+    public void EveryColourTheApplicationNamesResolvesInEveryTheme(bool dark, bool slate)
     {
-        var variant = Theme.VariantFor(dark, mica);
+        var variant = Theme.VariantFor(dark, slate);
 
         Assert.All(OwnBrushes.Concat(FluentBrushes).Concat(FileKinds), key =>
             Assert.True(Application.Current!.TryGetResource(key, variant, out _), $"missing '{key}'"));
     }
 
-    // Mica is drawn over the plain theme it inherits, so whatever it does not name is that theme's
+    // Slate inherits its plain theme, so whatever it does not name is that theme's
     [AvaloniaTheory]
     [InlineData(true)]
     [InlineData(false)]
-    public void AMicaThemeFallsBackToItsPlainOneForEveryColourItDoesNotName(bool dark)
+    public void ASlateThemeFallsBackToItsPlainOneForEveryColourItDoesNotName(bool dark)
     {
-        var plain = Theme.VariantFor(dark, mica: false);
-        var mica = Theme.VariantFor(dark, mica: true);
-        var named = NamedBy(mica);
+        var plain = Theme.VariantFor(dark, slate: false);
+        var slate = Theme.VariantFor(dark, slate: true);
+        var named = NamedBy(slate);
 
         Assert.All(OwnBrushes.Concat(FluentBrushes).Where(key => !named.Contains(key)), key =>
-            Assert.Equal(ColourOf(key, plain), ColourOf(key, mica)));
+            Assert.Equal(PaintOf(key, plain), PaintOf(key, slate)));
     }
 
-    // A colour Mica names only to repeat the plain theme's is one that should not be there
+    // A colour Slate names only to repeat the plain theme's is one that should not be there
     [AvaloniaTheory]
     [InlineData(true)]
     [InlineData(false)]
-    public void EveryColourAMicaThemeNamesDiffersFromThePlainOne(bool dark)
+    public void EveryColourASlateThemeNamesDiffersFromThePlainOne(bool dark)
     {
-        var plain = Theme.VariantFor(dark, mica: false);
-        var mica = Theme.VariantFor(dark, mica: true);
+        var plain = Theme.VariantFor(dark, slate: false);
+        var slate = Theme.VariantFor(dark, slate: true);
 
-        Assert.All(NamedBy(mica).Where(key => Application.Current!.TryGetResource(key, plain, out _)), key =>
-            Assert.NotEqual(ColourOf(key, plain), ColourOf(key, mica)));
+        Assert.All(NamedBy(slate).Where(key => Application.Current!.TryGetResource(key, plain, out _)), key =>
+            Assert.NotEqual(PaintOf(key, plain), PaintOf(key, slate)));
     }
 
     // Two variants resolving to one colour is a value that was never given a second reading
@@ -137,17 +150,17 @@ public class ThemeTests : UiTestBase
             Assert.NotEqual(ColourOf(key, ThemeVariant.Dark), ColourOf(key, ThemeVariant.Light)));
     }
 
-    // The surfaces both leave clear for the backdrop are the same nothing, and that is the point
+    // The surfaces both leave clear over the window's gradient are the same nothing
     [AvaloniaFact]
-    public void TheTwoMicaThemesAgreeOnNothingButTheSurfacesTheyLeaveClear()
+    public void TheTwoSlateThemesAgreeOnNothingButTheSurfacesTheyLeaveClear()
     {
-        Assert.All(NamedBy(Theme.MicaDark), key =>
+        Assert.All(NamedBy(Theme.SlateDark), key =>
         {
-            var dark = ColourOf(key, Theme.MicaDark);
-            if (dark.A == 0 && ColourOf(key, Theme.MicaLight).A == 0)
+            var dark = PaintOf(key, Theme.SlateDark);
+            if (dark == "#00000000" && PaintOf(key, Theme.SlateLight) == "#00000000")
                 return;
 
-            Assert.NotEqual(dark, ColourOf(key, Theme.MicaLight));
+            Assert.NotEqual(dark, PaintOf(key, Theme.SlateLight));
         });
     }
 
@@ -227,55 +240,44 @@ public class ThemeTests : UiTestBase
 
     #endregion
 
-    #region The backdrop
+    #region The window
 
+    // Painted by the window itself, so it moves with the window rather than staying put on the desktop
     [AvaloniaTheory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void AWindowAsksForMicaUnderAMicaTheme(bool dark)
+    [InlineData(true, "#26282E", "#1B1C20")]
+    [InlineData(false, "#F7F8FB", "#E8EBF1")]
+    public void ASlateWindowIsPaintedWithItsThemesGradient(bool dark, string from, string to)
     {
-        Shell.RequestedThemeVariant = Theme.VariantFor(dark, mica: true);
+        var window = new Window { Classes = { "AppWindow" }, RequestedThemeVariant = Theme.VariantFor(dark, slate: true) };
+        window.Show();
 
-        Assert.Equal(
-            [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.None],
-            Shell.TransparencyLevelHint);
+        var gradient = Assert.IsType<LinearGradientBrush>(window.Background);
+        Assert.Equal([Color.Parse(from), Color.Parse(to)], gradient.GradientStops.Select(stop => stop.Color));
+        window.Close();
     }
 
     [AvaloniaTheory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void AWindowAsksForNothingUnderAPlainTheme(bool dark)
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    public void NoThemeAsksTheSystemToDrawBehindTheWindow(bool dark, bool slate)
     {
-        Shell.RequestedThemeVariant = Theme.VariantFor(dark, mica: false);
+        Shell.RequestedThemeVariant = Theme.VariantFor(dark, slate);
 
         Assert.Empty(Shell.TransparencyLevelHint);
     }
 
-    // The headless platform draws no Mica, which is what Windows 10 or a remote session amounts to
-    [AvaloniaTheory]
-    [InlineData(true, "#202227")]
-    [InlineData(false, "#F3F4F7")]
-    public void WhereNoMicaIsDrawnTheWindowIsPaintedASolidColourOfItsTheme(bool dark, string expected)
-    {
-        var window = new Window { Classes = { "AppWindow" }, RequestedThemeVariant = Theme.VariantFor(dark, mica: true) };
-        window.Show();
-
-        Assert.Equal(WindowTransparencyLevel.None, window.ActualTransparencyLevel);
-        Assert.Contains(Theme.OpaqueClass, window.Classes);
-        Assert.Equal(Color.Parse(expected), Assert.IsAssignableFrom<ISolidColorBrush>(window.Background).Color);
-        window.Close();
-    }
-
-    // Choosing Mica from Options happens with the window already open
+    // Choosing Slate from Options happens with the window already open
     [AvaloniaFact]
-    public void AWindowAlreadyOpenWhenMicaIsChosenIsPaintedInMicasSolidColour()
+    public void AWindowAlreadyOpenWhenSlateIsChosenIsRepaintedInIt()
     {
         var window = new Window { Classes = { "AppWindow" }, RequestedThemeVariant = ThemeVariant.Dark };
         window.Show();
 
-        window.RequestedThemeVariant = Theme.MicaDark;
+        window.RequestedThemeVariant = Theme.SlateDark;
 
-        Assert.Equal(Color.Parse("#202227"), Assert.IsAssignableFrom<ISolidColorBrush>(window.Background).Color);
+        Assert.IsType<LinearGradientBrush>(window.Background);
         window.Close();
     }
 
@@ -295,16 +297,15 @@ public class ThemeTests : UiTestBase
 
         try
         {
-            Theme.Apply(dark: false, mica: true);
+            Theme.Apply(dark: false, slate: true);
             Layout.Apply(true);
 
             Assert.All(new Window[] { compare, dialog }, window =>
             {
-                Assert.Equal(Theme.MicaLight, window.ActualThemeVariant);
+                Assert.Equal(Theme.SlateLight, window.ActualThemeVariant);
                 Assert.Contains(Layout.ModernClass, window.Classes);
-                Assert.NotEmpty(window.TransparencyLevelHint);
             });
-            Assert.Equal(Color.Parse("#F3F4F7"), Assert.IsAssignableFrom<ISolidColorBrush>(compare.Background).Color);
+            Assert.Equal(Color.Parse("#F7F8FB"), Assert.IsType<LinearGradientBrush>(compare.Background).GradientStops[0].Color);
         }
         finally
         {
@@ -321,16 +322,16 @@ public class ThemeTests : UiTestBase
     [AvaloniaTheory]
     [InlineData(true, false, "Dark")]
     [InlineData(false, false, "Light")]
-    [InlineData(true, true, "MicaDark")]
-    [InlineData(false, true, "MicaLight")]
-    public void ApplyingPutsOnTheVariantForEachChoice(bool dark, bool mica, string expected)
+    [InlineData(true, true, "SlateDark")]
+    [InlineData(false, true, "SlateLight")]
+    public void ApplyingPutsOnTheVariantForEachChoice(bool dark, bool slate, string expected)
     {
         var application = Application.Current!;
         var before = application.RequestedThemeVariant;
 
         try
         {
-            Theme.Apply(dark, mica);
+            Theme.Apply(dark, slate);
 
             Assert.Equal(expected, application.ActualThemeVariant.Key);
             Assert.Equal(dark ? ThemeVariant.Dark : ThemeVariant.Light,
@@ -388,47 +389,47 @@ public class ThemeTests : UiTestBase
     }
 
     [AvaloniaFact]
-    public void TheOptionsDialogStartsFromTheStoredMicaAndLayout()
+    public void TheOptionsDialogStartsFromTheStoredSlateAndLayout()
     {
-        Settings.SetMicaTheme(true);
+        Settings.SetSlateTheme(true);
         Settings.SetModernLayout(false);
 
         var options = new OptionsDialogViewModel(Settings);
 
-        Assert.True(options.MicaTheme);
+        Assert.True(options.SlateTheme);
         Assert.False(options.ModernLayout);
     }
 
     [AvaloniaFact]
-    public void SavingTheOptionsPutsOnAndRemembersTheMicaAndLayoutChosen()
+    public void SavingTheOptionsPutsOnAndRemembersTheSlateAndLayoutChosen()
     {
-        var themes = new List<(bool Dark, bool Mica)>();
+        var themes = new List<(bool Dark, bool Slate)>();
         var layouts = new List<bool>();
-        Theme.Applying = (dark, mica) => themes.Add((dark, mica));
+        Theme.Applying = (dark, slate) => themes.Add((dark, slate));
         Layout.Applying = modern => layouts.Add(modern);
 
-        new OptionsDialogViewModel(Settings) { MicaTheme = true, ModernLayout = false }.Apply();
+        new OptionsDialogViewModel(Settings) { SlateTheme = true, ModernLayout = false }.Apply();
 
         Assert.Equal([(true, true)], themes);
         Assert.Equal([false], layouts);
         var reopened = new Settings(SettingsPath);
-        Assert.True(reopened.IsMicaTheme);
+        Assert.True(reopened.IsSlateTheme);
         Assert.False(reopened.IsModernLayout);
     }
 
     [AvaloniaFact]
-    public void CancellingTheOptionsDialogLeavesMicaAndTheLayoutAlone()
+    public void CancellingTheOptionsDialogLeavesSlateAndTheLayoutAlone()
     {
-        var themes = new List<(bool Dark, bool Mica)>();
+        var themes = new List<(bool Dark, bool Slate)>();
         var layouts = new List<bool>();
-        Theme.Applying = (dark, mica) => themes.Add((dark, mica));
+        Theme.Applying = (dark, slate) => themes.Add((dark, slate));
         Layout.Applying = modern => layouts.Add(modern);
 
-        _ = new OptionsDialogViewModel(Settings) { MicaTheme = true, ModernLayout = false };
+        _ = new OptionsDialogViewModel(Settings) { SlateTheme = true, ModernLayout = false };
 
         Assert.Empty(themes);
         Assert.Empty(layouts);
-        Assert.False(Settings.IsMicaTheme);
+        Assert.False(Settings.IsSlateTheme);
         Assert.True(Settings.IsModernLayout);
     }
 

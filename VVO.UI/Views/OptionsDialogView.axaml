@@ -17,8 +17,8 @@
                 <TextBlock Classes="DialogNote OptionNote" Text="When off the application wears its light theme instead."/>
             </StackPanel>
 
-            <CheckBox Content="Mica theme"
-                      IsChecked="{Binding MicaTheme, Mode=TwoWay}"/>
+            <CheckBox Content="Slate theme"
+                      IsChecked="{Binding SlateTheme, Mode=TwoWay}"/>
 
             <CheckBox Content="Modern layout"
                       IsChecked="{Binding ModernLayout, Mode=TwoWay}"/>

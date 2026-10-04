@@ -118,7 +118,7 @@ public class AppResourceTests
 
         try
         {
-            foreach (var variant in new[] { ThemeVariant.Light, Theme.MicaDark, ThemeVariant.Dark })
+            foreach (var variant in new[] { ThemeVariant.Light, Theme.SlateDark, ThemeVariant.Dark })
             {
                 application.RequestedThemeVariant = variant;
 

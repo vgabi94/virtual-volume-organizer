@@ -1,6 +1,5 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="using:VVO.UI"
         xmlns:vm="using:VVO.UI.ViewModels">
     <Design.PreviewWith>
     <Border Padding="20">
@@ -18,20 +17,12 @@
     </Border>
     </Design.PreviewWith>
     
-    <!-- Every window asks for Mica under a Mica theme -->
     <Style Selector="Window">
         <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
-        <Setter Property="TransparencyLevelHint"
-                Value="{Binding $self.ActualThemeVariant, Converter={x:Static local:Theme.TransparencyFor}}"/>
     </Style>
 
-    <!-- Painted solid where no backdrop is drawn; TransparencyBackgroundFallback is not refreshed
-         once a window is open -->
     <Style Selector="Window.AppWindow">
         <Setter Property="Background" Value="{DynamicResource WindowBackground}"/>
-    </Style>
-    <Style Selector="Window.AppWindow.Opaque">
-        <Setter Property="Background" Value="{DynamicResource WindowFallbackBackground}"/>
     </Style>
 
     <Styles.Resources>

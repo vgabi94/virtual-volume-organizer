@@ -153,7 +153,7 @@ public class ViewBuildTests : UiTestBase
     public void TheOptionsDialogShowsWhatIsStored()
     {
         Settings.SetDarkTheme(false);
-        Settings.SetMicaTheme(true);
+        Settings.SetSlateTheme(true);
         Settings.SetModernLayout(false);
         Settings.SetShowFolderDetailsAlways(true);
         Settings.SetScanHiddenAndSystem(false);
@@ -162,7 +162,7 @@ public class ViewBuildTests : UiTestBase
         // One box per flag, in the order the dialog lists them
         var checks = window.GetVisualDescendants().OfType<CheckBox>().ToList();
         Assert.Equal(5, checks.Count);
-        Assert.Equal(["Dark theme", "Mica theme", "Modern layout"], checks.Take(3).Select(check => check.Content));
+        Assert.Equal(["Dark theme", "Slate theme", "Modern layout"], checks.Take(3).Select(check => check.Content));
         Assert.False(checks[0].IsChecked);
         Assert.True(checks[1].IsChecked);
         Assert.False(checks[2].IsChecked);

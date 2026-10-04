@@ -18,7 +18,6 @@
                  the Fluent colour it was drawn in before it had a name, so a theme that changes one
                  role leaves the others where they were. -->
             <SolidColorBrush x:Key="WindowBackground" Color="#000000"/>
-            <StaticResource x:Key="WindowFallbackBackground" ResourceKey="WindowBackground"/>
             <SolidColorBrush x:Key="ChromeBackground" Color="#1F1F1F"/>
             <SolidColorBrush x:Key="SidebarBackground" Color="#2B2B2B"/>
             <SolidColorBrush x:Key="StartPageBackground" Color="#2B2B2B"/>
@@ -81,7 +80,6 @@
             <SolidColorBrush x:Key="DialogBackground" Color="#FAF9F7"/>
 
             <SolidColorBrush x:Key="WindowBackground" Color="#FAF9F7"/>
-            <StaticResource x:Key="WindowFallbackBackground" ResourceKey="WindowBackground"/>
             <SolidColorBrush x:Key="ChromeBackground" Color="#EDEBE7"/>
             <SolidColorBrush x:Key="SidebarBackground" Color="#F2F0EC"/>
             <SolidColorBrush x:Key="StartPageBackground" Color="#F2F0EC"/>
@@ -139,13 +137,14 @@
             <SolidColorBrush x:Key="DiffChangedForeground" Color="#8A6116"/>
         </ResourceDictionary>
 
-        <!-- Drawn over the Mica backdrop: the frame, sidebar and bars let the wallpaper's tint
-             through, and the content sits on one translucent raised layer. Whatever is not named
-             here is the plain theme's. -->
-        <ResourceDictionary x:Key="{x:Static local:Theme.MicaDark}">
-            <SolidColorBrush x:Key="WindowBackground" Color="#00000000"/>
-            <!-- Painted instead when the system draws no Mica: Windows 10, or a remote session -->
-            <SolidColorBrush x:Key="WindowFallbackBackground" Color="#202227"/>
+        <!-- Cool blue-greys: the frame, sidebar and bars are clear over one gradient the window is
+             painted with, and the content sits on a translucent raised layer. Whatever is not
+             named here is the plain theme's. -->
+        <ResourceDictionary x:Key="{x:Static local:Theme.SlateDark}">
+            <LinearGradientBrush x:Key="WindowBackground" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Offset="0" Color="#26282E"/>
+                <GradientStop Offset="1" Color="#1B1C20"/>
+            </LinearGradientBrush>
             <SolidColorBrush x:Key="ChromeBackground" Color="#00000000"/>
             <SolidColorBrush x:Key="SidebarBackground" Color="#00000000"/>
             <SolidColorBrush x:Key="StartPageBackground" Color="#00000000"/>
@@ -190,13 +189,14 @@
             <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
         </ResourceDictionary>
 
-        <!-- Drawn over the Mica backdrop: the frame, sidebar and bars let the wallpaper's tint
-             through, and the content sits on one translucent raised layer. Whatever is not named
-             here is the plain theme's. -->
-        <ResourceDictionary x:Key="{x:Static local:Theme.MicaLight}">
-            <SolidColorBrush x:Key="WindowBackground" Color="#00000000"/>
-            <!-- Painted instead when the system draws no Mica: Windows 10, or a remote session -->
-            <SolidColorBrush x:Key="WindowFallbackBackground" Color="#F3F4F7"/>
+        <!-- Cool blue-greys: the frame, sidebar and bars are clear over one gradient the window is
+             painted with, and the content sits on a translucent raised layer. Whatever is not
+             named here is the plain theme's. -->
+        <ResourceDictionary x:Key="{x:Static local:Theme.SlateLight}">
+            <LinearGradientBrush x:Key="WindowBackground" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Offset="0" Color="#F7F8FB"/>
+                <GradientStop Offset="1" Color="#E8EBF1"/>
+            </LinearGradientBrush>
             <SolidColorBrush x:Key="ChromeBackground" Color="#00000000"/>
             <SolidColorBrush x:Key="SidebarBackground" Color="#00000000"/>
             <SolidColorBrush x:Key="StartPageBackground" Color="#00000000"/>
