@@ -180,6 +180,51 @@ public class ThemeTests : UiTestBase
     }
 
     [AvaloniaFact]
+    public void TheOptionsDialogStartsFromTheStoredMicaAndLayout()
+    {
+        Settings.SetMicaTheme(true);
+        Settings.SetModernLayout(false);
+
+        var options = new OptionsDialogViewModel(Settings);
+
+        Assert.True(options.MicaTheme);
+        Assert.False(options.ModernLayout);
+    }
+
+    [AvaloniaFact]
+    public void SavingTheOptionsPutsOnAndRemembersTheMicaAndLayoutChosen()
+    {
+        var themes = new List<(bool Dark, bool Mica)>();
+        var layouts = new List<bool>();
+        Theme.Applying = (dark, mica) => themes.Add((dark, mica));
+        Layout.Applying = modern => layouts.Add(modern);
+
+        new OptionsDialogViewModel(Settings) { MicaTheme = true, ModernLayout = false }.Apply();
+
+        Assert.Equal([(true, true)], themes);
+        Assert.Equal([false], layouts);
+        var reopened = new Settings(SettingsPath);
+        Assert.True(reopened.IsMicaTheme);
+        Assert.False(reopened.IsModernLayout);
+    }
+
+    [AvaloniaFact]
+    public void CancellingTheOptionsDialogLeavesMicaAndTheLayoutAlone()
+    {
+        var themes = new List<(bool Dark, bool Mica)>();
+        var layouts = new List<bool>();
+        Theme.Applying = (dark, mica) => themes.Add((dark, mica));
+        Layout.Applying = modern => layouts.Add(modern);
+
+        _ = new OptionsDialogViewModel(Settings) { MicaTheme = true, ModernLayout = false };
+
+        Assert.Empty(themes);
+        Assert.Empty(layouts);
+        Assert.False(Settings.IsMicaTheme);
+        Assert.True(Settings.IsModernLayout);
+    }
+
+    [AvaloniaFact]
     public void CancellingTheOptionsDialogLeavesTheThemeAlone()
     {
         var applied = new List<bool>();

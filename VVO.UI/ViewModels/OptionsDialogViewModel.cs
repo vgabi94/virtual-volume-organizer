@@ -18,6 +18,12 @@ public partial class OptionsDialogViewModel : ObservableObject
     [ObservableProperty]
     public partial bool DarkTheme { get; set; }
 
+    [ObservableProperty]
+    public partial bool MicaTheme { get; set; }
+
+    [ObservableProperty]
+    public partial bool ModernLayout { get; set; }
+
     public OptionsDialogViewModel(Settings settings)
     {
         _settings = settings;
@@ -26,6 +32,8 @@ public partial class OptionsDialogViewModel : ObservableObject
         MaxRecentDatabases = settings.Data.MaxRecentFiles;
         ScanHiddenAndSystem = settings.Data.ScanHiddenAndSystem;
         DarkTheme = settings.IsDarkTheme;
+        MicaTheme = settings.IsMicaTheme;
+        ModernLayout = settings.IsModernLayout;
     }
 
     /// <summary>
@@ -38,8 +46,12 @@ public partial class OptionsDialogViewModel : ObservableObject
         _settings.SetMaxRecentFiles(MaxRecentDatabases);
         _settings.SetScanHiddenAndSystem(ScanHiddenAndSystem);
 
-        // Nothing else owns the theme, so it is put on here rather than handed to a caller
+        // Nothing else owns the theme or the layout, so they are put on here rather than handed to a caller
         _settings.SetDarkTheme(DarkTheme);
-        Theme.Apply(DarkTheme, _settings.IsMicaTheme);
+        _settings.SetMicaTheme(MicaTheme);
+        Theme.Apply(DarkTheme, MicaTheme);
+
+        _settings.SetModernLayout(ModernLayout);
+        Layout.Apply(ModernLayout);
     }
 }
