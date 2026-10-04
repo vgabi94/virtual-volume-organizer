@@ -115,11 +115,16 @@ public static class Catalogue
     {
         var database = context.Service<IDatabaseService>();
         var ancestors = new List<FileRecord>();
+        var visited = new HashSet<Guid> { record.Id };
 
         for (var parentId = record.ParentId; parentId is { } id;)
         {
             var parent = (await database.FindItemsAsync<FileRecord>(item => item.Id == id)).SingleOrDefault()
                 ?? throw new InvalidOperationException($"The catalogue record '{record.Id}' has lost its parent '{id}'.");
+
+            if (!visited.Add(parent.Id))
+                throw new InvalidOperationException(
+                    $"The folders above the catalogue record '{record.Id}' are each other's parents and never reach the top of the tree.");
 
             ancestors.Insert(0, parent);
             parentId = parent.ParentId;

@@ -108,18 +108,15 @@ public static class Confirmation
     {
         var tokens = new HashSet<Token>(ReferenceEqualityComparer.Instance);
 
-        for (SymbolResult? command = parseResult.CommandResult; command != null; command = command.Parent)
+        for (var command = parseResult.CommandResult; command != null; command = command.Parent as CommandResult)
         {
-            if (command is not CommandResult commandResult)
-                continue;
-
-            foreach (var child in commandResult.Children)
+            foreach (var child in command.Children)
             {
                 Symbol symbol = child switch
                 {
                     ArgumentResult argument => argument.Argument,
                     OptionResult option => option.Option,
-                    _ => commandResult.Command
+                    _ => command.Command
                 };
 
                 if (PathSymbols.TryGetValue(symbol, out _))

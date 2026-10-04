@@ -116,6 +116,21 @@ public static class Awkward
     }
 
     /// <summary>
+    /// A tree in which two folders have become each other's parent, cut off from the root.
+    /// </summary>
+    public static async Task<(RootFolderMetadata Entry, FolderTree Tree)> ParentLoopAsync(
+        TempCatalogue catalogue, Guid volumeId)
+    {
+        var tree = TestTree.Root("looped")
+            .Folder("a", a => a.Folder("b", b => b.File("inside.txt", 1)))
+            .Build();
+        var entry = await catalogue.AddFolderAsync(volumeId, tree);
+
+        await catalogue.Database.UpdateItemsAsync([tree.Record("a") with { ParentId = tree.Record("b").Id }]);
+        return (entry, tree);
+    }
+
+    /// <summary>
     /// A scanned tree no folder entry refers to.
     /// </summary>
     public static async Task<FolderTree> OrphanTreeAsync(TempCatalogue catalogue)

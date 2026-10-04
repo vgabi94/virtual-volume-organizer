@@ -30,6 +30,7 @@ public class DamagedCatalogueTests
         await Awkward.RecordWithoutParentAsync(catalogue, fixture.Backups.Id);
         await Awkward.EntryInMissingVolumeAsync(catalogue);
         await Awkward.OrphanTreeAsync(catalogue);
+        await Awkward.ParentLoopAsync(catalogue, fixture.Backups.Id);
 
         var result = await CliRunner.RunAsync(command.Valid(fixture));
 
@@ -153,6 +154,51 @@ public class DamagedCatalogueTests
         Assert.Empty(HitNames(search));
         Assert.Equal(0, stat.ExitCode);
         Assert.Equal(0, stat.Json.GetProperty("record").GetProperty("entries").GetArrayLength());
+    }
+
+    // With no place to head them, tables fall back on the folder's own name
+    [Fact]
+    public async Task ATreeNoFolderListsStillShowsAsATable()
+    {
+        using var catalogue = await TempCatalogue.CreateAsync();
+        var stray = await Awkward.OrphanTreeAsync(catalogue);
+        var root = stray.Metadata.TreeId.ToString();
+
+        var ls = await RunAsync(catalogue, "ls", root, "--format", "table");
+        var tree = await RunAsync(catalogue, "tree", root, "--format", "table");
+
+        Assert.Equal(0, ls.ExitCode);
+        Assert.StartsWith("orphan", ls.Stdout);
+        Assert.Contains("stray.txt", ls.Stdout);
+        Assert.Equal(0, tree.ExitCode);
+        Assert.Contains("stray.txt", tree.Stdout);
+    }
+
+    #endregion
+
+    #region Folders that are each other's parent
+
+    // A walk up from inside the loop never reaches a root, so it has to notice it has been round
+    [Fact]
+    public async Task ALoopOfParentsIsReportedRatherThanWalkedForever()
+    {
+        using var catalogue = await TempCatalogue.CreateAsync();
+        var volume = await catalogue.AddVolumeAsync("Backups");
+        var (entry, tree) = await Awkward.ParentLoopAsync(catalogue, volume.Id);
+        var inside = tree.Record("inside.txt").Id.ToString();
+        var limit = TimeSpan.FromSeconds(30);
+
+        var stat = await RunAsync(catalogue, "stat", inside).WaitAsync(limit);
+        var ls = await RunAsync(catalogue, "ls", tree.Record("b").Id.ToString()).WaitAsync(limit);
+        var search = await RunAsync(catalogue, "search", "inside").WaitAsync(limit);
+        var listing = await RunAsync(catalogue, "tree", entry.Id.ToString()).WaitAsync(limit);
+
+        Assert.Equal("error", stat.ErrorCode);
+        Assert.Contains(inside, stat.Error.GetProperty("message").GetString());
+        Assert.Equal("error", ls.ErrorCode);
+        Assert.Empty(HitNames(search));
+        Assert.Equal(1, search.Json.GetProperty("unplaced").GetInt32());
+        Assert.Equal(0, listing.ExitCode);
     }
 
     #endregion
