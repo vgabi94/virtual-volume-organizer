@@ -132,7 +132,7 @@ public class AppResourceTests
             "StatusSpacing", "VolumeExplorerSplitterWidth", "StatusBarHeight", "StatusBarFontSize", "TitleBarHeight",
             "VolumeChipSpacing", "VolumeChipIconSize", "TintOpacity", "ExtensionTagFontSize", "PaneSplitterWidth",
             "StartPageLogoSize", "StartPageTitleFontSize", "StartPageHeroSpacing", "StartPageCardWidth",
-            "StartPageCardSpacing", "StartPageCardIconSize"
+            "StartPageCardSpacing", "StartPageCardIconSize", "AccentHoverOpacity", "AccentPressedOpacity"
         ];
         string[] thicknesses =
         [

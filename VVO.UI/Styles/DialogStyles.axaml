@@ -117,6 +117,35 @@
         <Setter Property="Height" Value="{StaticResource IconChoiceSize}"/>
     </Style>
 
+    <!-- The Modern layout -->
+
+    <!-- Filled in the accent through every state the template would otherwise paint grey, all
+         but disabled -->
+    <Style Selector="Window.Modern Button.DialogPrimary">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AccentForegroundBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="Window.Modern Button.DialogPrimary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AccentForegroundBrush}"/>
+        <Setter Property="Opacity" Value="{StaticResource AccentHoverOpacity}"/>
+    </Style>
+    <Style Selector="Window.Modern Button.DialogPrimary:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AccentForegroundBrush}"/>
+        <Setter Property="Opacity" Value="{StaticResource AccentPressedOpacity}"/>
+    </Style>
+
+    <Style Selector="Window.Modern Border.IconChoices">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+    <Style Selector="Window.Modern Border.IconChoices ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter, Window.Modern Border.IconChoices ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource SelectionBackground}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource FrameCornerRadius}"/>
+    </Style>
+
     <Style Selector="Border.DocumentFrame">
         <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}"/>
         <Setter Property="BorderThickness" Value="{StaticResource FrameThickness}"/>

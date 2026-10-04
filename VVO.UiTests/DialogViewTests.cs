@@ -3,6 +3,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using VVO.Core.Models;
+using VVO.UI;
 using VVO.UI.ViewModels;
 using VVO.UI.Views;
 
@@ -172,6 +173,54 @@ public class DialogViewTests : UiTestBase
         Assert.Equal("Virtual Volume Organizer", viewModel.AppName);
         Assert.Equal("1.4.2", viewModel.Version);
         Assert.Contains("MIT", viewModel.IconsCredit);
+    }
+
+    #endregion
+
+    #region The button Enter presses
+
+    private IEnumerable<Window> DialogsThatConfirm() =>
+    [
+        new NameDialogView { DataContext = new NameDialogViewModel("Name for the duplicate", "Duplicate", "Code") },
+        new VirtualVolumeDialogView { DataContext = VirtualVolumeDialogViewModel.ForNewVolume() },
+        new FolderDialogView { DataContext = SomeFolderDialog() },
+        new NewDatabaseDialogView { DataContext = new NewDatabaseDialogViewModel() },
+        new CompareTargetDialogView { DataContext = new CompareTargetDialogViewModel([]) },
+        new OptionsDialogView { DataContext = new OptionsDialogViewModel(Settings) },
+        new ConfirmDeleteDialogView { DataContext = ConfirmDeleteDialogViewModel.ForFolder("Code") }
+    ];
+
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void EveryDialogMarksTheButtonEnterPressesAsItsPrimary(bool modern)
+    {
+        Layout.Apply(modern);
+
+        foreach (var dialog in DialogsThatConfirm())
+        {
+            dialog.Show();
+            Pump();
+
+            var primary = ButtonOf(dialog, cancel: false);
+            Assert.False(primary.IsCancel);
+            Assert.Contains("DialogPrimary", primary.Classes);
+            dialog.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void TheModernPrimaryButtonIsFilledWithTheAccent()
+    {
+        Layout.Apply(true);
+        var dialog = new NameDialogView { DataContext = new NameDialogViewModel("Name for the duplicate", "Duplicate", "Code") };
+        dialog.Show();
+        Pump();
+
+        Assert.True(dialog.TryFindResource("AccentBrush", dialog.ActualThemeVariant, out var accent));
+        Assert.Same(accent, ButtonOf(dialog, cancel: false).Background);
+        Assert.NotSame(accent, ButtonOf(dialog, cancel: true).Background);
+        dialog.Close();
     }
 
     #endregion
