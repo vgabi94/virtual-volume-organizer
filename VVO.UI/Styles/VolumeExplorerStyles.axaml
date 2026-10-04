@@ -155,7 +155,7 @@
     <Style Selector="Window.Modern DataGridCell TextBlock.Folder">
         <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
-    <Style Selector="Window.Modern DataGridCell.Size TextBlock">
+    <Style Selector="Window.Modern DataGridCell.Number TextBlock">
         <Setter Property="TextAlignment" Value="Right"/>
         <Setter Property="FontFeatures" Value="+tnum"/>
     </Style>

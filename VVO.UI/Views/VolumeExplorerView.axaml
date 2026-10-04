@@ -109,7 +109,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" SortMemberPath="SizeSortPath" CellStyleClasses="Size" />
+                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" SortMemberPath="SizeSortPath" CellStyleClasses="Number" />
                 <DataGridTextColumn Header="Modified" Binding="{Binding Modified}" Width="*" SortMemberPath="ModifiedSortPath" />
                 <DataGridTextColumn Header="Created" Binding="{Binding Created}" Width="*" SortMemberPath="CreatedSortPath" />
             </DataGrid.Columns>

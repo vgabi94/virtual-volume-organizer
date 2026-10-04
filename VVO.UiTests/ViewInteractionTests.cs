@@ -435,7 +435,7 @@ public class ViewInteractionTests : UiTestBase
         var pending = view.ShowDialog<bool>(Shell);
         Pump();
 
-        Press(ButtonNamed(view, "Rescan"));
+        Press(ButtonNamed(view, "Replace"));
         Pump();
 
         Assert.True(await pending);
