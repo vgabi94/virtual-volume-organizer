@@ -81,6 +81,21 @@
         <Setter Property="Margin" Value="0,0,0,4" />
         <Setter Property="Background" Value="{DynamicResource DividerBrush}" />
     </Style>
+    <Style Selector="Window.Modern Separator.SidebarToolbarRule">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <!-- The Modern layout keeps a volume's actions out of sight, its folder count standing in
+         for them, until the row is pointed at or selected -->
+    <Style Selector="Window.Modern ToggleButton.VirtualVolumeGroup Button.VolumeAction">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="Window.Modern ToggleButton.VirtualVolumeGroup:pointerover Button.VolumeAction, Window.Modern ToggleButton.VirtualVolumeGroup.Selected Button.VolumeAction">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="Window.Modern ToggleButton.VirtualVolumeGroup:pointerover TextBlock.VolumeCount, Window.Modern ToggleButton.VirtualVolumeGroup.Selected TextBlock.VolumeCount">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
 
     <Style Selector="Button.LowEmphasis">
         <Setter Property="Background" Value="Transparent"></Setter>

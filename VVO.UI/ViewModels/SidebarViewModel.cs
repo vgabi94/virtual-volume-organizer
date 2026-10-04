@@ -58,6 +58,10 @@ public partial class VirtualVolumeNode : ObservableObject
     [ObservableProperty]
     public partial FolderItem? SelectedFolder { get; set; }
 
+    // Whether this is the sidebar's SelectedVirtualVolume, for the row to show it by
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
+
     public Guid Id => Record.Id;
     public string Name => Record.Name;
     public Geometry? IconData => VirtualVolumeIcons.Lookup(Record.Icon);
@@ -107,6 +111,19 @@ public partial class SidebarViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(EditVirtualVolumeCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteVirtualVolumeCommand))]
     public partial VirtualVolumeNode? SelectedVirtualVolume { get; set; }
+
+    partial void OnSelectedVirtualVolumeChanged(VirtualVolumeNode? oldValue, VirtualVolumeNode? newValue)
+    {
+        if (oldValue != null)
+        {
+            oldValue.IsSelected = false;
+        }
+
+        if (newValue != null)
+        {
+            newValue.IsSelected = true;
+        }
+    }
 
     // The selection lives on whichever volume owns it, mirrored here so the menu bar has a
     // single place to reach it from

@@ -63,6 +63,7 @@
                             <DataTemplate x:DataType="vm:VirtualVolumeNode">
                                 <StackPanel>
                                     <ToggleButton Classes="SidebarHeader VirtualVolumeGroup"
+                                                  Classes.Selected="{Binding IsSelected}"
                                                   IsChecked="{Binding IsExpanded, Mode=TwoWay}"
                                                   Command="{Binding Owner.SelectVirtualVolumeCommand}"
                                                   CommandParameter="{Binding}">
@@ -98,16 +99,16 @@
                                                       Foreground="{Binding IconBrush}"
                                                       Margin="{DynamicResource SidebarVolumeIconMargin}"/>
                                             <TextBlock Grid.Column="2" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                                            <Button Grid.Column="3" ToolTip.Tip="Scan folder into this volume" Classes="LowEmphasis" Command="{Binding Owner.AddFolderCommand}" CommandParameter="{Binding}">
+                                            <Button Grid.Column="3" ToolTip.Tip="Scan folder into this volume" Classes="LowEmphasis VolumeAction" Command="{Binding Owner.AddFolderCommand}" CommandParameter="{Binding}">
                                                 <PathIcon Classes="SidebarIcon FlipY" Data="{StaticResource ScanSearch}"/>
                                             </Button>
-                                            <Button Grid.Column="4" ToolTip.Tip="Edit virtual volume" Classes="LowEmphasis" Command="{Binding Owner.EditVirtualVolumeCommand}" CommandParameter="{Binding}">
+                                            <Button Grid.Column="4" ToolTip.Tip="Edit virtual volume" Classes="LowEmphasis VolumeAction" Command="{Binding Owner.EditVirtualVolumeCommand}" CommandParameter="{Binding}">
                                                 <PathIcon Classes="SidebarIcon" Data="{StaticResource PencilBox}"/>
                                             </Button>
-                                            <Button Grid.Column="5" ToolTip.Tip="Delete virtual volume" Classes="LowEmphasis" Command="{Binding Owner.DeleteVirtualVolumeCommand}" CommandParameter="{Binding}">
+                                            <Button Grid.Column="5" ToolTip.Tip="Delete virtual volume" Classes="LowEmphasis VolumeAction" Command="{Binding Owner.DeleteVirtualVolumeCommand}" CommandParameter="{Binding}">
                                                 <PathIcon Classes="SidebarIcon" Data="{StaticResource DiskRemove}"/>
                                             </Button>
-                                            <TextBlock Grid.Column="6" Text="{Binding Folders.Count}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="{DynamicResource SidebarItemCountMargin}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="6" Classes="VolumeCount" Text="{Binding Folders.Count}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="{DynamicResource SidebarItemCountMargin}" VerticalAlignment="Center"/>
                                         </Grid>
                                     </ToggleButton>
                                     <ListBox ItemsSource="{Binding Folders}"

@@ -122,9 +122,12 @@
     <!-- Invisible until the pointer lands on it. MinWidth has to be set as well as Width: the
          Fluent theme floors a GridSplitter at 6, and a floor outranks a width. -->
     <Style Selector="GridSplitter.PaneSplitter">
-      <Setter Property="MinWidth" Value="4" />
-      <Setter Property="Width" Value="4" />
+      <Setter Property="MinWidth" Value="{StaticResource PaneSplitterWidth}" />
+      <Setter Property="Width" Value="{StaticResource PaneSplitterWidth}" />
       <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Window.Modern GridSplitter.PaneSplitter:pointerover, Window.Modern GridSplitter.PaneSplitter:pressed">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
     </Style>
 </Styles>
 
