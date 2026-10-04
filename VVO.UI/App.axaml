@@ -106,6 +106,10 @@
         <sys:Double x:Key="StatusIndicatorHeight">30</sys:Double>
         <Thickness x:Key="StatusButtonPadding">4</Thickness>
         <Thickness x:Key="DatabaseStatusMargin">0,0,12,0</Thickness>
+        <sys:Double x:Key="StatusBarHeight">32</sys:Double>
+        <sys:Double x:Key="StatusBarFontSize">12</sys:Double>
+        <Thickness x:Key="StatusBarStartMargin">18,0,0,0</Thickness>
+        <Thickness x:Key="StatusBarEndMargin">0,0,18,0</Thickness>
     </Application.Resources>
     
     <Application.Styles>

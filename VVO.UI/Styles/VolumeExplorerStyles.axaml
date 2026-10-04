@@ -5,6 +5,11 @@
         <TextBox Classes="SearchBox" PlaceholderText="Search all..." />
     </Design.PreviewWith>
     
+    <!-- The Modern layout shows it in the status bar -->
+    <Style Selector="Window.Modern TextBlock.HeaderSummary">
+        <Setter Property="IsVisible" Value="False"/>
+    </Style>
+
     <Style Selector="DataGrid.ExplorerGrid">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="HeadersVisibility" Value="Column" />
