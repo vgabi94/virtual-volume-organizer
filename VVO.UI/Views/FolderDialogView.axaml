@@ -10,34 +10,29 @@
         ShowInTaskbar="False"
         Background="{DynamicResource DialogBackground}">
 
-    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto, Auto" Margin="24" RowSpacing="14">
+    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto, Auto" Margin="{StaticResource DialogMargin}" RowSpacing="{StaticResource DialogRowSpacing}">
 
-        <StackPanel Grid.Row="0" Spacing="6">
-            <TextBlock Text="Name" FontWeight="Medium" FontSize="13"/>
-            <TextBox Text="{Binding FolderName, Mode=TwoWay}" Padding="10,8"/>
+        <StackPanel Grid.Row="0" Classes="DialogField">
+            <TextBlock Text="Name" Classes="DialogLabel"/>
+            <TextBox Text="{Binding FolderName, Mode=TwoWay}" Classes="DialogInput"/>
             <TextBlock Text="{Binding NameProblem}"
                        IsVisible="{Binding NameProblem, Converter={x:Static ObjectConverters.IsNotNull}}"
-                       Foreground="{DynamicResource ErrorTextBrush}"
-                       TextWrapping="Wrap"
-                       FontSize="12"/>
+                       Classes="DialogError"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Spacing="6">
-            <TextBlock Text="Description" FontWeight="Medium" FontSize="13"/>
+        <StackPanel Grid.Row="1" Classes="DialogField">
+            <TextBlock Text="Description" Classes="DialogLabel"/>
             <TextBox Text="{Binding Description, Mode=TwoWay}"
                      AcceptsReturn="True"
                      TextWrapping="Wrap"
-                     Height="70"
-                     Padding="10,8"/>
+                     Height="{StaticResource DescriptionBoxHeight}"
+                     Classes="DialogInput"/>
         </StackPanel>
 
-        <TextBlock Grid.Row="2" Text="Icon" FontWeight="Medium" FontSize="13"/>
+        <TextBlock Grid.Row="2" Text="Icon" Classes="DialogLabel"/>
 
         <Border Grid.Row="3"
-                BorderBrush="{DynamicResource DividerBrush}"
-                BorderThickness="1"
-                CornerRadius="4"
-                Padding="4">
+                Classes="IconChoices">
             <ScrollViewer>
                 <ListBox ItemsSource="{Binding Icons}"
                          SelectedItem="{Binding SelectedIcon, Mode=TwoWay}"
@@ -52,7 +47,7 @@
                         <DataTemplate x:DataType="vm:IconChoice">
                             <PathIcon Data="{Binding Data}"
                                       Classes.FlipY="{Binding IsFlipped}"
-                                      Width="26" Height="26"
+                                      Classes="IconChoice"
                                       Foreground="{Binding #Dialog.((vm:FolderDialogViewModel)DataContext).SelectedBrush}"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -60,29 +55,29 @@
             </ScrollViewer>
         </Border>
 
-        <StackPanel Grid.Row="4" Spacing="6">
+        <StackPanel Grid.Row="4" Classes="DialogField">
             <Grid ColumnDefinitions="*, Auto">
-                <TextBlock Text="Colour" FontWeight="Medium" FontSize="13" VerticalAlignment="Center"/>
+                <TextBlock Text="Colour" Classes="DialogLabel" VerticalAlignment="Center"/>
                 <Button Grid.Column="1"
                         Content="Reset Color"
                         Command="{Binding ResetColorCommand}"
-                        Padding="10,4"/>
+                        Classes="DialogSmall"/>
             </Grid>
             <ColorPicker Color="{Binding SelectedColor, Mode=TwoWay}"
                          IsAlphaVisible="False"
                          HorizontalAlignment="Left"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <StackPanel Grid.Row="5" Classes="DialogButtons">
             <Button Content="Cancel"
                     Click="OnCancelClicked"
                     IsCancel="True"
-                    Padding="18,7"/>
+                    Classes="Dialog"/>
             <Button Content="{Binding ConfirmText}"
                     Click="OnConfirmClicked"
                     IsDefault="True"
                     IsEnabled="{Binding CanConfirm}"
-                    Padding="18,7"/>
+                    Classes="DialogPrimary"/>
         </StackPanel>
     </Grid>
 </Window>

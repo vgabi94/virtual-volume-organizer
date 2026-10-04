@@ -76,22 +76,22 @@
                 </MenuItem>
             </Menu>
             <Panel Grid.Column="2" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="10" IsVisible="{Binding IsStatusMessageVisible}">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="{StaticResource StatusSpacing}" IsVisible="{Binding IsStatusMessageVisible}">
                     <!-- Fixed width and right-aligned: a count that grows a digit would
                          otherwise reflow the row and shift what sits beside it -->
                     <TextBlock Text="{Binding StatusMessage}"
                                VerticalAlignment="Center"
-                               MinWidth="280"
+                               MinWidth="{StaticResource StatusMessageMinWidth}"
                                TextAlignment="Right"
-                               Margin="0,0,4,0" />
-                    <LoadingIndicator IsActive="{Binding IsStatusMessageVisible}" Mode="Wave" Height="30" />
-                    <Button Content="Cancel" Padding="4" Margin="0,0,4,0" Command="{Binding CancelCommand}" IsVisible="{Binding IsCancelVisible}"/>
+                               Margin="{StaticResource StatusItemMargin}" />
+                    <LoadingIndicator IsActive="{Binding IsStatusMessageVisible}" Mode="Wave" Height="{StaticResource StatusIndicatorHeight}" />
+                    <Button Content="Cancel" Padding="{StaticResource StatusButtonPadding}" Margin="{StaticResource StatusItemMargin}" Command="{Binding CancelCommand}" IsVisible="{Binding IsCancelVisible}"/>
                 </StackPanel>
                 <PathIcon Data="{StaticResource DatabaseCheck}"
                           Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"
                           Foreground="{DynamicResource IconBrush}"
                           HorizontalAlignment="Right" VerticalAlignment="Center"
-                          Margin="0,0,12,0"
+                          Margin="{StaticResource DatabaseStatusMargin}"
                           IsVisible="{Binding IsDatabaseStatusVisible}"
                           ToolTip.Tip="{Binding LastWriteText}"/>
             </Panel>

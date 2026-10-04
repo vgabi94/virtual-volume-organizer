@@ -43,7 +43,7 @@
                     </ScrollViewer>
                 </Grid>
             </Border>
-            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="Transparent" MinWidth="2" Width="2"/>
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="Transparent" MinWidth="{StaticResource VolumeExplorerSplitterWidth}" Width="{StaticResource VolumeExplorerSplitterWidth}"/>
             <TextBox Grid.Column="2" x:Name="FileSearchBox" Classes="SearchBox" PlaceholderText="Search files..." VerticalAlignment="Center" Text="{Binding SearchTerm}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
             <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                 <Button Classes="LowEmphasis" ToolTip.Tip="Add folder(s)" Command="{Binding AddFoldersCommand}">

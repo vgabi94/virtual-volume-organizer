@@ -9,16 +9,12 @@
         ShowInTaskbar="False"
         Background="{DynamicResource DialogBackground}">
 
-    <Grid RowDefinitions="*, Auto" Margin="24">
-        <StackPanel Grid.Row="0" Spacing="18">
-            <StackPanel Spacing="4">
+    <Grid RowDefinitions="*, Auto" Margin="{StaticResource DialogMargin}">
+        <StackPanel Grid.Row="0" Spacing="{StaticResource OptionsSpacing}">
+            <StackPanel Spacing="{StaticResource DialogNoteSpacing}">
                 <CheckBox Content="Dark theme"
                           IsChecked="{Binding DarkTheme, Mode=TwoWay}"/>
-                <TextBlock Text="When off the application wears its light theme instead."
-                           TextWrapping="Wrap"
-                           FontSize="13"
-                           Margin="28,0,0,0"
-                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <TextBlock Classes="DialogNote OptionNote" Text="When off the application wears its light theme instead."/>
             </StackPanel>
 
             <CheckBox Content="Mica theme"
@@ -27,41 +23,33 @@
             <CheckBox Content="Modern layout"
                       IsChecked="{Binding ModernLayout, Mode=TwoWay}"/>
 
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="{StaticResource DialogNoteSpacing}">
                 <CheckBox Content="Always show folder paths and descriptions"
                           IsChecked="{Binding ShowFolderDetailsAlways, Mode=TwoWay}"/>
-                <TextBlock Text="When off they appear only while a folder is hovered or selected."
-                           TextWrapping="Wrap"
-                           FontSize="13"
-                           Margin="28,0,0,0"
-                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <TextBlock Classes="DialogNote OptionNote" Text="When off they appear only while a folder is hovered or selected."/>
             </StackPanel>
 
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="{StaticResource DialogNoteSpacing}">
                 <CheckBox Content="Scan hidden and system files"
                           IsChecked="{Binding ScanHiddenAndSystem, Mode=TwoWay}"/>
-                <TextBlock Text="When off, a scan leaves out anything marked hidden or system, which on a system drive means ProgramData and every AppData folder."
-                           TextWrapping="Wrap"
-                           FontSize="13"
-                           Margin="28,0,0,0"
-                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <TextBlock Classes="DialogNote OptionNote" Text="When off, a scan leaves out anything marked hidden or system, which on a system drive means ProgramData and every AppData folder."/>
             </StackPanel>
 
-            <StackPanel Spacing="6">
+            <StackPanel Classes="DialogField">
                 <TextBlock Text="Databases to remember on the start page"/>
                 <NumericUpDown Value="{Binding MaxRecentDatabases, Mode=TwoWay}"
                                Minimum="1"
                                Maximum="30"
                                Increment="1"
                                FormatString="0"
-                               Width="140"
+                               Width="{StaticResource OptionsNumberWidth}"
                                HorizontalAlignment="Left"/>
             </StackPanel>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
-            <Button Content="Cancel" Click="OnCancelClicked" IsCancel="True" Padding="18,7"/>
-            <Button Content="Save" Click="OnSaveClicked" IsDefault="True" Padding="18,7"/>
+        <StackPanel Grid.Row="1" Classes="DialogButtons" Margin="{StaticResource DialogButtonRowMargin}">
+            <Button Content="Cancel" Click="OnCancelClicked" IsCancel="True" Classes="Dialog"/>
+            <Button Content="Save" Click="OnSaveClicked" IsDefault="True" Classes="DialogPrimary"/>
         </StackPanel>
     </Grid>
 </Window>

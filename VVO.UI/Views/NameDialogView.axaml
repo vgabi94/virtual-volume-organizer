@@ -9,27 +9,25 @@
         ShowInTaskbar="False"
         Background="{DynamicResource DialogBackground}">
 
-    <Grid RowDefinitions="*, Auto" Margin="24">
-        <StackPanel Grid.Row="0" Spacing="6" VerticalAlignment="Center">
-            <TextBlock Text="{Binding Header}" FontWeight="Medium" FontSize="13"/>
-            <TextBox Text="{Binding Name, Mode=TwoWay}" Padding="10,8"/>
+    <Grid RowDefinitions="*, Auto" Margin="{StaticResource DialogMargin}">
+        <StackPanel Grid.Row="0" Classes="DialogField" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Header}" Classes="DialogLabel"/>
+            <TextBox Text="{Binding Name, Mode=TwoWay}" Classes="DialogInput"/>
             <TextBlock Text="{Binding NameProblem}"
                        IsVisible="{Binding NameProblem, Converter={x:Static ObjectConverters.IsNotNull}}"
-                       Foreground="{DynamicResource ErrorTextBrush}"
-                       TextWrapping="Wrap"
-                       FontSize="12"/>
+                       Classes="DialogError"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+        <StackPanel Grid.Row="1" Classes="DialogButtons" Margin="{StaticResource DialogButtonRowMargin}">
             <Button Content="Cancel"
                     Click="OnCancelClicked"
                     IsCancel="True"
-                    Padding="18,7"/>
+                    Classes="Dialog"/>
             <Button Content="{Binding ConfirmText}"
                     Click="OnConfirmClicked"
                     IsDefault="True"
                     IsEnabled="{Binding CanConfirm}"
-                    Padding="18,7"/>
+                    Classes="DialogPrimary"/>
         </StackPanel>
     </Grid>
 </Window>

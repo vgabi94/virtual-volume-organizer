@@ -10,43 +10,42 @@
         x:Name="DialogWindow"
         Background="{DynamicResource DialogBackground}">
 
-    <Grid RowDefinitions="Auto, *, Auto" Margin="24">
-        <StackPanel Grid.Row="1" Spacing="16">
-            <StackPanel Spacing="6">
-                <TextBlock Text="Database Name" FontWeight="Medium" FontSize="13"/>
+    <Grid RowDefinitions="Auto, *, Auto" Margin="{StaticResource DialogMargin}">
+        <StackPanel Grid.Row="1" Spacing="{StaticResource DialogSectionSpacing}">
+            <StackPanel Classes="DialogField">
+                <TextBlock Text="Database Name" Classes="DialogLabel"/>
                 <TextBox Text="{Binding CustomName, Mode=TwoWay}" 
                          PlaceholderText="e.g. My Media Collection" 
-                         Padding="10,8"/>
+                         Classes="DialogInput"/>
             </StackPanel>
 
-            <StackPanel Spacing="6">
-                <TextBlock Text="Save Location" FontWeight="Medium" FontSize="13"/>
+            <StackPanel Classes="DialogField">
+                <TextBlock Text="Save Location" Classes="DialogLabel"/>
                 <Grid ColumnDefinitions="*, Auto">
                     <TextBox Grid.Column="0" 
                              Text="{Binding DatabasePath, Mode=TwoWay}" 
                              PlaceholderText="Click Browse to choose path..." 
                              IsReadOnly="True" 
-                             Padding="10,8"/>
+                             Classes="DialogInput"/>
                     <Button Grid.Column="1" 
                             Content="Browse..." 
-                            Margin="8,0,0,0" 
-                            Padding="14,8"
+                            Classes="DialogBrowse"
                             Command="{Binding SelectPathCommand}" 
                             CommandParameter="{Binding #DialogWindow}"/>
                 </Grid>
             </StackPanel>
         </StackPanel>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+        <StackPanel Grid.Row="2" Classes="DialogButtons" Margin="{StaticResource DialogButtonRowMargin}">
             <Button Content="Cancel" 
                     Click="OnCancelClicked" 
                     IsCancel="True" 
-                    Padding="18,7"/>
+                    Classes="Dialog"/>
             <Button Content="Create" 
                     Click="OnCreateClicked" 
                     IsDefault="True" 
                     IsEnabled="{Binding CanCreate}" 
-                    Padding="18,7"/>
+                    Classes="DialogPrimary"/>
         </StackPanel>
     </Grid>
 </Window>

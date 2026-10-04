@@ -116,4 +116,40 @@ public class AppResourceTests
             Assert.IsType<double>(resource);
         }
     }
+
+    // The views name these instead of carrying numbers, so one missing is a view that will not load
+    [AvaloniaFact]
+    public void EverySizeTheViewsAreLaidOutWithIsDefined()
+    {
+        string[] lengths =
+        [
+            "CompareCopySpacing", "CompareHeaderSpacing", "CompareSymbolFontSize", "DescriptionBoxHeight",
+            "DialogAlertIconSize", "DialogButtonSpacing", "DialogContentSpacing", "DialogErrorFontSize",
+            "DialogFieldSpacing", "DialogNoteSpacing", "DialogRowSpacing", "DialogSectionSpacing",
+            "DialogSubjectFontSize", "DialogTextFontSize", "DialogTitleFontSize", "DialogTitleSpacing",
+            "DocumentFontSize", "IconChoiceSize", "ItemSubtitleFontSize", "ItemSubtitleOpacity",
+            "OptionsNumberWidth", "OptionsSpacing", "StatusIndicatorHeight", "StatusMessageMinWidth",
+            "StatusSpacing", "VolumeExplorerSplitterWidth"
+        ];
+        string[] thicknesses =
+        [
+            "CompareCopyButtonPadding", "CompareFooterMargin", "CompareHeaderMargin", "CompareMargin",
+            "CompareSummaryMargin", "DatabaseStatusMargin", "DialogAlertIconMargin", "DialogBrowseButtonMargin",
+            "DialogBrowseButtonPadding", "DialogButtonPadding", "DialogButtonRowMargin", "DialogLabelMargin",
+            "DialogListItemMargin", "DialogMargin", "DialogSectionMargin", "DialogSmallButtonPadding",
+            "DialogTextBoxPadding", "DocumentPadding", "FrameThickness", "IconChoicesPadding",
+            "OptionNoteMargin", "ShortcutRowMargin", "StatusButtonPadding", "StatusItemMargin"
+        ];
+
+        Assert.All(lengths, key => Assert.IsType<double>(Resource(key)));
+        Assert.All(thicknesses, key => Assert.IsType<Thickness>(Resource(key)));
+        Assert.IsType<CornerRadius>(Resource("FrameCornerRadius"));
+    }
+
+    private static object? Resource(string key)
+    {
+        Assert.True(Application.Current!.TryFindResource(key, out var resource), $"missing '{key}'");
+
+        return resource;
+    }
 }

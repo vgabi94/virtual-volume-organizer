@@ -1,0 +1,131 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <StackPanel Margin="{StaticResource DialogMargin}" Width="360">
+            <StackPanel Classes="DialogField">
+                <TextBlock Classes="DialogLabel" Text="Name"/>
+                <TextBox Classes="DialogInput" Text="Discs"/>
+                <TextBlock Classes="DialogError" Text="That name is taken."/>
+            </StackPanel>
+            <StackPanel Classes="DialogButtons" Margin="{StaticResource DialogButtonRowMargin}">
+                <Button Classes="Dialog" Content="Cancel"/>
+                <Button Classes="DialogPrimary" Content="Save"/>
+            </StackPanel>
+        </StackPanel>
+    </Design.PreviewWith>
+
+    <!-- The pieces every dialog is built from, so each one is spaced and sized the same -->
+
+    <Style Selector="TextBlock.DialogLabel">
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontSize" Value="{StaticResource DialogTextFontSize}"/>
+    </Style>
+
+    <Style Selector="TextBlock.DialogTitle">
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="{StaticResource DialogTitleFontSize}"/>
+    </Style>
+
+    <Style Selector="TextBlock.DialogSubject">
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="{StaticResource DialogSubjectFontSize}"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
+
+    <Style Selector="TextBlock.DialogNote">
+        <Setter Property="FontSize" Value="{StaticResource DialogTextFontSize}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <!-- Under its checkbox, lined up with the checkbox's caption rather than its box -->
+    <Style Selector="TextBlock.OptionNote">
+        <Setter Property="Margin" Value="{StaticResource OptionNoteMargin}"/>
+    </Style>
+
+    <Style Selector="TextBlock.DialogError">
+        <Setter Property="FontSize" Value="{StaticResource DialogErrorFontSize}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ErrorTextBrush}"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <Style Selector="TextBlock.ItemSubtitle">
+        <Setter Property="FontSize" Value="{StaticResource ItemSubtitleFontSize}"/>
+        <Setter Property="Opacity" Value="{StaticResource ItemSubtitleOpacity}"/>
+    </Style>
+
+    <Style Selector="HyperlinkButton.DialogLink">
+        <Setter Property="FontSize" Value="{StaticResource DialogTextFontSize}"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+    </Style>
+
+    <Style Selector="TextBox.DialogInput">
+        <Setter Property="Padding" Value="{StaticResource DialogTextBoxPadding}"/>
+    </Style>
+
+    <Style Selector="StackPanel.DialogField">
+        <Setter Property="Spacing" Value="{StaticResource DialogFieldSpacing}"/>
+    </Style>
+
+    <Style Selector="StackPanel.DialogButtons">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Spacing" Value="{StaticResource DialogButtonSpacing}"/>
+    </Style>
+
+    <!-- Cancel and Close; the button Enter presses is DialogPrimary -->
+    <Style Selector="Button.Dialog">
+        <Setter Property="Padding" Value="{StaticResource DialogButtonPadding}"/>
+    </Style>
+
+    <Style Selector="Button.DialogPrimary">
+        <Setter Property="Padding" Value="{StaticResource DialogButtonPadding}"/>
+    </Style>
+
+    <Style Selector="Button.DialogSmall">
+        <Setter Property="Padding" Value="{StaticResource DialogSmallButtonPadding}"/>
+    </Style>
+
+    <!-- Beside the read-only box it fills in, so it matches the box's height -->
+    <Style Selector="Button.DialogBrowse">
+        <Setter Property="Padding" Value="{StaticResource DialogBrowseButtonPadding}"/>
+        <Setter Property="Margin" Value="{StaticResource DialogBrowseButtonMargin}"/>
+    </Style>
+
+    <Style Selector="Button.CompareCopy">
+        <Setter Property="Padding" Value="{StaticResource CompareCopyButtonPadding}"/>
+    </Style>
+
+    <Style Selector="PathIcon.DialogAlert">
+        <Setter Property="Width" Value="{StaticResource DialogAlertIconSize}"/>
+        <Setter Property="Height" Value="{StaticResource DialogAlertIconSize}"/>
+        <Setter Property="Margin" Value="{StaticResource DialogAlertIconMargin}"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
+    </Style>
+
+    <Style Selector="Border.IconChoices">
+        <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource FrameThickness}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource FrameCornerRadius}"/>
+        <Setter Property="Padding" Value="{StaticResource IconChoicesPadding}"/>
+    </Style>
+
+    <Style Selector="PathIcon.IconChoice">
+        <Setter Property="Width" Value="{StaticResource IconChoiceSize}"/>
+        <Setter Property="Height" Value="{StaticResource IconChoiceSize}"/>
+    </Style>
+
+    <Style Selector="Border.DocumentFrame">
+        <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource FrameThickness}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource FrameCornerRadius}"/>
+    </Style>
+
+    <Style Selector="SelectableTextBlock.DocumentText">
+        <Setter Property="FontFamily" Value="Consolas,Menlo,Monospace"/>
+        <Setter Property="FontSize" Value="{StaticResource DocumentFontSize}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+    </Style>
+</Styles>

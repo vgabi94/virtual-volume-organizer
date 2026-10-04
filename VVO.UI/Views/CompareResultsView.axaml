@@ -40,14 +40,14 @@
 
         <Style Selector="TextBlock.StatusSymbol">
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontSize" Value="{StaticResource CompareSymbolFontSize}"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="Auto, *, Auto" Margin="16">
-        <StackPanel Grid.Row="0" Spacing="4" Margin="4,0,4,12">
+    <Grid RowDefinitions="Auto, *, Auto" Margin="{StaticResource CompareMargin}">
+        <StackPanel Grid.Row="0" Spacing="{StaticResource CompareHeaderSpacing}" Margin="{StaticResource CompareHeaderMargin}">
             <Grid ColumnDefinitions="70, *">
                 <TextBlock Grid.Column="0" Text="Source" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
                 <TextBlock Grid.Column="1" Text="{Binding SourceName}" TextTrimming="CharacterEllipsis"/>
@@ -56,7 +56,7 @@
                 <TextBlock Grid.Column="0" Text="Target" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
                 <TextBlock Grid.Column="1" Text="{Binding TargetName}" TextTrimming="CharacterEllipsis"/>
             </Grid>
-            <TextBlock Text="{Binding Summary}" Margin="0,8,0,0" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Summary}" Margin="{StaticResource CompareSummaryMargin}" FontWeight="Bold"/>
             <TextBlock Text="{Binding Proposal}"
                        TextWrapping="Wrap"
                        Foreground="{DynamicResource TextSecondaryBrush}"
@@ -112,32 +112,32 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Grid Grid.Row="2" ColumnDefinitions="*, Auto" Margin="4,12,4,0">
-            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+        <Grid Grid.Row="2" ColumnDefinitions="*, Auto" Margin="{StaticResource CompareFooterMargin}">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="{StaticResource CompareCopySpacing}">
                 <Button Content="Copy added"
-                        Padding="14,7"
+                        Classes="CompareCopy"
                         IsEnabled="{Binding HasAdded}"
                         ToolTip.Tip="Copy the full paths of added entries, one per line, under the target root"
                         Click="OnCopyAddedClicked"/>
                 <Button Content="Copy removed"
-                        Padding="14,7"
+                        Classes="CompareCopy"
                         IsEnabled="{Binding HasRemoved}"
                         ToolTip.Tip="Copy the full paths of removed entries, one per line, under the source root"
                         Click="OnCopyRemovedClicked"/>
                 <Button Content="Copy changed"
-                        Padding="14,7"
+                        Classes="CompareCopy"
                         IsEnabled="{Binding HasChanged}"
                         ToolTip.Tip="Copy the full paths of changed entries, one per line, under the source root"
                         Click="OnCopyChangedClicked"/>
             </StackPanel>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+            <StackPanel Grid.Column="1" Classes="DialogButtons">
                 <Button Content="{Binding CloseText}"
-                        Padding="18,7"
+                        Classes="Dialog"
                         IsCancel="True"
                         Click="OnCloseClicked"/>
                 <Button Content="Rescan"
-                        Padding="18,7"
+                        Classes="DialogPrimary"
                         IsDefault="True"
                         IsVisible="{Binding IsUpdate}"
                         Click="OnUpdateClicked"/>

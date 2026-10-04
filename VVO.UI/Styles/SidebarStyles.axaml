@@ -108,8 +108,8 @@
          them on for good. Never set IsVisible on these locally or the styles stop winning. -->
     <Style Selector="ListBox.VirtualVolumeFolders TextBlock.FolderDetail">
         <Setter Property="IsVisible" Value="False"/>
-        <Setter Property="FontSize" Value="{StaticResource SidebarItemSubtitleFontSize}"/>
-        <Setter Property="Opacity" Value="{StaticResource SidebarItemSubtitleOpacity}"/>
+        <Setter Property="FontSize" Value="{StaticResource ItemSubtitleFontSize}"/>
+        <Setter Property="Opacity" Value="{StaticResource ItemSubtitleOpacity}"/>
         <Setter Property="Margin" Value="10,0,0,0"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>

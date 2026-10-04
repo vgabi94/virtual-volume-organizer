@@ -10,7 +10,7 @@
         <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="{DynamicResource SidebarHeaderMargin}">
             <StackPanel>
                 <TextBlock Text="{Binding DatabaseName}" FontWeight="Bold" FontSize="{DynamicResource SidebarTitleFontSize}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
-                <TextBlock Text="{Binding DatabasePath}" Foreground="{DynamicResource TextTertiaryBrush}" FontSize="{StaticResource SidebarItemSubtitleFontSize}" />
+                <TextBlock Text="{Binding DatabasePath}" Foreground="{DynamicResource TextTertiaryBrush}" FontSize="{StaticResource ItemSubtitleFontSize}" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
                 <Button ToolTip.Tip="New Database" Classes="LowEmphasis" Command="{Binding NewDatabaseCommand}" CommandParameter="{Binding #Sidebar}">
@@ -177,7 +177,7 @@
                                                     <Grid Grid.Column="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
                                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Title}" FontWeight="Bold"/>
                                                         <TextBlock Grid.Row="0" Grid.Column="1" Classes="FolderDetail" Text="{Binding Path}"/>
-                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Subtitle}" FontSize="{DynamicResource SidebarItemSubtitleFontSize}" Opacity="{DynamicResource SidebarItemSubtitleOpacity}"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Subtitle}" FontSize="{DynamicResource ItemSubtitleFontSize}" Opacity="{DynamicResource ItemSubtitleOpacity}"/>
                                                         <TextBlock Grid.Row="1" Grid.Column="1" Classes="FolderDetail" Text="{Binding Description}"/>
                                                     </Grid>
                                                 </Grid>

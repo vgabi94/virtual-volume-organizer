@@ -9,30 +9,21 @@
         ShowInTaskbar="False"
         Background="{DynamicResource DialogBackground}">
 
-    <Grid RowDefinitions="Auto, *, Auto" Margin="24" RowSpacing="14">
+    <Grid RowDefinitions="Auto, *, Auto" Margin="{StaticResource DialogMargin}" RowSpacing="{StaticResource DialogRowSpacing}">
 
-        <StackPanel Grid.Row="0" Spacing="2">
-            <TextBlock Text="{Binding AppName}" FontWeight="Bold" FontSize="18"/>
-            <TextBlock Text="{Binding Version, StringFormat='Version {0}'}"
-                       FontSize="13"
-                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+        <StackPanel Grid.Row="0" Spacing="{StaticResource DialogTitleSpacing}">
+            <TextBlock Classes="DialogTitle" Text="{Binding AppName}"/>
+            <TextBlock Classes="DialogNote" Text="{Binding Version, StringFormat='Version {0}'}"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Spacing="4">
-            <TextBlock Text="{Binding IconsCredit}"
-                       TextWrapping="Wrap"
-                       FontSize="13"
-                       Foreground="{DynamicResource TextSecondaryBrush}"/>
-            <HyperlinkButton Content="GitHub"
-                             NavigateUri="{Binding RepositoryUrl}"
-                             FontSize="13"
-                             Padding="0"
-                             HorizontalAlignment="Left"/>
-            <HyperlinkButton Content="Third-party notices"
-                             Click="OnNoticesClicked"
-                             FontSize="13"
-                             Padding="0"
-                             HorizontalAlignment="Left"/>
+        <StackPanel Grid.Row="1" Spacing="{StaticResource DialogNoteSpacing}">
+            <TextBlock Classes="DialogNote" Text="{Binding IconsCredit}"/>
+            <HyperlinkButton Classes="DialogLink"
+                             Content="GitHub"
+                             NavigateUri="{Binding RepositoryUrl}"/>
+            <HyperlinkButton Classes="DialogLink"
+                             Content="Third-party notices"
+                             Click="OnNoticesClicked"/>
         </StackPanel>
 
         <Button Grid.Row="2"
@@ -41,6 +32,6 @@
                 IsDefault="True"
                 IsCancel="True"
                 HorizontalAlignment="Right"
-                Padding="18,7"/>
+                Classes="Dialog"/>
     </Grid>
 </Window>

@@ -10,47 +10,46 @@
         ShowInTaskbar="False"
         Background="{DynamicResource DialogBackground}">
 
-    <Grid RowDefinitions="Auto, *, Auto, Auto" Margin="24">
-        <TextBlock Grid.Row="0" Text="Compare against a catalogued volume" FontWeight="Medium" FontSize="13" Margin="0,0,0,6"/>
+    <Grid RowDefinitions="Auto, *, Auto, Auto" Margin="{StaticResource DialogMargin}">
+        <TextBlock Grid.Row="0" Text="Compare against a catalogued volume" Classes="DialogLabel" Margin="{StaticResource DialogLabelMargin}"/>
 
         <ListBox Grid.Row="1" ItemsSource="{Binding Folders}" SelectedItem="{Binding SelectedFolder, Mode=TwoWay}" SelectionMode="Single">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="0,2">
+                    <StackPanel Margin="{StaticResource DialogListItemMargin}">
                         <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding Path}" FontSize="11" Opacity="0.8"/>
+                        <TextBlock Classes="ItemSubtitle" Text="{Binding Path}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <StackPanel Grid.Row="2" Spacing="6" Margin="0,16,0,0">
-            <TextBlock Text="...or against a folder on disk" FontWeight="Medium" FontSize="13"/>
+        <StackPanel Grid.Row="2" Classes="DialogField" Margin="{StaticResource DialogSectionMargin}">
+            <TextBlock Text="...or against a folder on disk" Classes="DialogLabel"/>
             <Grid ColumnDefinitions="*, Auto">
                 <TextBox Grid.Column="0"
                          Text="{Binding LiveFolderPath, Mode=TwoWay}"
                          PlaceholderText="Click Browse to choose a folder..."
                          IsReadOnly="True"
-                         Padding="10,8"/>
+                         Classes="DialogInput"/>
                 <Button Grid.Column="1"
                         Content="Browse..."
-                        Margin="8,0,0,0"
-                        Padding="14,8"
+                        Classes="DialogBrowse"
                         Command="{Binding BrowseFolderCommand}"
                         CommandParameter="{Binding #DialogWindow}"/>
             </Grid>
         </StackPanel>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+        <StackPanel Grid.Row="3" Classes="DialogButtons" Margin="{StaticResource DialogButtonRowMargin}">
             <Button Content="Cancel"
                     Click="OnCancelClicked"
                     IsCancel="True"
-                    Padding="18,7"/>
+                    Classes="Dialog"/>
             <Button Content="Compare"
                     Click="OnCompareClicked"
                     IsDefault="True"
                     IsEnabled="{Binding CanCompare}"
-                    Padding="18,7"/>
+                    Classes="DialogPrimary"/>
         </StackPanel>
     </Grid>
 </Window>
