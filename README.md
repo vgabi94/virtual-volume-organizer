@@ -2,7 +2,14 @@
   <img src="VVO.UI/Assets/vvo2.svg" alt="Virtual Volume Organizer" width="128" height="128">
 </p>
 
-# Virtual Volume Organizer
+<h1 align="center">Virtual Volume Organizer</h1>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/vgabi94/virtual-volume-organizer" alt="MIT License"></a>
+  <a href="https://github.com/vgabi94/virtual-volume-organizer/releases/latest"><img src="https://img.shields.io/github/v/release/vgabi94/virtual-volume-organizer?label=release" alt="Latest release"></a>
+  <a href="https://github.com/vgabi94/virtual-volume-organizer/releases"><img src="https://img.shields.io/github/downloads/vgabi94/virtual-volume-organizer/total" alt="Downloads"></a>
+  <a href="https://github.com/vgabi94/virtual-volume-organizer/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/vgabi94/virtual-volume-organizer/ci.yml?branch=main&label=CI" alt="CI status"></a>
+</p>
 
 Virtual Volume Organizer (VVO) catalogues offline drives, backups, and USB sticks into `.vvo` database files so you can browse, search, and diff folders while the media is disconnected.
 
@@ -132,10 +139,3 @@ VirtualVolumeOrganizer.exe D:\Catalogues\backup.vvo
 ```
 
 Associate `.vvo` files with `VirtualVolumeOrganizer.exe` to open catalogues by double-clicking them.
-
-## Credits
-
-- Icons from [MahApps.Metro.IconPacks](https://github.com/MahApps/MahApps.Metro.IconPacks) via [IconPacks.Browser](https://github.com/MahApps/IconPacks.Browser).
-- Third-party licenses are listed in [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt).
-
-
