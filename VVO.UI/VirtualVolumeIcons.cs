@@ -2,31 +2,19 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using VVO.Core;
 
 namespace VVO.UI;
 
 /// <summary>
-/// The icons a virtual volume can be listed under, by resource key. Mirrors the
-/// "Virtual Volumes types" section of Icons/IconsResource.axaml.
+/// The icons a virtual volume can be listed under, by resource key. The keys are shared with
+/// the CLI through <see cref="IconKeys"/>.
 /// </summary>
 public static class VirtualVolumeIcons
 {
-    public const string Default = "HardDrive";
+    public const string Default = IconKeys.DefaultVolume;
 
-    public static IReadOnlyList<string> Keys { get; } =
-    [
-        "HardDrive",
-        "HardDisk",
-        "DeviceSsdFill",
-        "NvmeFill",
-        "UsbDriveFill",
-        "CompactDisc",
-        "FloppyDisk",
-        "MicroSd",
-        "Smartphone",
-        "Archive",
-        "StarFilled"
-    ];
+    public static IReadOnlyList<string> Keys => IconKeys.Volumes;
 
     // Icons whose path data is drawn bottom-up, which renders them upside down until flipped
     private static readonly HashSet<string> FlippedKeys = ["Archive", "HardDrive", "UsbDriveFill"];

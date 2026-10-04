@@ -1,0 +1,16 @@
+{
+  "error": {
+    "code": "confirmation_required",
+    "message": "Rescanning replaces what is catalogued for this folder with what was just scanned. This cannot be undone. Run the command in a terminal to confirm.",
+    "path": "<disk>",
+    "counts": {
+      "added": 1,
+      "removed": 2,
+      "changed": 1,
+      "unchanged": 1
+    },
+    "skippedFolders": 0,
+    "preview": "vvo compare 00000000-0000-0000-0000-000000000010 --disk <disk> --db <catalogue>",
+    "command": "vvo folder rescan 00000000-0000-0000-0000-000000000010 --db <catalogue>"
+  }
+}

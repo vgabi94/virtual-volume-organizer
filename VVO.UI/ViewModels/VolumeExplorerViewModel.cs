@@ -9,6 +9,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using VVO.Core;
 using VVO.Core.Models;
 using VVO.Core.Services;
 using VVO.UI.Messages;
@@ -670,8 +671,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
         {
             await EnsureFoldersLoadedAsync(treeId);
 
-            var records = await _databaseService.FindItemsAsync<FileRecord>(record =>
-                record.RootFolderId == treeId && record.Id != treeId && record.Name.Contains(term));
+            var records = await _virtualVolumeService.FindByNameAsync(term, treeId);
 
             if (token != _navigationToken)
                 return;
@@ -698,10 +698,8 @@ public partial class VolumeExplorerViewModel : ViewModelBase
         {
             await EnsureEveryFolderLoadedAsync();
 
-            // The name is indexed but a substring match cannot use that index, so this is a
-            // scan either way and the trees are sorted out afterwards
-            var records = await _databaseService.FindItemsAsync<FileRecord>(record =>
-                record.ParentId != null && record.Name.Contains(term));
+            // Every tree is searched and the ones no folder lists are sorted out afterwards
+            var records = await _virtualVolumeService.FindByNameAsync(term);
 
             if (token != _navigationToken)
                 return;

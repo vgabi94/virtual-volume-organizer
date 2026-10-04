@@ -31,6 +31,26 @@ public class FileScannerService : IFileScannerService
 
         protected override FileRecord TransformEntry(ref FileSystemEntry entry) => _transform(ref entry);
 
+        // A junction or symbolic link is catalogued as the folder it is on disk, but its contents
+        // live elsewhere and may be an ancestor, which the walk would go round until the path is
+        // too long. Other reparse points, cloud placeholders among them, are walked as usual, and
+        // so is a disk mounted in a folder: its target is a whole volume, as Explorer shows it.
+        protected override bool ShouldRecurseIntoEntry(ref FileSystemEntry entry)
+        {
+            if ((entry.Attributes & FileAttributes.ReparsePoint) == 0)
+                return true;
+
+            try
+            {
+                var target = new DirectoryInfo(entry.ToFullPath()).LinkTarget;
+                return target == null || target.Contains("Volume{", StringComparison.OrdinalIgnoreCase);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                return false;
+            }
+        }
+
         // Carrying on is what IgnoreInaccessible did; the difference is that what was left
         // out is now counted rather than lost
         protected override bool ContinueOnError(int error)
@@ -208,60 +228,27 @@ public class FileScannerService : IFileScannerService
                 skipped = enumerator.Skipped;
             }
 
-            progress?.Report($"Building folder map... {entries.Count:N0} entries");
-            var childrenFolderMap = new Dictionary<Guid, List<Guid>>();
-            
-            foreach (var entry in entries)
-            {
-                // We build the children map only for folders
-                // because individual sizes of files were already summed up
-                // during the FileSystemEnumerable iteration above.
-                if (!entry.IsFolder) continue;
-
-                Debug.Assert(entry.ParentId != null, "entry.ParentId should not be null!");
-                if (!childrenFolderMap.TryGetValue(entry.ParentId.Value, out var list))
-                {
-                    list = new List<Guid>();
-                    childrenFolderMap[entry.ParentId.Value] = list;
-                }
-                
-                list.Add(entry.Id);
-                cancellationToken.ThrowIfCancellationRequested();
-            }
-            
             progress?.Report($"Computing folder sizes... {entries.Count:N0} entries");
-            ComputeSize(rootFolderId);
-            
-            progress?.Report($"Assigning folder sizes... {entries.Count:N0} entries");
-            for (int i = 0; i < entries.Count; i++)
+
+            // The files are already summed into their folders. A folder is found while its parent
+            // is walked, so it comes after its parent and before anything under it: read
+            // backwards, every folder below one is totalled before it is, and no recursion is
+            // needed, which a deep enough tree would overflow.
+            for (var i = entries.Count - 1; i >= 0; i--)
             {
                 var entry = entries[i];
-                if (entry.IsFolder)
-                {
-                    entries[i] = entry with { Size = folderSize[entry.Id] };
-                    cancellationToken.ThrowIfCancellationRequested();
-                }
+                if (!entry.IsFolder)
+                    continue;
+
+                Debug.Assert(entry.ParentId != null, "entry.ParentId should not be null!");
+                var size = folderSize[entry.Id];
+                entries[i] = entry with { Size = size };
+                folderSize[entry.ParentId.Value] += size;
+                cancellationToken.ThrowIfCancellationRequested();
             }
 
             entries.Add(rootFolder with { Size = folderSize[rootFolderId] });
             return new ScanResult(rootFolderMetadata, entries, skipped);
-            
-            long ComputeSize(Guid folderId)
-            {
-                long size = folderSize.GetValueOrDefault(folderId, 0);
-                if (childrenFolderMap.TryGetValue(folderId, out var childrenFolders))
-                {
-                    foreach (var childFolderId in childrenFolders)
-                    {
-                        size += ComputeSize(childFolderId);
-                    }
-                }
-                
-                folderSize[folderId] = size;
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                return size;
-            }
         }, cancellationToken);
     }
 

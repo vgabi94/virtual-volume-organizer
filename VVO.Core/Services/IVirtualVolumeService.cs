@@ -38,6 +38,14 @@ public interface IVirtualVolumeService
     Task<IReadOnlyCollection<RootFolderMetadata>> GetFoldersAsync(Guid virtualVolumeId);
 
     /// <summary>
+    /// Catalogued files and folders whose name contains <paramref name="term"/>, case ignored, the
+    /// root of a tree never among them. The term is matched as written: '_' and '%' are just
+    /// characters.
+    /// </summary>
+    /// <param name="treeId">Searches the one tree; every tree when null, those no folder lists included.</param>
+    Task<IReadOnlyList<FileRecord>> FindByNameAsync(string term, Guid? treeId = null);
+
+    /// <summary>
     /// Stores a freshly scanned tree and places it in the given virtual volume. The whole thing
     /// is one transaction, so cancelling part way puts nothing in the database rather than
     /// leaving half a tree behind.

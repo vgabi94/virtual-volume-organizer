@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using VVO.Core;
 using VVO.Core.Models;
 
 namespace VVO.UI.ViewModels;
@@ -8,10 +9,13 @@ namespace VVO.UI.ViewModels;
 public partial class VirtualVolumeDialogViewModel : AppearanceDialogViewModel
 {
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanConfirm))]
+    [NotifyPropertyChangedFor(nameof(CanConfirm), nameof(NameProblem))]
     public partial string VolumeName { get; set; }
 
-    public override bool CanConfirm => base.CanConfirm && !string.IsNullOrWhiteSpace(VolumeName);
+    public string? NameProblem => CataloguePath.NameProblem(VolumeName);
+
+    public override bool CanConfirm =>
+        base.CanConfirm && !string.IsNullOrWhiteSpace(VolumeName) && NameProblem == null;
 
     private VirtualVolumeDialogViewModel(
         string header, string confirmText, string volumeName, string? icon, string? color)

@@ -17,6 +17,11 @@
             <TextBox Text="{Binding VolumeName, Mode=TwoWay}"
                      PlaceholderText="e.g. Backup Drives"
                      Padding="10,8"/>
+            <TextBlock Text="{Binding NameProblem}"
+                       IsVisible="{Binding NameProblem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                       Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                       TextWrapping="Wrap"
+                       FontSize="12"/>
         </StackPanel>
 
         <TextBlock Grid.Row="1" Text="Icon" FontWeight="Medium" FontSize="13"/>

@@ -1,0 +1,72 @@
+{
+  "folder": {
+    "id": "00000000-0000-0000-0000-000000000100",
+    "parentId": null,
+    "treeId": "00000000-0000-0000-0000-000000000100",
+    "isFolder": true,
+    "name": "Photos",
+    "size": 6155,
+    "created": "2026-01-01T00:00:00Z",
+    "modified": "2026-01-01T00:00:00Z",
+    "entries": [
+      {
+        "entryId": "00000000-0000-0000-0000-000000000010",
+        "cataloguePath": "Backups:\\Holidays",
+        "physicalPath": "<disk>"
+      }
+    ]
+  },
+  "children": [
+    {
+      "id": "00000000-0000-0000-0000-000000000103",
+      "parentId": "00000000-0000-0000-0000-000000000100",
+      "treeId": "00000000-0000-0000-0000-000000000100",
+      "isFolder": true,
+      "name": "photos",
+      "size": 6144,
+      "created": "2026-01-01T00:00:00Z",
+      "modified": "2026-01-01T00:00:00Z",
+      "entries": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000010",
+          "cataloguePath": "Backups:\\Holidays\\photos",
+          "physicalPath": "<disk>\\photos"
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000102",
+      "parentId": "00000000-0000-0000-0000-000000000100",
+      "treeId": "00000000-0000-0000-0000-000000000100",
+      "isFolder": false,
+      "name": "old notes.txt",
+      "size": 1,
+      "created": "2026-01-01T00:00:00Z",
+      "modified": "2026-01-01T00:00:00Z",
+      "entries": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000010",
+          "cataloguePath": "Backups:\\Holidays\\old notes.txt",
+          "physicalPath": "<disk>\\old notes.txt"
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000101",
+      "parentId": "00000000-0000-0000-0000-000000000100",
+      "treeId": "00000000-0000-0000-0000-000000000100",
+      "isFolder": false,
+      "name": "readme.txt",
+      "size": 10,
+      "created": "2026-01-01T00:00:00Z",
+      "modified": "2026-01-01T00:00:00Z",
+      "entries": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000010",
+          "cataloguePath": "Backups:\\Holidays\\readme.txt",
+          "physicalPath": "<disk>\\readme.txt"
+        }
+      ]
+    }
+  ]
+}

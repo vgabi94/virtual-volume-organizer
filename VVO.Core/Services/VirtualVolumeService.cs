@@ -1,3 +1,4 @@
+using System.Globalization;
 using LiteDB;
 using VVO.Core.Models;
 
@@ -20,6 +21,7 @@ public class VirtualVolumeService : IVirtualVolumeService
     public async Task<VirtualVolumeRecord> CreateVirtualVolumeAsync(string name, string icon, string? color = null)
     {
         RequireName(name);
+        RequireUsableName(name, nameof(name));
         RequireIcon(icon);
 
         var record = new VirtualVolumeRecord
@@ -91,6 +93,23 @@ public class VirtualVolumeService : IVirtualVolumeService
         return _databaseService.FindItemsAsync<RootFolderMetadata>(entry => entry.VirtualVolumeId == virtualVolumeId);
     }
 
+    public async Task<IReadOnlyList<FileRecord>> FindByNameAsync(string term, Guid? treeId = null)
+    {
+        // The name is indexed but a substring match cannot use that index, so this is a scan
+        // either way. LiteDB answers Contains with LIKE, where '_' and '%' are wildcards; that
+        // answer holds every literal match and more, so it is narrowed to the literal ones.
+        var found = treeId is { } id
+            ? await _databaseService.FindItemsAsync<FileRecord>(record =>
+                record.RootFolderId == id && record.Id != id && record.Name.Contains(term))
+            : await _databaseService.FindItemsAsync<FileRecord>(record =>
+                record.ParentId != null && record.Name.Contains(term));
+
+        return found.Where(record => ContainsIgnoringCase(record.Name, term)).ToList();
+    }
+
+    private static bool ContainsIgnoringCase(string name, string term) =>
+        CultureInfo.InvariantCulture.CompareInfo.IndexOf(name, term, CompareOptions.IgnoreCase) >= 0;
+
     // Big enough that the batching costs nothing next to the write, small enough that a scan of
     // a system drive reports more than once
     private const int SaveBatchSize = 20_000;
@@ -103,6 +122,7 @@ public class VirtualVolumeService : IVirtualVolumeService
         CancellationToken cancellationToken = default)
     {
         RequireRoot(scanned, records, nameof(records));
+        RequireUsableName(scanned.Label, nameof(scanned));
 
         var entry = scanned with { VirtualVolumeId = virtualVolumeId };
 
@@ -206,6 +226,8 @@ public class VirtualVolumeService : IVirtualVolumeService
 
     public async Task<RootFolderMetadata> CopyFolderAsync(Guid entryId, Guid targetVirtualVolumeId, string? label = null)
     {
+        RequireUsableName(label, nameof(label));
+
         RootFolderMetadata? copy = null;
 
         await _databaseService.TransactionAsync(db =>
@@ -357,7 +379,7 @@ public class VirtualVolumeService : IVirtualVolumeService
             var record = files.FindById(id);
             if (record == null)
             {
-                throw new ArgumentException($"There is no catalogue record '{id}'.", nameof(recordIds));
+                throw new CatalogueItemNotFoundException($"There is no catalogue record '{id}'.", nameof(recordIds));
             }
 
             if (record.ParentId == null)
@@ -454,7 +476,7 @@ public class VirtualVolumeService : IVirtualVolumeService
         var parent = files.FindById(parentId);
         if (parent == null)
         {
-            throw new ArgumentException($"There is no catalogue record '{parentId}'.", nameof(parentId));
+            throw new CatalogueItemNotFoundException($"There is no catalogue record '{parentId}'.", nameof(parentId));
         }
 
         if (!parent.IsFolder)
@@ -582,6 +604,16 @@ public class VirtualVolumeService : IVirtualVolumeService
         }
     }
 
+    // Only where a name is new: an update also puts back what undo remembers, which a catalogue
+    // written before the rule may hold
+    private static void RequireUsableName(string? name, string paramName)
+    {
+        if (CataloguePath.NameProblem(name) is { } problem)
+        {
+            throw new ArgumentException(problem, paramName);
+        }
+    }
+
     private static void RequireIcon(string icon)
     {
         if (string.IsNullOrWhiteSpace(icon))
@@ -596,7 +628,7 @@ public class VirtualVolumeService : IVirtualVolumeService
         var volume = volumes.FindById(virtualVolumeId);
         if (volume == null)
         {
-            throw new ArgumentException($"There is no virtual volume '{virtualVolumeId}'.", paramName);
+            throw new CatalogueItemNotFoundException($"There is no virtual volume '{virtualVolumeId}'.", paramName);
         }
 
         return volume;
@@ -608,7 +640,7 @@ public class VirtualVolumeService : IVirtualVolumeService
         var entry = entries.FindById(entryId);
         if (entry == null)
         {
-            throw new ArgumentException($"There is no folder entry '{entryId}'.", paramName);
+            throw new CatalogueItemNotFoundException($"There is no folder entry '{entryId}'.", paramName);
         }
 
         return entry;

@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using MsBox.Avalonia.Enums;
+using VVO.Core;
 using VVO.Core.Services;
 
 namespace VVO.UI;
@@ -11,16 +12,11 @@ namespace VVO.UI;
 /// </summary>
 public static class ScanWarning
 {
-    public const string Title = "Some folders were not read";
+    public const string Title = ScanWarnings.SkippedTitle;
 
-    public static string Describe(int skippedFolders, string path)
-    {
-        var folders = skippedFolders == 1 ? "1 folder" : $"{skippedFolders} folders";
-
-        return $"{folders} under '{path}' could not be opened and were left out.\n\n"
-               + "This is usually a permission the account does not have, or a protection "
-               + "feature such as Controlled Folder Access blocking the folder.";
-    }
+    // The wording lives in Core, where the CLI reads it too
+    public static string Describe(int skippedFolders, string path) =>
+        ScanWarnings.DescribeSkipped(skippedFolders, path);
 
     public static Task TellIfShortAsync(ScanResult scan, string path)
     {

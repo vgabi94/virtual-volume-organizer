@@ -1,4 +1,4 @@
-using VVO.UI;
+using VVO.Core;
 
 namespace VVO.Tests;
 

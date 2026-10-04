@@ -57,6 +57,17 @@ public class DialogViewModelTests
         Assert.True(viewModel.CanConfirm);
     }
 
+    [Fact]
+    public void ADuplicateNameWithASeparatorIsRefusedAndSaysWhy()
+    {
+        var viewModel = new NameDialogViewModel("Name", "Duplicate", "Code");
+
+        viewModel.Name = "Code:copy";
+
+        Assert.False(viewModel.CanConfirm);
+        Assert.NotNull(viewModel.NameProblem);
+    }
+
     #endregion
 
     #region New database
@@ -194,6 +205,19 @@ public class DialogViewModelTests
         Assert.True(viewModel.CanConfirm);
     }
 
+    [Theory]
+    [InlineData(@"C:\Backups")]
+    [InlineData("Backups:2")]
+    public void AVolumeNameWithASeparatorIsRefusedAndSaysWhy(string name)
+    {
+        var viewModel = VirtualVolumeDialogViewModel.ForNewVolume();
+
+        viewModel.VolumeName = name;
+
+        Assert.False(viewModel.CanConfirm);
+        Assert.Contains("can't contain", viewModel.NameProblem);
+    }
+
     [Fact]
     public void EveryOfferedIconIsListedToChooseFrom()
     {
@@ -318,6 +342,27 @@ public class DialogViewModelTests
         Assert.False(viewModel.CanConfirm);
 
         viewModel.FolderName = "Code";
+        Assert.True(viewModel.CanConfirm);
+    }
+
+    [Fact]
+    public void AFolderLabelWithASeparatorIsRefusedAndSaysWhy()
+    {
+        var viewModel = new FolderDialogViewModel(Entry(), "Code");
+
+        viewModel.FolderName = @"2024\summer";
+
+        Assert.False(viewModel.CanConfirm);
+        Assert.Contains("can't contain", viewModel.NameProblem);
+    }
+
+    // Left as scanned it stores no label, so a drive scanned without one can still be saved
+    [Fact]
+    public void TheScannedNameIsAcceptedEvenWithASeparator()
+    {
+        var viewModel = new FolderDialogViewModel(Entry(), @"C:\");
+
+        Assert.Null(viewModel.NameProblem);
         Assert.True(viewModel.CanConfirm);
     }
 

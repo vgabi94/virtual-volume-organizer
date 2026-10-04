@@ -668,7 +668,7 @@ public partial class SidebarViewModel : ViewModelBase
             var viewModel = new NameDialogViewModel("Name for the duplicate", "Duplicate", item.Title);
             var dialog = new Views.NameDialogView { DataContext = viewModel };
 
-            if (!await Dialogs.ShowAsync(dialog, window) || string.IsNullOrWhiteSpace(viewModel.Name))
+            if (!await Dialogs.ShowAsync(dialog, window) || !viewModel.CanConfirm)
                 return;
 
             await CopyListedFolderAsync(item, item.Entry.VirtualVolumeId, viewModel.Name.Trim());

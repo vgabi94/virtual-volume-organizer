@@ -1,0 +1,25 @@
+{
+  "relativePath": "beach.jpg",
+  "status": "changed",
+  "changes": [
+    "size",
+    "modified"
+  ],
+  "descendantCount": null,
+  "left": {
+    "id": "44444444-4444-4444-4444-444444444444",
+    "isFolder": false,
+    "name": "beach.jpg",
+    "size": 2048,
+    "created": "2025-12-24T18:00:30Z",
+    "modified": "2025-12-24T18:00:30Z"
+  },
+  "right": {
+    "id": null,
+    "isFolder": false,
+    "name": "beach.jpg",
+    "size": 4096,
+    "created": "2025-12-24T18:00:30Z",
+    "modified": "2026-03-01T09:15:00Z"
+  }
+}

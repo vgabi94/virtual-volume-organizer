@@ -488,6 +488,27 @@ public class DatabaseServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task CountItemsAsync_CountsEveryItemOrTheMatchingOnes()
+    {
+        await _service.InsertItemsAsync(new List<TestItem>
+        {
+            new TestItem { Id = Guid.NewGuid(), Name = "Target" },
+            new TestItem { Id = Guid.NewGuid(), Name = "Target" },
+            new TestItem { Id = Guid.NewGuid(), Name = "Other" }
+        });
+
+        Assert.Equal(3, await _service.CountItemsAsync<TestItem>());
+        Assert.Equal(2, await _service.CountItemsAsync<TestItem>(x => x.Name == "Target"));
+        Assert.Equal(0, await _service.CountItemsAsync<TestItem>(x => x.Name == "Missing"));
+    }
+
+    [Fact]
+    public async Task CountItemsAsync_IsZeroForATableNothingWasWrittenTo()
+    {
+        Assert.Equal(0, await _service.CountItemsAsync<TestItem>());
+    }
+
+    [Fact]
     public async Task DatabaseMetadata_PersistsNameAndPath()
     {
         var dbMeta = new DatabaseMetadata
@@ -739,8 +760,7 @@ public class DatabaseServiceTests : IDisposable
         await GivenACatalogueOfAsync(2_000);
         var reported = new List<string>();
 
-        await _service.ShrinkDatabaseAsync(new Progress<string>(reported.Add));
-        await Task.Yield();
+        await _service.ShrinkDatabaseAsync(new ReportedProgress(reported));
 
         Assert.Contains(reported, message => message.StartsWith("Removing indexes..."));
         Assert.Contains(reported, message => message.StartsWith("Compacting"));
@@ -817,4 +837,239 @@ public class DatabaseServiceTests : IDisposable
         Assert.Equal(1, announced);
     }
 
+    // How the other program holds it: a second LiteDB, which is what the CLI or the GUI would be
+    private FileStream HoldTheFile() =>
+        new(_dbPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+
+    [Fact]
+    public void AFileHeldElsewhereFailsToOpenWithASharingViolation()
+    {
+        // The retry recognises a busy file by this exception; if LiteDB changes it, this says so
+        using var hold = HoldTheFile();
+
+        var thrown = Assert.ThrowsAny<IOException>(() => new LiteDatabase(_dbPath));
+
+        Assert.Equal(unchecked((int)0x80070020), thrown.HResult);
+    }
+
+    [Fact]
+    public async Task AFileReleasedWhileWaitingIsReadOnceItIsFree()
+    {
+        await _service.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "a", Path = _dbPath }]);
+        var hold = HoldTheFile();
+
+        var read = _service.ReadItemsAsync<DatabaseMetadata>();
+        await Task.Delay(300);
+        hold.Dispose();
+
+        Assert.Single(await read);
+    }
+
+    [Fact]
+    public async Task AFileWriteWaitsForTheFileToBeFree()
+    {
+        var hold = HoldTheFile();
+
+        var write = _service.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "a", Path = _dbPath }]);
+        await Task.Delay(300);
+        hold.Dispose();
+        await write;
+
+        Assert.Single(await _service.ReadItemsAsync<DatabaseMetadata>());
+    }
+
+    [Fact]
+    public async Task AFileHeldThroughoutEndsInDatabaseBusy()
+    {
+        using var hold = HoldTheFile();
+        var waited = System.Diagnostics.Stopwatch.StartNew();
+
+        var thrown = await Assert.ThrowsAsync<DatabaseBusyException>(
+            () => _service.ReadItemsAsync<DatabaseMetadata>());
+
+        // 100 + 200 + 400 + 800 + 1600 ms between the attempts
+        Assert.True(waited.Elapsed >= TimeSpan.FromSeconds(3), $"Gave up after {waited.Elapsed}.");
+        Assert.Contains(Path.GetFileName(_dbPath), thrown.Message);
+        Assert.IsAssignableFrom<IOException>(thrown.InnerException);
+    }
+
+    [Fact]
+    public async Task OpeningAHeldCatalogueEndsInDatabaseBusy()
+    {
+        using var hold = HoldTheFile();
+
+        await Assert.ThrowsAsync<DatabaseBusyException>(
+            () => new DatabaseService().EnsureDatabaseReadyAsync(_dbPath));
+    }
+
+    [Fact]
+    public async Task AFileThatIsNotACatalogueIsRefusedWithoutWaiting()
+    {
+        var path = SpilledPath();
+        File.WriteAllText(path, "This is not a catalogue.");
+        var waited = System.Diagnostics.Stopwatch.StartNew();
+
+        await Assert.ThrowsAsync<InvalidDataException>(
+            () => new DatabaseService().EnsureDatabaseReadyAsync(path));
+
+        Assert.True(waited.Elapsed < TimeSpan.FromSeconds(1), $"Took {waited.Elapsed}.");
+    }
+
+    // A file system allows spaces at either end of a name, and the catalogue has to keep them, or
+    // the path it gives is wrong and every rescan sees the file as removed and added again
+    [Theory]
+    [InlineData(" leading.txt")]
+    [InlineData("trailing.txt ")]
+    [InlineData("  both  ")]
+    public async Task NamesKeepTheirSpaces(string name)
+    {
+        var record = new FileRecord { Id = Guid.NewGuid(), Name = name };
+        await _service.InsertItemsAsync([record]);
+
+        Assert.Equal(name, Assert.Single(await _service.ReadItemsAsync<FileRecord>()).Name);
+    }
+
+    #region Read-only catalogues
+
+    private async Task<string> ReadOnlyCatalogueAsync()
+    {
+        await _service.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "kept", Path = _dbPath }]);
+        File.SetAttributes(_dbPath, File.GetAttributes(_dbPath) | FileAttributes.ReadOnly);
+        return _dbPath;
+    }
+
+    private void Writable() => File.SetAttributes(_dbPath, File.GetAttributes(_dbPath) & ~FileAttributes.ReadOnly);
+
+    [Fact]
+    public async Task AReadOnlyCatalogueOpensForReading()
+    {
+        var path = await ReadOnlyCatalogueAsync();
+        var before = File.ReadAllBytes(path);
+        try
+        {
+            var service = new DatabaseService();
+            await service.EnsureDatabaseReadyAsync(path);
+
+            Assert.True(service.IsReadOnly);
+            Assert.Equal("kept", Assert.Single(await service.ReadItemsAsync<DatabaseMetadata>()).Name);
+            Assert.Equal(1, await service.CountItemsAsync<DatabaseMetadata>());
+            Assert.Equal(before, File.ReadAllBytes(path));
+        }
+        finally
+        {
+            Writable();
+        }
+    }
+
+    [Fact]
+    public async Task EveryWriteToAReadOnlyCatalogueIsRefusedAndChangesNothing()
+    {
+        var path = await ReadOnlyCatalogueAsync();
+        var before = File.ReadAllBytes(path);
+        try
+        {
+            var service = new DatabaseService();
+            await service.EnsureDatabaseReadyAsync(path);
+            var announced = 0;
+            service.Modified += (_, _) => announced++;
+
+            var item = new DatabaseMetadata { Id = Guid.NewGuid(), Name = "new", Path = path };
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.InsertItemsAsync([item]));
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.UpdateItemsAsync([item]));
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.RemoveItemsAsync<DatabaseMetadata>([item.Id]));
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.RemoveItemsAsync<DatabaseMetadata>(x => x.Name == "kept"));
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.TransactionAsync(_ => { }));
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() => service.ShrinkDatabaseAsync());
+
+            Assert.Equal(0, announced);
+            Assert.Equal(before, File.ReadAllBytes(path));
+        }
+        finally
+        {
+            Writable();
+        }
+    }
+
+    [Fact]
+    public async Task ReplacingAReadOnlyCatalogueIsRefused()
+    {
+        var path = await ReadOnlyCatalogueAsync();
+        var before = File.ReadAllBytes(path);
+        try
+        {
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(
+                () => new DatabaseService().EnsureDatabaseReadyAsync(path, replace: true));
+
+            Assert.Equal(before, File.ReadAllBytes(path));
+        }
+        finally
+        {
+            Writable();
+        }
+    }
+
+    [Fact]
+    public async Task OpeningAWritableCatalogueAfterAReadOnlyOneWritesAgain()
+    {
+        var readOnly = await ReadOnlyCatalogueAsync();
+        try
+        {
+            var service = new DatabaseService();
+            await service.EnsureDatabaseReadyAsync(readOnly);
+
+            var writable = SpilledPath();
+            await service.EnsureDatabaseReadyAsync(writable);
+            await service.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "w", Path = writable }]);
+
+            Assert.False(service.IsReadOnly);
+        }
+        finally
+        {
+            Writable();
+        }
+    }
+
+    // A share or a disc: the file itself allows writing, the place it is kept does not
+    [Fact]
+    public async Task ACatalogueInAFolderThatCannotBeWrittenIsReadOnly()
+    {
+        if (!OperatingSystem.IsWindows())
+            return;
+
+        var folder = Directory.CreateDirectory(Path.Combine(Path.GetTempPath(), $"VVO_ReadOnlyFolder_{Guid.NewGuid()}"));
+        var path = Path.Combine(folder.FullName, "catalogue.vvo");
+        var writer = new DatabaseService();
+        await writer.EnsureDatabaseReadyAsync(path);
+        await writer.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "kept", Path = path }]);
+
+        var user = System.Security.Principal.WindowsIdentity.GetCurrent().User!;
+        var denial = new System.Security.AccessControl.FileSystemAccessRule(
+            user,
+            System.Security.AccessControl.FileSystemRights.CreateFiles | System.Security.AccessControl.FileSystemRights.WriteData,
+            System.Security.AccessControl.InheritanceFlags.ContainerInherit | System.Security.AccessControl.InheritanceFlags.ObjectInherit,
+            System.Security.AccessControl.PropagationFlags.None,
+            System.Security.AccessControl.AccessControlType.Deny);
+        var security = folder.GetAccessControl();
+        security.AddAccessRule(denial);
+        folder.SetAccessControl(security);
+
+        try
+        {
+            var service = new DatabaseService();
+            await service.EnsureDatabaseReadyAsync(path);
+
+            Assert.True(service.IsReadOnly);
+            Assert.Single(await service.ReadItemsAsync<DatabaseMetadata>());
+            await Assert.ThrowsAsync<CatalogueReadOnlyException>(() =>
+                service.InsertItemsAsync([new DatabaseMetadata { Id = Guid.NewGuid(), Name = "x", Path = path }]));
+        }
+        finally
+        {
+            security.RemoveAccessRule(denial);
+            folder.SetAccessControl(security);
+            try { folder.Delete(true); } catch { }
+        }
+    }
+
+    #endregion
 }

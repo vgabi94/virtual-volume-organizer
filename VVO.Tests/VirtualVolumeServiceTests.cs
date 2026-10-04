@@ -1,4 +1,4 @@
-using VVO.Core.Models;
+﻿using VVO.Core.Models;
 using VVO.Core.Services;
 
 namespace VVO.Tests;
@@ -71,6 +71,55 @@ public class VirtualVolumeServiceTests : IDisposable
         await Assert.ThrowsAsync<ArgumentException>(() => _service.CreateVirtualVolumeAsync(name, "HardDrive"));
     }
 
+    #region Names that would read as deeper paths
+
+    [Theory]
+    [InlineData(@"C:\Backups")]
+    [InlineData("Backups:2")]
+    public async Task AVolumeNameWithASeparatorIsRefused(string name)
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("Backups", "HardDrive");
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.CreateVirtualVolumeAsync(name, "HardDrive"));
+        Assert.Equal(volume, Assert.Single(await _service.GetVirtualVolumesAsync()));
+    }
+
+    [Theory]
+    [InlineData(@"2024\summer")]
+    [InlineData("photos:old")]
+    public async Task AFolderLabelWithASeparatorIsRefused(string label)
+    {
+        var volume = await _service.CreateVirtualVolumeAsync("Backups", "HardDrive");
+        var entry = await AddFolderAsync(volume.Id);
+        var tree = TestTree.Root("other").Build();
+
+        await Assert.ThrowsAsync<ArgumentException>(() => _service.CopyFolderAsync(entry.Id, volume.Id, label));
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            _service.AddFolderAsync(volume.Id, tree.Metadata with { Label = label }, tree.Records.ToList()));
+
+        var stored = Assert.Single(await _database.ReadItemsAsync<RootFolderMetadata>());
+        Assert.Null(stored.Label);
+    }
+
+    // Catalogues written before the rule keep their names, and undo puts back what was there:
+    // through a restore, or through an update for a rename or a new label
+    [Fact]
+    public async Task WhatIsAlreadyStoredCanBePutBack()
+    {
+        var volume = new VirtualVolumeRecord { Id = Guid.NewGuid(), Name = @"C:\Backups", Icon = "HardDrive" };
+        await _service.RestoreVirtualVolumeAsync(volume);
+        var entry = await AddFolderAsync(volume.Id);
+
+        await _service.UpdateVirtualVolumeAsync(volume.Id, "Backups", "HardDrive", null);
+        await _service.UpdateVirtualVolumeAsync(volume.Id, @"C:\Backups", "HardDrive", null);
+        var labelled = await _service.UpdateFolderAsync(entry.Id, @"2024\summer", null, null, null);
+
+        Assert.Equal(@"C:\Backups", Assert.Single(await _service.GetVirtualVolumesAsync()).Name);
+        Assert.Equal(@"2024\summer", labelled.Label);
+    }
+
+    #endregion
+
     [Fact]
     public async Task CreateVirtualVolume_StoresItsAppearance()
     {
@@ -116,7 +165,7 @@ public class VirtualVolumeServiceTests : IDisposable
     [Fact]
     public async Task UpdateVirtualVolume_RejectsAnUnknownVolume()
     {
-        await Assert.ThrowsAsync<ArgumentException>(
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(
             () => _service.UpdateVirtualVolumeAsync(Guid.NewGuid(), "Backups", "HardDrive", null));
     }
 
@@ -149,7 +198,7 @@ public class VirtualVolumeServiceTests : IDisposable
     [Fact]
     public async Task DeleteVirtualVolume_RejectsAnUnknownVolume()
     {
-        await Assert.ThrowsAsync<ArgumentException>(() => _service.DeleteVirtualVolumeAsync(Guid.NewGuid()));
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(() => _service.DeleteVirtualVolumeAsync(Guid.NewGuid()));
     }
 
     [Fact]
@@ -186,7 +235,7 @@ public class VirtualVolumeServiceTests : IDisposable
     {
         var tree = TestTree.Root().Build();
 
-        await Assert.ThrowsAsync<ArgumentException>(
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(
             () => _service.AddFolderAsync(Guid.NewGuid(), tree.Metadata, tree.Records.ToList()));
     }
 
@@ -206,7 +255,7 @@ public class VirtualVolumeServiceTests : IDisposable
     {
         var tree = TestTree.Root().Build();
 
-        await Assert.ThrowsAsync<ArgumentException>(
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(
             () => _service.AddFolderAsync(Guid.NewGuid(), tree.Metadata, tree.Records.ToList()));
 
         Assert.Empty(await FilesOfAsync(tree.Metadata.TreeId));
@@ -263,7 +312,7 @@ public class VirtualVolumeServiceTests : IDisposable
     [Fact]
     public async Task UpdateFolder_RejectsAnUnknownEntry()
     {
-        await Assert.ThrowsAsync<ArgumentException>(
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(
             () => _service.UpdateFolderAsync(Guid.NewGuid(), "Renamed", null, null, null));
     }
 
@@ -322,8 +371,8 @@ public class VirtualVolumeServiceTests : IDisposable
         var volume = await _service.CreateVirtualVolumeAsync("Backups", "HardDrive");
         var original = await AddFolderAsync(volume.Id);
 
-        await Assert.ThrowsAsync<ArgumentException>(() => _service.CopyFolderAsync(Guid.NewGuid(), volume.Id));
-        await Assert.ThrowsAsync<ArgumentException>(() => _service.CopyFolderAsync(original.Id, Guid.NewGuid()));
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(() => _service.CopyFolderAsync(Guid.NewGuid(), volume.Id));
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(() => _service.CopyFolderAsync(original.Id, Guid.NewGuid()));
         Assert.Single(await _service.GetFoldersAsync(volume.Id));
     }
 
@@ -350,8 +399,8 @@ public class VirtualVolumeServiceTests : IDisposable
         var volume = await _service.CreateVirtualVolumeAsync("Backups", "HardDrive");
         var folder = await AddFolderAsync(volume.Id);
 
-        await Assert.ThrowsAsync<ArgumentException>(() => _service.MoveFolderAsync(Guid.NewGuid(), volume.Id));
-        await Assert.ThrowsAsync<ArgumentException>(() => _service.MoveFolderAsync(folder.Id, Guid.NewGuid()));
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(() => _service.MoveFolderAsync(Guid.NewGuid(), volume.Id));
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(() => _service.MoveFolderAsync(folder.Id, Guid.NewGuid()));
     }
 
     #endregion
@@ -372,7 +421,7 @@ public class VirtualVolumeServiceTests : IDisposable
     [Fact]
     public async Task RemoveFolder_RejectsAnUnknownEntry()
     {
-        await Assert.ThrowsAsync<ArgumentException>(() => _service.RemoveFolderAsync(Guid.NewGuid()));
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(() => _service.RemoveFolderAsync(Guid.NewGuid()));
     }
 
     [Fact]
@@ -492,8 +541,7 @@ public class VirtualVolumeServiceTests : IDisposable
         await AddFolderAsync(volume.Id, "two");
         var reported = new List<string>();
 
-        await _service.DeleteVirtualVolumeAsync(volume.Id, new Progress<string>(reported.Add));
-        await Task.Yield();
+        await _service.DeleteVirtualVolumeAsync(volume.Id, new ReportedProgress(reported));
 
         Assert.Contains(reported, message => message.Contains("2 of 2"));
     }
@@ -538,8 +586,7 @@ public class VirtualVolumeServiceTests : IDisposable
         await _service.CopyFolderAsync(entry.Id, other.Id);
         var reported = new List<string>();
 
-        await _service.RemoveFolderAsync(entry.Id, new Progress<string>(reported.Add));
-        await Task.Yield();
+        await _service.RemoveFolderAsync(entry.Id, new ReportedProgress(reported));
 
         Assert.DoesNotContain(reported, message => message.StartsWith("Deleting files"));
         Assert.NotEmpty(await FilesOfAsync(entry.TreeId));
@@ -646,7 +693,7 @@ public class VirtualVolumeServiceTests : IDisposable
     [Fact]
     public async Task RemoveRecords_RejectsAnUnknownRecord()
     {
-        await Assert.ThrowsAsync<ArgumentException>(() => _service.RemoveRecordsAsync([Guid.NewGuid()]));
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(() => _service.RemoveRecordsAsync([Guid.NewGuid()]));
     }
 
     [Fact]
@@ -825,7 +872,7 @@ public class VirtualVolumeServiceTests : IDisposable
     [Fact]
     public async Task AddRecords_RejectsAMissingParent()
     {
-        await Assert.ThrowsAsync<ArgumentException>(
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(
             () => _service.AddRecordsAsync(Guid.NewGuid(), []));
     }
 
@@ -870,9 +917,8 @@ public class VirtualVolumeServiceTests : IDisposable
         var reported = new List<string>();
 
         await _service.AddFolderAsync(
-            volume.Id, tree.Metadata, tree.Records.ToList(), new Progress<string>(reported.Add));
+            volume.Id, tree.Metadata, tree.Records.ToList(), new ReportedProgress(reported));
 
-        await Task.Yield();
         Assert.Contains(reported, message => message.Contains("3 of 3"));
     }
 
@@ -1029,7 +1075,7 @@ public class VirtualVolumeServiceTests : IDisposable
     {
         var rescanned = Rescanned();
 
-        await Assert.ThrowsAsync<ArgumentException>(() => _service.UpdateFolderContentsAsync(
+        await Assert.ThrowsAsync<CatalogueItemNotFoundException>(() => _service.UpdateFolderContentsAsync(
             Guid.NewGuid(), rescanned.Metadata, rescanned.Records.ToList()));
     }
 
@@ -1074,9 +1120,8 @@ public class VirtualVolumeServiceTests : IDisposable
         var reported = new List<string>();
 
         await _service.UpdateFolderContentsAsync(
-            folder.Id, rescanned.Metadata, rescanned.Records.ToList(), new Progress<string>(reported.Add));
+            folder.Id, rescanned.Metadata, rescanned.Records.ToList(), new ReportedProgress(reported));
 
-        await Task.Yield();
         Assert.Contains(reported, message => message.Contains("Removing"));
         Assert.Contains(reported, message => message.Contains("3 of 3"));
     }

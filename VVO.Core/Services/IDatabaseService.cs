@@ -16,6 +16,12 @@ public interface IDatabaseService
     string DbPath { get; }
 
     /// <summary>
+    /// The open catalogue can be read but not written: every write ends in
+    /// <see cref="CatalogueReadOnlyException"/> with nothing changed.
+    /// </summary>
+    bool IsReadOnly { get; }
+
+    /// <summary>
     /// Sets current working database file and ensures the tables are initialized. Anything the
     /// file already holds is cleared out first when <paramref name="replace"/> is asked for.
     /// </summary>
@@ -38,6 +44,12 @@ public interface IDatabaseService
     Task RemoveItemsAsync<T>(Expression<Func<T, bool>> predicate);
     Task<IReadOnlyCollection<T>> ReadItemsAsync<T>();
     Task<IReadOnlyCollection<T>> FindItemsAsync<T>(Expression<Func<T, bool>> predicate);
+
+    /// <summary>
+    /// Counts without reading the records, which for a catalogue of a whole drive is most of
+    /// what a read costs. Every item is counted when no predicate is given.
+    /// </summary>
+    Task<int> CountItemsAsync<T>(Expression<Func<T, bool>>? predicate = null);
     /// <summary>
     /// Rewrites the database without the space deleted records were holding. Cancellation is
     /// taken between the steps rather than during them: the compaction itself is one call into

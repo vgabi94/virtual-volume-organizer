@@ -1,0 +1,70 @@
+{
+  "folder": {
+    "id": "00000000-0000-0000-0000-000000000103",
+    "parentId": "00000000-0000-0000-0000-000000000100",
+    "treeId": "00000000-0000-0000-0000-000000000100",
+    "isFolder": true,
+    "name": "photos",
+    "size": 6144,
+    "created": "2026-01-01T00:00:00Z",
+    "modified": "2026-01-01T00:00:00Z",
+    "entries": [
+      {
+        "entryId": "00000000-0000-0000-0000-000000000010",
+        "cataloguePath": "Backups:\\Holidays\\photos",
+        "physicalPath": "<disk>\\photos"
+      },
+      {
+        "entryId": "00000000-0000-0000-0000-000000000020",
+        "cataloguePath": "Archive:\\ice\\photos",
+        "physicalPath": "<disk>\\photos"
+      }
+    ]
+  },
+  "children": [
+    {
+      "id": "00000000-0000-0000-0000-000000000105",
+      "parentId": "00000000-0000-0000-0000-000000000103",
+      "treeId": "00000000-0000-0000-0000-000000000100",
+      "isFolder": true,
+      "name": "trip",
+      "size": 4096,
+      "created": "2026-01-01T00:00:00Z",
+      "modified": "2026-01-01T00:00:00Z",
+      "entries": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000010",
+          "cataloguePath": "Backups:\\Holidays\\photos\\trip",
+          "physicalPath": "<disk>\\photos\\trip"
+        },
+        {
+          "entryId": "00000000-0000-0000-0000-000000000020",
+          "cataloguePath": "Archive:\\ice\\photos\\trip",
+          "physicalPath": "<disk>\\photos\\trip"
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000104",
+      "parentId": "00000000-0000-0000-0000-000000000103",
+      "treeId": "00000000-0000-0000-0000-000000000100",
+      "isFolder": false,
+      "name": "beach.jpg",
+      "size": 2048,
+      "created": "2026-01-01T00:00:00Z",
+      "modified": "2026-01-01T00:00:00Z",
+      "entries": [
+        {
+          "entryId": "00000000-0000-0000-0000-000000000010",
+          "cataloguePath": "Backups:\\Holidays\\photos\\beach.jpg",
+          "physicalPath": "<disk>\\photos\\beach.jpg"
+        },
+        {
+          "entryId": "00000000-0000-0000-0000-000000000020",
+          "cataloguePath": "Archive:\\ice\\photos\\beach.jpg",
+          "physicalPath": "<disk>\\photos\\beach.jpg"
+        }
+      ]
+    }
+  ]
+}
