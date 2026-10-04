@@ -10,7 +10,7 @@
         x:Name="MainWindow"
         Icon="/Assets/vvo2.ico"
         Title="Virtual Volume Organizer"
-        Background="{DynamicResource WindowBackground}">
+        Classes="AppWindow">
 
     <Grid RowDefinitions="Auto, *">
         <Grid ColumnDefinitions="Auto, *, Auto" Background="{DynamicResource ChromeBackground}">

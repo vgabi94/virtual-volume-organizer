@@ -18,6 +18,7 @@
                  the Fluent colour it was drawn in before it had a name, so a theme that changes one
                  role leaves the others where they were. -->
             <SolidColorBrush x:Key="WindowBackground" Color="#000000"/>
+            <StaticResource x:Key="WindowFallbackBackground" ResourceKey="WindowBackground"/>
             <SolidColorBrush x:Key="ChromeBackground" Color="#1F1F1F"/>
             <SolidColorBrush x:Key="SidebarBackground" Color="#2B2B2B"/>
             <SolidColorBrush x:Key="StartPageBackground" Color="#2B2B2B"/>
@@ -80,6 +81,7 @@
             <SolidColorBrush x:Key="DialogBackground" Color="#FAF9F7"/>
 
             <SolidColorBrush x:Key="WindowBackground" Color="#FAF9F7"/>
+            <StaticResource x:Key="WindowFallbackBackground" ResourceKey="WindowBackground"/>
             <SolidColorBrush x:Key="ChromeBackground" Color="#EDEBE7"/>
             <SolidColorBrush x:Key="SidebarBackground" Color="#F2F0EC"/>
             <SolidColorBrush x:Key="StartPageBackground" Color="#F2F0EC"/>

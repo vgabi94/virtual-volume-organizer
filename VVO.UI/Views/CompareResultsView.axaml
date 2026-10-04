@@ -5,7 +5,7 @@
         x:DataType="vm:CompareResultsViewModel"
         Title="{Binding WindowTitle}" Width="960" Height="620"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource WindowBackground}">
+        Classes="AppWindow">
 
     <Window.Styles>
         <Style Selector="DataGridRow.Added">

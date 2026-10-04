@@ -24,7 +24,7 @@ public class ThemeTests : UiTestBase
         "DiffAddedBackground", "DiffAddedSelectedBackground", "DiffAddedForeground",
         "DiffRemovedBackground", "DiffRemovedSelectedBackground", "DiffRemovedForeground",
         "DiffChangedBackground", "DiffChangedSelectedBackground", "DiffChangedForeground",
-        "WindowBackground", "ChromeBackground", "SidebarBackground", "StartPageBackground",
+        "WindowBackground", "WindowFallbackBackground", "ChromeBackground", "SidebarBackground", "StartPageBackground",
         "ContentBackground", "ContentBorderBrush", "StatusBarBackground", "DividerBrush",
         "TextPrimaryBrush", "TextSecondaryBrush", "TextTertiaryBrush", "IconBrush",
         "HoverBackground", "PressedBackground", "SelectionBackground", "SelectionForeground",
@@ -224,6 +224,60 @@ public class ThemeTests : UiTestBase
 
     private static double Luminance(Color colour) =>
         (0.299 * colour.R + 0.587 * colour.G + 0.114 * colour.B) / 255.0;
+
+    #endregion
+
+    #region The backdrop
+
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void AWindowAsksForMicaUnderAMicaTheme(bool dark)
+    {
+        Shell.RequestedThemeVariant = Theme.VariantFor(dark, mica: true);
+
+        Assert.Equal(
+            [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.None],
+            Shell.TransparencyLevelHint);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void AWindowAsksForNothingUnderAPlainTheme(bool dark)
+    {
+        Shell.RequestedThemeVariant = Theme.VariantFor(dark, mica: false);
+
+        Assert.Empty(Shell.TransparencyLevelHint);
+    }
+
+    // The headless platform draws no Mica, which is what Windows 10 or a remote session amounts to
+    [AvaloniaTheory]
+    [InlineData(true, "#202227")]
+    [InlineData(false, "#F3F4F7")]
+    public void WhereNoMicaIsDrawnTheWindowIsPaintedASolidColourOfItsTheme(bool dark, string expected)
+    {
+        var window = new Window { Classes = { "AppWindow" }, RequestedThemeVariant = Theme.VariantFor(dark, mica: true) };
+        window.Show();
+
+        Assert.Equal(WindowTransparencyLevel.None, window.ActualTransparencyLevel);
+        Assert.Contains(Theme.OpaqueClass, window.Classes);
+        Assert.Equal(Color.Parse(expected), Assert.IsAssignableFrom<ISolidColorBrush>(window.Background).Color);
+        window.Close();
+    }
+
+    // Choosing Mica from Options happens with the window already open
+    [AvaloniaFact]
+    public void AWindowAlreadyOpenWhenMicaIsChosenIsPaintedInMicasSolidColour()
+    {
+        var window = new Window { Classes = { "AppWindow" }, RequestedThemeVariant = ThemeVariant.Dark };
+        window.Show();
+
+        window.RequestedThemeVariant = Theme.MicaDark;
+
+        Assert.Equal(Color.Parse("#202227"), Assert.IsAssignableFrom<ISolidColorBrush>(window.Background).Color);
+        window.Close();
+    }
 
     #endregion
 

@@ -13,6 +13,7 @@ public partial class App : Application
     {
         AvaloniaXamlLoader.Load(this);
         Layout.Track();
+        Theme.Track();
     }
 
     public override void OnFrameworkInitializationCompleted()
