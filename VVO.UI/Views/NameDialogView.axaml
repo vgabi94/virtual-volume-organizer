@@ -15,7 +15,7 @@
             <TextBox Text="{Binding Name, Mode=TwoWay}" Padding="10,8"/>
             <TextBlock Text="{Binding NameProblem}"
                        IsVisible="{Binding NameProblem, Converter={x:Static ObjectConverters.IsNotNull}}"
-                       Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                       Foreground="{DynamicResource ErrorTextBrush}"
                        TextWrapping="Wrap"
                        FontSize="12"/>
         </StackPanel>

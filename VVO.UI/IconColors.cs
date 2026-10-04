@@ -20,7 +20,7 @@ public static class IconColors
             // variant in force finds the wrong shade or none at all.
             return application != null
                    && application.TryFindResource(
-                       "SystemControlForegroundBaseMediumBrush", application.ActualThemeVariant, out var resource)
+                       "IconBrush", application.ActualThemeVariant, out var resource)
                    && resource is ISolidColorBrush brush
                 ? brush.Color
                 : Colors.Gray;

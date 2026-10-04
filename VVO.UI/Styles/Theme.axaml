@@ -9,10 +9,6 @@
             <!-- Set apart from the panel behind it, which the theme's own value is not -->
             <SolidColorBrush x:Key="TextControlBackground" Color="#1C1C1C"/>
 
-            <!-- Stated rather than laid over the window as a wash of white, which left the
-                 listing taking its colour from whatever happened to be behind it -->
-            <SolidColorBrush x:Key="ExplorerBackground" Color="#181818"/>
-
             <!-- Level with the menu bar, so a dialog reads as part of the application rather
                  than as a hole cut in it -->
             <SolidColorBrush x:Key="DialogBackground" Color="#1F1F1F"/>
@@ -24,6 +20,8 @@
             <SolidColorBrush x:Key="ChromeBackground" Color="#1F1F1F"/>
             <SolidColorBrush x:Key="SidebarBackground" Color="#2B2B2B"/>
             <SolidColorBrush x:Key="StartPageBackground" Color="#2B2B2B"/>
+            <!-- Stated rather than laid over the window as a wash of white, which left the
+                 listing taking its colour from whatever happened to be behind it -->
             <SolidColorBrush x:Key="ContentBackground" Color="#181818"/>
             <SolidColorBrush x:Key="ContentBorderBrush" Color="#33FFFFFF"/>
             <SolidColorBrush x:Key="StatusBarBackground" Color="#1F1F1F"/>
@@ -58,7 +56,6 @@
 
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFF"/>
-            <SolidColorBrush x:Key="ExplorerBackground" Color="#FFFDFB"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#FAF9F7"/>
 
             <SolidColorBrush x:Key="WindowBackground" Color="#FAF9F7"/>

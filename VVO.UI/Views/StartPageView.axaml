@@ -7,7 +7,7 @@
              x:Class="VVO.UI.Views.StartPageView"
              x:DataType="vm:StartPageViewModel"
              x:Name="StartPage"
-             Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+             Background="{DynamicResource StartPageBackground}">
 
     <!-- Everything shares one centred column so headings, rows and buttons keep a single
          left edge whatever the window width -->

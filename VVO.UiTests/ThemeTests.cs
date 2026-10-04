@@ -19,7 +19,7 @@ public class ThemeTests : UiTestBase
     /// <summary>Every colour the application defines for itself rather than taking from Fluent.</summary>
     private static readonly string[] OwnBrushes =
     [
-        "TextControlBackground", "ExplorerBackground", "DialogBackground",
+        "TextControlBackground", "DialogBackground",
         "DiffAddedBackground", "DiffAddedSelectedBackground", "DiffAddedForeground",
         "DiffRemovedBackground", "DiffRemovedSelectedBackground", "DiffRemovedForeground",
         "DiffChangedBackground", "DiffChangedSelectedBackground", "DiffChangedForeground",
@@ -50,7 +50,6 @@ public class ThemeTests : UiTestBase
         ("ChromeBackground", "SystemControlBackgroundChromeMediumBrush"),
         ("SidebarBackground", "SystemControlBackgroundChromeMediumLowBrush"),
         ("StartPageBackground", "SystemControlBackgroundChromeMediumLowBrush"),
-        ("ContentBackground", "ExplorerBackground"),
         ("ContentBorderBrush", "SystemControlForegroundBaseLowBrush"),
         ("StatusBarBackground", "SystemControlBackgroundChromeMediumBrush"),
         ("DividerBrush", "SystemControlForegroundBaseLowBrush"),

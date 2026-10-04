@@ -17,14 +17,14 @@
     </Design.PreviewWith>
     
     <Style Selector="Window">
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
     </Style>
 
     <Style Selector="Menu.MenuBarStyle">
-      <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumBrush}" />
+      <Setter Property="Background" Value="{DynamicResource ChromeBackground}" />
     </Style>
     <Style Selector="Menu.MenuBarStyle > MenuItem">
-      <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     </Style>
 
     <!-- Invisible until the pointer lands on it. MinWidth has to be set as well as Width: the

@@ -19,7 +19,7 @@
                                    Text="{Binding Action}"
                                    FontSize="13"
                                    TextWrapping="Wrap"
-                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

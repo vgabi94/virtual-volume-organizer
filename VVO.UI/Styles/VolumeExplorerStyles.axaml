@@ -15,14 +15,14 @@
 
     <Style Selector="DataGridColumnHeader">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="SeparatorBrush" Value="Transparent" />
         <Setter Property="Padding" Value="10,5" />
     </Style>
 
     <Style Selector="DataGridRow:selected">
-        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+        <Setter Property="Background" Value="{DynamicResource RowSelectionBackground}" />
     </Style>
 
     <Style Selector="DataGridCell">
@@ -32,7 +32,7 @@
     <Style Selector="TextBox.SearchBox">
         <Setter Property="CornerRadius" Value="4" />
         <Setter Property="Padding" Value="8,6" />
-        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource ControlBackground}"/>
         <Setter Property="InnerLeftContent">
             <Setter.Value>
                 <Template>
@@ -49,22 +49,22 @@
     <Style Selector="Border.PathViewStyle">
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="0"/>
-        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource ControlBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}"/>
         <Setter Property="CornerRadius" Value="4" />
         <Setter Property="Margin" Value="8, 0" />
     </Style>
 
     <Style Selector="Border.PathViewStyle Button.PathUp">
         <Setter Property="Background" Value="{DynamicResource TextControlBackground}"/>
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource IconBrush}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Margin" Value="0"/>
     </Style>
 
     <Style Selector="Border.PathViewStyle Button.Breadcrumb">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="4,2"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -73,14 +73,14 @@
     </Style>
 
     <Style Selector="Border.PathViewStyle TextBlock.VolumePrefix">
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Margin" Value="8,0,0,0"/>
     </Style>
 
     <Style Selector="Border.PathViewStyle TextBlock.BreadcrumbSeparator">
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseLowBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
     

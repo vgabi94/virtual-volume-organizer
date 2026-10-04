@@ -4,7 +4,7 @@
              x:Class="VVO.UI.Views.VolumeExplorerView"
              x:DataType="vm:VolumeExplorerViewModel"
              x:Name="Explorer"
-             Background="{DynamicResource ExplorerBackground}">
+             Background="{DynamicResource ContentBackground}">
     <Grid RowDefinitions="Auto, *">
         <Grid Grid.Row="0" ColumnDefinitions="2*, Auto, *, Auto, Auto" Margin="{DynamicResource VolumeExplorerHeaderMargin}">
             <!-- A Grid, not a StackPanel: a horizontal stack measures its children with
@@ -53,7 +53,7 @@
                     <PathIcon Classes="SidebarIcon" Data="{StaticResource FilePlus}"/>
                 </Button>
             </StackPanel>
-            <TextBlock Grid.Column="4" Text="{Binding ItemSummary}" VerticalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
+            <TextBlock Grid.Column="4" Text="{Binding ItemSummary}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
         </Grid>
 
         <DataGrid Grid.Row="1" x:Name="FileGrid" ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile, Mode=TwoWay}" SelectionMode="Extended" Classes="ExplorerGrid" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" IsReadOnly="True" Margin="{DynamicResource VolumeExplorerHorizontalMargin}" DoubleTapped="OnFileGridDoubleTapped" ContextRequested="OnFileGridContextRequested" SelectionChanged="OnFileGridSelectionChanged">
@@ -80,7 +80,7 @@
                                           Classes.FlipY="{Binding IsIconFlipped}"
                                           Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"
                                           VerticalAlignment="Center"
-                                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                          Foreground="{DynamicResource IconBrush}"/>
                                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </DataTemplate>

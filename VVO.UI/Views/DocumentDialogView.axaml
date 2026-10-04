@@ -13,12 +13,12 @@
         <Border Grid.Row="0"
                 BorderThickness="1"
                 CornerRadius="4"
-                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+                BorderBrush="{DynamicResource DividerBrush}">
             <ScrollViewer Padding="14" HorizontalScrollBarVisibility="Auto">
                 <SelectableTextBlock Text="{Binding Text}"
                                      FontFamily="Consolas,Menlo,Monospace"
                                      FontSize="12"
-                                     Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                     Foreground="{DynamicResource TextSecondaryBrush}"/>
             </ScrollViewer>
         </Border>
 

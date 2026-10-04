@@ -17,7 +17,7 @@
             <TextBox Text="{Binding FolderName, Mode=TwoWay}" Padding="10,8"/>
             <TextBlock Text="{Binding NameProblem}"
                        IsVisible="{Binding NameProblem, Converter={x:Static ObjectConverters.IsNotNull}}"
-                       Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
+                       Foreground="{DynamicResource ErrorTextBrush}"
                        TextWrapping="Wrap"
                        FontSize="12"/>
         </StackPanel>
@@ -34,7 +34,7 @@
         <TextBlock Grid.Row="2" Text="Icon" FontWeight="Medium" FontSize="13"/>
 
         <Border Grid.Row="3"
-                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderBrush="{DynamicResource DividerBrush}"
                 BorderThickness="1"
                 CornerRadius="4"
                 Padding="4">

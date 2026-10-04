@@ -15,14 +15,14 @@
             <TextBlock Text="{Binding AppName}" FontWeight="Bold" FontSize="18"/>
             <TextBlock Text="{Binding Version, StringFormat='Version {0}'}"
                        FontSize="13"
-                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Spacing="4">
             <TextBlock Text="{Binding IconsCredit}"
                        TextWrapping="Wrap"
                        FontSize="13"
-                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
             <HyperlinkButton Content="GitHub"
                              NavigateUri="{Binding RepositoryUrl}"
                              FontSize="13"

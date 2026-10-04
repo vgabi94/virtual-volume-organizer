@@ -16,11 +16,11 @@
                       Width="24" Height="24"
                       VerticalAlignment="Top"
                       Margin="0,2,14,0"
-                      Foreground="{DynamicResource DiffRemovedForeground}"/>
+                      Foreground="{DynamicResource DangerBrush}"/>
             <StackPanel Grid.Column="1" Spacing="10">
                 <TextBlock Text="{Binding ItemName}" FontWeight="Bold" FontSize="15" TextTrimming="CharacterEllipsis"/>
                 <TextBlock TextWrapping="Wrap"
-                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
                            Text="{Binding Message}"/>
             </StackPanel>
         </Grid>
@@ -39,7 +39,7 @@
                     Click="OnDeleteClicked"
                     IsDefault="True"
                     IsEnabled="{Binding CanDelete}"
-                    Foreground="{DynamicResource DiffRemovedForeground}"
+                    Foreground="{DynamicResource DangerBrush}"
                     Padding="18,7"/>
         </StackPanel>
     </Grid>

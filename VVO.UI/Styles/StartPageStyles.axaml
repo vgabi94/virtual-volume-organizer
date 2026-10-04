@@ -59,11 +59,11 @@
     </Style>
 
     <Style Selector="Button.BigButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource HoverBackground}"/>
     </Style>
 
     <Style Selector="Button.BigButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListMediumBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource PressedBackground}"/>
     </Style>
 
     <Style Selector="Button.BigButton > StackPanel">
@@ -74,7 +74,7 @@
         <Setter Property="Width" Value="{StaticResource StartPageIconSize}"/>
         <Setter Property="Height" Value="{StaticResource StartPageIconSize}"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource IconBrush}"/>
     </Style>
 
     <Style Selector="Button.BigButton TextBlock">
@@ -95,7 +95,7 @@
 
     <Style Selector="TextBlock.EmptyHint">
         <Setter Property="FontSize" Value="{StaticResource StartPageItemPathFontSize}"/>
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseLowBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}"/>
         <Setter Property="Margin" Value="8,0,0,0"/>
     </Style>
 
@@ -119,12 +119,12 @@
 
     <Style Selector="Button.RecentLink:pointerover TextBlock.RecentName">
         <Setter Property="TextDecorations" Value="Underline"/>
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
     </Style>
 
     <Style Selector="Button.RecentLink:pointerover TextBlock.RecentPath">
         <Setter Property="TextDecorations" Value="Underline"/>
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
     </Style>
 
     <Style Selector="Button.RecentLink /template/ ContentPresenter#PART_ContentPresenter">
@@ -132,7 +132,7 @@
     </Style>
 
     <Style Selector="Button.RecentLink:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource HoverBackground}"/>
     </Style>
 
     <Style Selector="TextBlock.RecentName">
@@ -143,7 +143,7 @@
 
     <Style Selector="TextBlock.RecentPath">
         <Setter Property="FontSize" Value="{StaticResource StartPageItemPathFontSize}"/>
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseLowBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
@@ -166,10 +166,10 @@
     <Style Selector="Button.RecentRemove PathIcon">
         <Setter Property="Width" Value="{StaticResource IconChevron}"/>
         <Setter Property="Height" Value="{StaticResource IconChevron}"/>
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource IconBrush}"/>
     </Style>
 
     <Style Selector="Button.RecentRemove:pointerover PathIcon">
-        <Setter Property="Foreground" Value="{DynamicResource DiffRemovedForeground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
     </Style>
 </Styles>

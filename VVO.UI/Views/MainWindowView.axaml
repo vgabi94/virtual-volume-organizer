@@ -10,10 +10,10 @@
         x:Name="MainWindow"
         Icon="/Assets/vvo2.ico"
         Title="Virtual Volume Organizer"
-        Background="{DynamicResource SystemRegionBrush}">
+        Background="{DynamicResource WindowBackground}">
 
     <Grid RowDefinitions="Auto, *">
-        <Grid ColumnDefinitions="Auto, *, Auto" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+        <Grid ColumnDefinitions="Auto, *, Auto" Background="{DynamicResource ChromeBackground}">
             <Menu Classes="MenuBarStyle">
                 <MenuItem Header="_File">
                     <MenuItem Header="_New Database..." HotKey="Ctrl+N" InputGesture="Ctrl+N" Command="{Binding SidebarViewModel.NewDatabaseCommand}" CommandParameter="{Binding #MainWindow}"/>
@@ -89,7 +89,7 @@
                 </StackPanel>
                 <PathIcon Data="{StaticResource DatabaseCheck}"
                           Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"
-                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                          Foreground="{DynamicResource IconBrush}"
                           HorizontalAlignment="Right" VerticalAlignment="Center"
                           Margin="0,0,12,0"
                           IsVisible="{Binding IsDatabaseStatusVisible}"

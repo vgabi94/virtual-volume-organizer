@@ -4,13 +4,13 @@
              x:Class="VVO.UI.Views.SidebarView"
              x:DataType="vm:SidebarViewModel"
              x:Name="Sidebar"
-             Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+             Background="{DynamicResource SidebarBackground}">
     <Grid RowDefinitions="Auto, Auto, Auto, *">
         
         <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="{DynamicResource SidebarHeaderMargin}">
             <StackPanel>
-                <TextBlock Text="{Binding DatabaseName}" FontWeight="Bold" FontSize="{DynamicResource SidebarTitleFontSize}" VerticalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
-                <TextBlock Text="{Binding DatabasePath}" Foreground="{DynamicResource SystemControlForegroundBaseLowBrush}" FontSize="{StaticResource SidebarItemSubtitleFontSize}" />
+                <TextBlock Text="{Binding DatabaseName}" FontWeight="Bold" FontSize="{DynamicResource SidebarTitleFontSize}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <TextBlock Text="{Binding DatabasePath}" Foreground="{DynamicResource TextTertiaryBrush}" FontSize="{StaticResource SidebarItemSubtitleFontSize}" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
                 <Button ToolTip.Tip="New Database" Classes="LowEmphasis" Command="{Binding NewDatabaseCommand}" CommandParameter="{Binding #Sidebar}">
@@ -97,7 +97,7 @@
                                                       Data="{Binding IconData}"
                                                       Foreground="{Binding IconBrush}"
                                                       Margin="{DynamicResource SidebarVolumeIconMargin}"/>
-                                            <TextBlock Grid.Column="2" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                             <Button Grid.Column="3" ToolTip.Tip="Scan folder into this volume" Classes="LowEmphasis" Command="{Binding Owner.AddFolderCommand}" CommandParameter="{Binding}">
                                                 <PathIcon Classes="SidebarIcon FlipY" Data="{StaticResource ScanSearch}"/>
                                             </Button>
@@ -107,7 +107,7 @@
                                             <Button Grid.Column="5" ToolTip.Tip="Delete virtual volume" Classes="LowEmphasis" Command="{Binding Owner.DeleteVirtualVolumeCommand}" CommandParameter="{Binding}">
                                                 <PathIcon Classes="SidebarIcon" Data="{StaticResource DiskRemove}"/>
                                             </Button>
-                                            <TextBlock Grid.Column="6" Text="{Binding Folders.Count}" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="{DynamicResource SidebarItemCountMargin}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="6" Text="{Binding Folders.Count}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="{DynamicResource SidebarItemCountMargin}" VerticalAlignment="Center"/>
                                         </Grid>
                                     </ToggleButton>
                                     <ListBox ItemsSource="{Binding Folders}"

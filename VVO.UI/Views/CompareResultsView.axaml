@@ -5,7 +5,7 @@
         x:DataType="vm:CompareResultsViewModel"
         Title="{Binding WindowTitle}" Width="960" Height="620"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource SystemRegionBrush}">
+        Background="{DynamicResource WindowBackground}">
 
     <Window.Styles>
         <Style Selector="DataGridRow.Added">
@@ -49,17 +49,17 @@
     <Grid RowDefinitions="Auto, *, Auto" Margin="16">
         <StackPanel Grid.Row="0" Spacing="4" Margin="4,0,4,12">
             <Grid ColumnDefinitions="70, *">
-                <TextBlock Grid.Column="0" Text="Source" FontWeight="Bold" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                <TextBlock Grid.Column="0" Text="Source" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
                 <TextBlock Grid.Column="1" Text="{Binding SourceName}" TextTrimming="CharacterEllipsis"/>
             </Grid>
             <Grid ColumnDefinitions="70, *">
-                <TextBlock Grid.Column="0" Text="Target" FontWeight="Bold" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                <TextBlock Grid.Column="0" Text="Target" FontWeight="Bold" Foreground="{DynamicResource TextSecondaryBrush}"/>
                 <TextBlock Grid.Column="1" Text="{Binding TargetName}" TextTrimming="CharacterEllipsis"/>
             </Grid>
             <TextBlock Text="{Binding Summary}" Margin="0,8,0,0" FontWeight="Bold"/>
             <TextBlock Text="{Binding Proposal}"
                        TextWrapping="Wrap"
-                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
                        IsVisible="{Binding IsUpdate}"/>
         </StackPanel>
 
@@ -67,7 +67,7 @@
                    Text="No differences found."
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
-                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
                    IsVisible="{Binding !HasDifferences}"/>
 
         <DataGrid Grid.Row="1"
@@ -99,7 +99,7 @@
                                           Classes.FlipY="{Binding IsIconFlipped}"
                                           Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"
                                           VerticalAlignment="Center"
-                                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                          Foreground="{DynamicResource IconBrush}"/>
                                 <TextBlock Text="{Binding Path}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </DataTemplate>
