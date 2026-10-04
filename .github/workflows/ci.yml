@@ -53,3 +53,21 @@ jobs:
         name: VirtualVolumeOrganizer-win-x64
         path: publish/win-x64/VirtualVolumeOrganizer.exe
         retention-days: 14
+
+    # A folder of its own, so neither publish can leave anything in the other's output
+    - name: Publish the command line as a self-contained executable
+      if: github.ref == 'refs/heads/main'
+      run: >
+        dotnet publish VVO.Cli/VVO.Cli.csproj -c Release -r win-x64 --self-contained true
+        -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true
+        -p:DebugType=none -p:DebugSymbols=false
+        -p:SourceRevisionId=${{ github.sha }}
+        -o publish/cli-win-x64
+
+    - name: Upload the command line
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: vvo-win-x64
+        path: publish/cli-win-x64/vvo.exe
+        retention-days: 14
