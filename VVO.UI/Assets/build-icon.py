@@ -1,4 +1,4 @@
-"""Regenerate vvo2.ico from vvo2.svg. Run after editing the SVG.
+"""Regenerate vvo2.ico and vvo2.png from vvo2.svg. Run after editing the SVG.
 
     python build-icon.py
 
@@ -21,6 +21,9 @@ except ImportError:
 HERE = Path(__file__).parent
 SOURCE = HERE / "vvo2.svg"
 TARGET = HERE / "vvo2.ico"
+# What the app draws itself, in the title bar and on the start page
+PNG_TARGET = HERE / "vvo2.png"
+PNG_SIZE = 128
 
 # Sizes Windows Explorer and the taskbar pick from across 100–300% DPI.
 # Anything absent gets stretched by the shell instead. 256 is PNG-compressed
@@ -124,8 +127,10 @@ def main() -> None:
     ensure_rasterizer()
     with tempfile.TemporaryDirectory() as tmp:
         frames = [(size, rasterize(size, Path(tmp))) for size in sorted(SIZES)]
+        PNG_TARGET.write_bytes(to_png(rasterize(PNG_SIZE, Path(tmp))))
     TARGET.write_bytes(pack(frames))
     print(f"{TARGET.name}: {len(SIZES)} sizes, {TARGET.stat().st_size:,} bytes")
+    print(f"{PNG_TARGET.name}: {PNG_SIZE}px, {PNG_TARGET.stat().st_size:,} bytes")
 
 
 if __name__ == "__main__":

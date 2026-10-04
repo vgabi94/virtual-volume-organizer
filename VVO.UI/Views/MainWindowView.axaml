@@ -10,11 +10,13 @@
         x:Name="MainWindow"
         Icon="/Assets/vvo2.ico"
         Title="Virtual Volume Organizer"
-        Classes="AppWindow">
+        Classes="AppWindow MenuInTitleBar">
 
     <Grid RowDefinitions="Auto, *, Auto" ColumnDefinitions="Auto, *">
-        <Grid Grid.ColumnSpan="2" ColumnDefinitions="Auto, *" Background="{DynamicResource ChromeBackground}">
-            <Menu Classes="MenuBarStyle">
+        <Grid Grid.ColumnSpan="2" Classes="MenuBar" ColumnDefinitions="Auto, Auto, *" Background="{DynamicResource ChromeBackground}">
+            <Image Classes="TitleBarIcon" Source="/Assets/vvo2.png"/>
+            <Border Grid.Column="2" Classes="TitleBarDrag"/>
+            <Menu Grid.Column="1" Classes="MenuBarStyle">
                 <MenuItem Header="_File">
                     <MenuItem Header="_New Database..." HotKey="Ctrl+N" InputGesture="Ctrl+N" Command="{Binding SidebarViewModel.NewDatabaseCommand}" CommandParameter="{Binding #MainWindow}"/>
                     <MenuItem Header="_Open Database..." HotKey="Ctrl+O" InputGesture="Ctrl+O" Command="{Binding SidebarViewModel.OpenDatabaseCommand}" CommandParameter="{Binding #MainWindow}"/>

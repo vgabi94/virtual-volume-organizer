@@ -34,6 +34,31 @@
         <Setter Property="Background" Value="{DynamicResource WindowFallbackBackground}"/>
     </Style>
 
+    <!-- The Modern layout draws the menu row as the title bar, beside the system caption buttons -->
+    <Style Selector="Window.Modern.MenuInTitleBar">
+        <Setter Property="ExtendClientAreaToDecorationsHint" Value="True"/>
+        <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="{StaticResource TitleBarHeight}"/>
+    </Style>
+    <Style Selector="Window.Modern Grid.MenuBar">
+        <Setter Property="Height" Value="{StaticResource TitleBarHeight}"/>
+    </Style>
+    <Style Selector="Image.TitleBarIcon">
+        <Setter Property="IsVisible" Value="False"/>
+        <Setter Property="Width" Value="{StaticResource IconMedium}"/>
+        <Setter Property="Height" Value="{StaticResource IconMedium}"/>
+        <Setter Property="Margin" Value="{StaticResource TitleBarIconMargin}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Window.Modern Image.TitleBarIcon">
+        <Setter Property="IsVisible" Value="True"/>
+    </Style>
+    <!-- The platform moves, maximises and snaps the window from here; the role only takes effect
+         while the window is extended into its title bar -->
+    <Style Selector="Border.TitleBarDrag">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="WindowDecorationProperties.ElementRole" Value="TitleBar"/>
+    </Style>
+
     <Style Selector="StackPanel.StatusMessage">
         <Setter Property="Orientation" Value="Horizontal"/>
         <Setter Property="Spacing" Value="{StaticResource StatusSpacing}"/>

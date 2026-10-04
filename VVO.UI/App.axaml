@@ -110,6 +110,8 @@
         <sys:Double x:Key="StatusBarFontSize">12</sys:Double>
         <Thickness x:Key="StatusBarStartMargin">18,0,0,0</Thickness>
         <Thickness x:Key="StatusBarEndMargin">0,0,18,0</Thickness>
+        <sys:Double x:Key="TitleBarHeight">40</sys:Double>
+        <Thickness x:Key="TitleBarIconMargin">12,0,6,0</Thickness>
     </Application.Resources>
     
     <Application.Styles>
