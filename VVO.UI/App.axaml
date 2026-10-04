@@ -37,6 +37,16 @@
         <sys:Double x:Key="StartPageCaptionFontSize">14</sys:Double>
         <sys:Double x:Key="StartPageItemFontSize">14</sys:Double>
         <sys:Double x:Key="StartPageItemPathFontSize">13</sys:Double>
+        <!-- The Modern start page: the app's mark over its name, and the two ways in as cards -->
+        <sys:Double x:Key="StartPageLogoSize">76</sys:Double>
+        <sys:Double x:Key="StartPageTitleFontSize">28</sys:Double>
+        <sys:Double x:Key="StartPageHeroSpacing">22</sys:Double>
+        <!-- Half the content width, less half the gap between the two -->
+        <sys:Double x:Key="StartPageCardWidth">224</sys:Double>
+        <Thickness x:Key="StartPageCardPadding">18</Thickness>
+        <sys:Double x:Key="StartPageCardSpacing">14</sys:Double>
+        <sys:Double x:Key="StartPageCardIconSize">22</sys:Double>
+        <CornerRadius x:Key="CardCornerRadius">8</CornerRadius>
 
         <Thickness x:Key="VolumeExplorerHeaderMargin">20,10</Thickness>
         <Thickness x:Key="VolumeExplorerBackButtonMargin">0,0,5,0</Thickness>

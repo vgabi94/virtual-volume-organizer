@@ -142,6 +142,7 @@
     </Style>
 
     <Style Selector="TextBlock.RecentPath">
+        <Setter Property="Grid.Column" Value="1"/>
         <Setter Property="FontSize" Value="{StaticResource StartPageItemPathFontSize}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -171,5 +172,69 @@
 
     <Style Selector="Button.RecentRemove:pointerover PathIcon">
         <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
+    </Style>
+
+    <!-- The Modern layout -->
+
+    <Style Selector="StackPanel.StartHero">
+        <Setter Property="IsVisible" Value="False"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Spacing" Value="{StaticResource StartPageHeroSpacing}"/>
+    </Style>
+    <Style Selector="Window.Modern StackPanel.StartHero">
+        <Setter Property="IsVisible" Value="True"/>
+    </Style>
+    <Style Selector="StackPanel.StartHero > Image">
+        <Setter Property="Width" Value="{StaticResource StartPageLogoSize}"/>
+        <Setter Property="Height" Value="{StaticResource StartPageLogoSize}"/>
+    </Style>
+    <Style Selector="StackPanel.StartHero > TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource StartPageTitleFontSize}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="Window.Modern StackPanel.BigButtonsGroup">
+        <Setter Property="Spacing" Value="{StaticResource StartPageCardSpacing}"/>
+    </Style>
+    <Style Selector="Window.Modern Button.BigButton">
+        <Setter Property="Width" Value="{StaticResource StartPageCardWidth}"/>
+        <Setter Property="Padding" Value="{StaticResource StartPageCardPadding}"/>
+        <Setter Property="Background" Value="{DynamicResource ControlBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource FrameThickness}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+    </Style>
+    <Style Selector="Window.Modern Button.BigButton /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}"/>
+    </Style>
+    <Style Selector="Window.Modern Button.BigButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+    <Style Selector="Window.Modern Button.BigButton > StackPanel">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="Spacing" Value="{StaticResource StartPageCardSpacing}"/>
+    </Style>
+    <Style Selector="Window.Modern Button.BigButton PathIcon">
+        <Setter Property="Width" Value="{StaticResource StartPageCardIconSize}"/>
+        <Setter Property="Height" Value="{StaticResource StartPageCardIconSize}"/>
+        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+    <Style Selector="Window.Modern Button.BigButton TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+
+    <!-- Name over path -->
+    <Style Selector="Window.Modern TextBlock.RecentName">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+    <Style Selector="Window.Modern TextBlock.RecentPath">
+        <Setter Property="Grid.Row" Value="1"/>
+        <Setter Property="Grid.Column" Value="0"/>
+        <Setter Property="Grid.ColumnSpan" Value="2"/>
+        <Setter Property="FontSize" Value="{StaticResource ItemSubtitleFontSize}"/>
     </Style>
 </Styles>
