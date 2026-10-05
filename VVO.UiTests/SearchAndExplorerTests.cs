@@ -224,7 +224,7 @@ public class SearchAndExplorerTests : UiTestBase
         new(Theme.All.SelectMany(theme => new[] { (theme.Key, true), (theme.Key, false) }));
 
     // Hovered and focused too, which Fluent would otherwise repaint in its own frame. Focus keeps
-    // only its accent colour, so the caret is not the one sign of where typing goes.
+    // only its accent colour, hovered or not, so the caret is not the one sign of where typing goes.
     [AvaloniaTheory]
     [MemberData(nameof(EveryThemeInBothLayouts))]
     public void BothSearchBoxesAreFramedLikeThePathBox(string theme, bool modern)
@@ -255,21 +255,25 @@ public class SearchAndExplorerTests : UiTestBase
         foreach (var box in boxes)
         {
             var frame = box.GetVisualDescendants().OfType<Border>().First(border => border.Name == "PART_BorderElement");
-            foreach (var state in new[] { "", ":pointerover", ":focus" })
+            var states = (IPseudoClasses)box.Classes;
+            Color? focused = null;
+            foreach (var state in new[] { "", ":pointerover", ":focus", ":focus:pointerover" })
             {
-                var states = (IPseudoClasses)box.Classes;
-                if (state != "")
-                    states.Add(state);
+                var set = state.Split(':', StringSplitOptions.RemoveEmptyEntries).Select(name => ":" + name).ToList();
+                set.ForEach(states.Add);
                 Pump();
 
-                if (state != ":focus")
+                if (state == ":focus")
+                    focused = ColourOf(frame.BorderBrush);
+                else if (state.StartsWith(":focus"))
+                    Assert.Equal(focused, ColourOf(frame.BorderBrush));
+                else
                     Assert.Equal(ColourOf(path.BorderBrush), ColourOf(frame.BorderBrush));
                 Assert.Equal(path.BorderThickness, frame.BorderThickness);
                 Assert.Equal(path.CornerRadius, frame.CornerRadius);
                 Assert.Equal(ColourOf(path.Background), ColourOf(frame.Background));
 
-                if (state != "")
-                    states.Remove(state);
+                set.ForEach(name => states.Remove(name));
             }
         }
 

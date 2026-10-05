@@ -45,7 +45,7 @@
 
     <!-- Fluent repaints the frame on hover and focus; it keeps the Path box's, and focus only
          takes the accent colour -->
-    <Style Selector="TextBox.SearchBox:pointerover /template/ Border#PART_BorderElement">
+    <Style Selector="TextBox.SearchBox:pointerover:not(:focus) /template/ Border#PART_BorderElement">
         <Setter Property="Background" Value="{DynamicResource ControlBackground}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}"/>
     </Style>
