@@ -161,6 +161,11 @@ public class WholeOutputTests : IAsyncLifetime
     public Task Compare(string culture, string zone) =>
         AssertMatchesAsync("compare.json", culture, zone, ["compare", Older.ToString(), Photos.ToString()]);
 
+    // The older tree is listed once, so its folder has a place on disk; the current one twice, so it has none
+    [Theory, MemberData(nameof(Machines))]
+    public Task CompareSubfolders(string culture, string zone) =>
+        AssertMatchesAsync("compare-subfolders.json", culture, zone, ["compare", Id(202).ToString(), Record(3).ToString()]);
+
     #endregion
 
     #region Writing

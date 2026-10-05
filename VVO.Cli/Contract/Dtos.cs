@@ -91,6 +91,19 @@ public sealed record RecordDto(
 public sealed record TreeEntryDto(int Depth, RecordDto Record);
 
 /// <summary>
+/// What one side of a comparison starts from: a folder entry, a folder inside a tree, or a folder
+/// read from disk, which was never stored and so has neither id.
+/// </summary>
+/// <param name="EntryId">The folder entry, when the side was named by one.</param>
+/// <param name="RecordId">The folder record the rows are relative to: the top of the tree for an entry.</param>
+/// <param name="Title">The entry's title, or the folder's own name for a folder inside a tree.</param>
+/// <param name="Path">
+/// Where the folder is on disk. For a folder inside a tree, null unless exactly one entry lists the
+/// tree, since each entry can place it somewhere else.
+/// </param>
+public sealed record ComparedSideDto(Guid? EntryId, Guid? RecordId, string? Title, string? Path);
+
+/// <summary>
 /// One side of a compared pair. A side read from disk was never stored, so it has no id.
 /// </summary>
 public sealed record ComparedRecordDto(Guid? Id, bool IsFolder, string Name, long Size, DateTime Created, DateTime Modified)
