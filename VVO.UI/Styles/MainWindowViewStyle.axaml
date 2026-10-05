@@ -114,14 +114,13 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Margin" Value="{StaticResource StatusBarStartMargin}"/>
     </Style>
+    <!-- In the Last Write icon's place, which is hidden while an operation runs -->
     <Style Selector="Window.Modern StackPanel.StatusMessage">
         <Setter Property="Grid.Row" Value="2"/>
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="Margin" Value="{StaticResource StatusBarStartMargin}"/>
+        <Setter Property="Margin" Value="{StaticResource StatusBarEndMargin}"/>
     </Style>
     <Style Selector="Window.Modern TextBlock.StatusMessage">
         <Setter Property="FontSize" Value="{StaticResource StatusBarFontSize}"/>
-        <Setter Property="TextAlignment" Value="Left"/>
     </Style>
     <Style Selector="Window.Modern PathIcon.DatabaseStatus">
         <Setter Property="Grid.Row" Value="2"/>

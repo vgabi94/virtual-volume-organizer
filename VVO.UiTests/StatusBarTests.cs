@@ -1,4 +1,7 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Messaging;
@@ -96,6 +99,42 @@ public class StatusBarTests : UiTestBase
         using var probe = new MessageProbe<CancelRequestedMessage>();
         cancel.Command!.Execute(cancel.CommandParameter);
         Assert.Single(probe.All);
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void TheModernLayoutShowsARunningOperationOnTheRightInTheLastWriteIconsPlace()
+    {
+        var (window, _) = Opened(modern: true);
+        var icon = Classed<PathIcon>(window, "DatabaseStatus");
+        var iconRight = icon.Bounds.Right;
+
+        WeakReferenceMessenger.Default.Send(new UpdateStatusMessage(true, "Scanning... 1 files", true));
+        Pump();
+
+        var status = Classed<StackPanel>(window, "StatusMessage");
+        Assert.False(Shown(icon));
+        Assert.Equal(HorizontalAlignment.Right, status.HorizontalAlignment);
+        Assert.Equal(iconRight, status.Bounds.Right, 0.5);
+        Assert.Equal(TextAlignment.Right, Classed<TextBlock>(window, "StatusMessage").TextAlignment);
+
+        // The summary keeps the left
+        var summary = Classed<TextBlock>(window, "StatusSummary");
+        Assert.True(Shown(summary));
+        Assert.True(summary.Bounds.Right < status.Bounds.Left);
+
+        // A count that grows reads further left, and what follows it stays put
+        var indicator = status.Children[1];
+        var indicatorAt = indicator.TranslatePoint(default, window);
+        WeakReferenceMessenger.Default.Send(new UpdateStatusMessage(true, "Scanning... 1,234,567 files", true));
+        Pump();
+        Assert.Equal(indicatorAt, indicator.TranslatePoint(default, window));
+
+        WeakReferenceMessenger.Default.Send(new UpdateStatusMessage(false, "", false));
+        Pump();
+        Assert.False(Shown(status));
+        Assert.True(Shown(icon));
+        Assert.Equal(iconRight, icon.Bounds.Right);
         window.Close();
     }
 
