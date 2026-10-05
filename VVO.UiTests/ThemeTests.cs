@@ -142,6 +142,72 @@ public class ThemeTests : UiTestBase
             Assert.NotEqual(PaintOf(name, plain), PaintOf(name, derived)));
     }
 
+    public static TheoryData<string> TheMockupThemes =>
+    [
+        "AmethystDark", "AmethystLight", "PaperDark", "PaperLight",
+        "SageDark", "SageLight", "NebulaDark", "NebulaLight"
+    ];
+
+    [AvaloniaTheory]
+    [MemberData(nameof(EveryTheme))]
+    public void TextReadsOnTheContentOfEveryTheme(string key) =>
+        AssertReadable(key, "TextPrimaryBrush", "TextSecondaryBrush");
+
+    // Inherited from the plain themes, so read again on each new ground
+    [AvaloniaTheory]
+    [MemberData(nameof(TheMockupThemes))]
+    public void DiffColoursAndWarningsReadOnTheContentOfEachMockupTheme(string key) =>
+        AssertReadable(key, "DiffAddedForeground", "DiffRemovedForeground", "DiffChangedForeground", "DangerBrush", "ErrorTextBrush");
+
+    // Read where they land: on the content layer, over whatever of the window's gradient it lets through
+    private static void AssertReadable(string key, params string[] names)
+    {
+        var variant = Theme.Named(key).Variant;
+        var window = Application.Current!.TryGetResource("WindowBackground", variant, out var found) && found is GradientBrush gradient
+            ? gradient.GradientStops.Select(stop => stop.Color).ToList()
+            : [SolidOf("WindowBackground", variant)];
+        var grounds = window.Select(colour => Over(SolidOf("ContentBackground", variant), colour)).ToList();
+
+        Assert.All(names, name => Assert.All(grounds, ground =>
+        {
+            var ratio = ContrastOf(Over(SolidOf(name, variant), ground), ground);
+            Assert.True(ratio >= 4.5, $"'{name}' reads at {ratio:F2}:1 on {ground}");
+        }));
+    }
+
+    private static Color SolidOf(string key, ThemeVariant variant)
+    {
+        var brush = BrushOf(key, variant);
+        return Color.FromArgb((byte)Math.Round(brush.Color.A * brush.Opacity), brush.Color.R, brush.Color.G, brush.Color.B);
+    }
+
+    private static Color Over(Color top, Color bottom)
+    {
+        var alpha = top.A / 255.0;
+        byte Mix(byte over, byte under) => (byte)Math.Round(over * alpha + under * (1 - alpha));
+
+        return Color.FromRgb(Mix(top.R, bottom.R), Mix(top.G, bottom.G), Mix(top.B, bottom.B));
+    }
+
+    // The WCAG contrast ratio
+    private static double ContrastOf(Color one, Color other)
+    {
+        static double Channel(byte value)
+        {
+            var linear = value / 255.0;
+            return linear <= 0.04045 ? linear / 12.92 : Math.Pow((linear + 0.055) / 1.055, 2.4);
+        }
+
+        static double RelativeLuminance(Color colour) =>
+            0.2126 * Channel(colour.R) + 0.7152 * Channel(colour.G) + 0.0722 * Channel(colour.B);
+
+        var (lighter, darker) = (RelativeLuminance(one), RelativeLuminance(other));
+        if (lighter < darker)
+            (lighter, darker) = (darker, lighter);
+
+        return (lighter + 0.05) / (darker + 0.05);
+    }
+
     // Two variants resolving to one colour is a value that was never given a second reading
     [AvaloniaFact]
     public void TheTwoThemesAgreeOnNothingTheApplicationDefinesForItself()

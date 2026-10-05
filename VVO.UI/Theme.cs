@@ -24,6 +24,14 @@ public static class Theme
     // Each one inherits Dark or Light, so it only has to name the colours it changes
     public static readonly ThemeVariant SlateDark = new("SlateDark", ThemeVariant.Dark);
     public static readonly ThemeVariant SlateLight = new("SlateLight", ThemeVariant.Light);
+    public static readonly ThemeVariant AmethystDark = new("AmethystDark", ThemeVariant.Dark);
+    public static readonly ThemeVariant AmethystLight = new("AmethystLight", ThemeVariant.Light);
+    public static readonly ThemeVariant PaperDark = new("PaperDark", ThemeVariant.Dark);
+    public static readonly ThemeVariant PaperLight = new("PaperLight", ThemeVariant.Light);
+    public static readonly ThemeVariant SageDark = new("SageDark", ThemeVariant.Dark);
+    public static readonly ThemeVariant SageLight = new("SageLight", ThemeVariant.Light);
+    public static readonly ThemeVariant NebulaDark = new("NebulaDark", ThemeVariant.Dark);
+    public static readonly ThemeVariant NebulaLight = new("NebulaLight", ThemeVariant.Light);
 
     /// <summary>Every colour theme, in the order Options lists them. The first is the default.</summary>
     public static IReadOnlyList<ColourTheme> All { get; } =
@@ -31,7 +39,15 @@ public static class Theme
         new("Dark", ThemeVariant.Dark),
         new("Light", ThemeVariant.Light),
         new("Slate Dark", SlateDark),
-        new("Slate Light", SlateLight)
+        new("Slate Light", SlateLight),
+        new("Amethyst Dark", AmethystDark),
+        new("Amethyst Light", AmethystLight),
+        new("Paper & Ink Dark", PaperDark),
+        new("Paper & Ink Light", PaperLight),
+        new("Nordic Sage Dark", SageDark),
+        new("Nordic Sage Light", SageLight),
+        new("Nebula Dark", NebulaDark),
+        new("Nebula Light", NebulaLight)
     ];
 
     public static ColourTheme Default => All[0];
