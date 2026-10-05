@@ -929,6 +929,17 @@ public class DatabaseServiceTests : IDisposable
         Assert.Equal(name, Assert.Single(await _service.ReadItemsAsync<FileRecord>()).Name);
     }
 
+    // A folder listed without a path on disk keeps an empty one, which everything placing its
+    // records reads as a string rather than as null
+    [Fact]
+    public async Task AnEmptyPathComesBackEmpty()
+    {
+        var entry = new RootFolderMetadata { Id = Guid.NewGuid(), TreeId = Guid.NewGuid(), Path = string.Empty };
+        await _service.InsertItemsAsync([entry]);
+
+        Assert.Equal(string.Empty, Assert.Single(await _service.ReadItemsAsync<RootFolderMetadata>()).Path);
+    }
+
     #region Read-only catalogues
 
     private async Task<string> ReadOnlyCatalogueAsync()
