@@ -49,6 +49,23 @@
         <Setter Property="TextWrapping" Value="Wrap"/>
     </Style>
 
+    <!-- The folders the sidebar lists stand out from the folders inside them -->
+    <Style Selector="TreeView.FolderChoices TextBlock.Listed">
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+
+    <!-- Pointed at and picked in the theme's own colours, as the sidebar's folders are, rather
+         than in Fluent's accent -->
+    <Style Selector="TreeView.FolderChoices TreeViewItem /template/ Border#PART_LayoutRoot:pointerover">
+        <Setter Property="Background" Value="{DynamicResource HoverBackground}"/>
+    </Style>
+    <Style Selector="TreeView.FolderChoices TreeViewItem:selected /template/ Border#PART_LayoutRoot, TreeView.FolderChoices TreeViewItem:selected /template/ Border#PART_LayoutRoot:pointerover">
+        <Setter Property="Background" Value="{DynamicResource SelectionBackground}"/>
+    </Style>
+    <Style Selector="TreeView.FolderChoices TreeViewItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
+        <Setter Property="Foreground" Value="{DynamicResource SelectionForeground}"/>
+    </Style>
+
     <Style Selector="TextBlock.ItemSubtitle">
         <Setter Property="FontSize" Value="{StaticResource ItemSubtitleFontSize}"/>
         <Setter Property="Opacity" Value="{StaticResource ItemSubtitleOpacity}"/>

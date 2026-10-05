@@ -111,6 +111,11 @@ subtrees are expanded.
 `ChangeKind` covers size and modification time. Creation time is deliberately excluded: copying a
 file changes it without the contents differing.
 
+A comparison starts from whichever folder record the metadata's `TreeId` names, so a folder inside a
+tree is compared by naming it there and passing the whole tree: only what is below it is walked. The
+explorer asks the sidebar to run one through `CompareFoldersMessage`, since the sidebar holds the
+folders the target dialog offers.
+
 ## Export
 
 `DatabaseTransferService` writes the whole catalogue as one JSON document stamped with a

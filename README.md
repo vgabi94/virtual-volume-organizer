@@ -20,7 +20,7 @@ Built with C#, .NET 10, and [Avalonia UI](https://avaloniaui.net/).
 ## Features
 
 - **Fast scanning** with progress, cancellation, and folder size totals.
-- **Diff & compare** between two catalogued folders or against a live drive to see changes.
+- **Diff & compare** between two catalogued folders, at any depth, or against a live drive to see changes.
 - **Update scans** when reconnecting media, with a diff preview before saving.
 - **Virtual volumes** to group folders with custom labels, icons, and colors.
 - **Undo / Redo** for folder and volume edits.

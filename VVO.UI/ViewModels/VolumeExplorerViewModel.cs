@@ -19,6 +19,7 @@ namespace VVO.UI.ViewModels;
 public record FileItem
 {
     public required Guid Id { get; init; }
+    public Guid TreeId { get; init; }
     public required bool IsFolder { get; init; }
     public required string IconKey { get; init; }
     public string Name { get; init; } = string.Empty;
@@ -326,6 +327,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
 
     private void NotifySelectionCommands()
     {
+        CompareCommand.NotifyCanExecuteChanged();
         CopyCommand.NotifyCanExecuteChanged();
         CopyPhysicalCommand.NotifyCanExecuteChanged();
         DeleteCommand.NotifyCanExecuteChanged();
@@ -336,6 +338,37 @@ public partial class VolumeExplorerViewModel : ViewModelBase
         CopyAllCommand.NotifyCanExecuteChanged();
         CopyPhysicalAllCommand.NotifyCanExecuteChanged();
     }
+
+    #endregion
+
+    #region Comparing
+
+    /// <summary>
+    /// Compares a selected folder with whatever the user picks, or two selected folders with
+    /// each other, the first selected on the left.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanCompare))]
+    private async Task CompareAsync()
+    {
+        var folders = Selection().Select(Compared).ToList();
+        if (folders.Count is not (1 or 2))
+            return;
+
+        try
+        {
+            await WeakReferenceMessenger.Default.Send(new CompareFoldersMessage(folders[0], folders.ElementAtOrDefault(1)));
+        }
+        catch (Exception e)
+        {
+            await Logger.ShowErrorAsync(e);
+        }
+    }
+
+    private bool CanCompare() => Selection() is { Count: 1 or 2 } selection && selection.All(item => item.IsFolder);
+
+    // Headed by where it is in the catalogue, since two folders compared often share a name
+    private static ComparedFolder Compared(FileItem folder) =>
+        new(folder.TreeId, folder.Id, folder.VirtualPath, folder.PhysicalPath);
 
     #endregion
 
@@ -984,6 +1017,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
         return new FileItem
         {
             Id = record.Id,
+            TreeId = record.RootFolderId,
             IsFolder = record.IsFolder,
             IconKey = FileIcons.KeyFor(extension, record.IsFolder),
             Name = NameWithoutExtension(record),

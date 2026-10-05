@@ -4,25 +4,30 @@
         x:Class="VVO.UI.Views.CompareTargetDialogView"
         x:DataType="vm:CompareTargetDialogViewModel"
         x:Name="DialogWindow"
-        Title="Compare Against" Width="480" Height="420"
+        Title="Compare Against" Width="480" Height="520"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         ShowInTaskbar="False"
         Background="{DynamicResource DialogBackground}">
 
     <Grid RowDefinitions="Auto, *, Auto, Auto" Margin="{StaticResource DialogMargin}">
-        <TextBlock Grid.Row="0" Text="Compare against a catalogued volume" Classes="DialogLabel" Margin="{StaticResource DialogLabelMargin}"/>
+        <TextBlock Grid.Row="0" Text="Compare against a catalogued folder, or any folder inside one" Classes="DialogLabel" Margin="{StaticResource DialogLabelMargin}"/>
 
-        <ListBox Grid.Row="1" ItemsSource="{Binding Folders}" SelectedItem="{Binding SelectedFolder, Mode=TwoWay}" SelectionMode="Single">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
+        <TreeView Grid.Row="1" Classes="FolderChoices" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemsSource="{Binding Folders}" SelectedItem="{Binding SelectedFolder, Mode=TwoWay}" SelectionMode="Single">
+            <TreeView.Styles>
+                <Style Selector="TreeViewItem" x:DataType="vm:FolderChoice">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                </Style>
+            </TreeView.Styles>
+            <TreeView.ItemTemplate>
+                <TreeDataTemplate DataType="vm:FolderChoice" ItemsSource="{Binding Children}">
                     <StackPanel Margin="{StaticResource DialogListItemMargin}">
-                        <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
-                        <TextBlock Classes="ItemSubtitle" Text="{Binding Path}"/>
+                        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" Classes.Listed="{Binding IsListed}" Classes.ItemSubtitle="{Binding IsPlaceholder}"/>
+                        <TextBlock Classes="ItemSubtitle" Text="{Binding Path}" TextTrimming="CharacterEllipsis" IsVisible="{Binding IsListed}"/>
                     </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
 
         <StackPanel Grid.Row="2" Classes="DialogField" Margin="{StaticResource DialogSectionMargin}">
             <TextBlock Text="...or against a folder on disk" Classes="DialogLabel"/>

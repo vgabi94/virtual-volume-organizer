@@ -242,7 +242,7 @@ public class ViewBuildTests : UiTestBase
             DataContext = new CompareTargetDialogViewModel(choices)
         });
 
-        var list = window.GetVisualDescendants().OfType<ListBox>().Single();
+        var list = window.GetVisualDescendants().OfType<TreeView>().Single();
         Assert.Equal(choices, list.ItemsSource);
         Assert.Contains("Code", TextOf(window).Select(block => block.Text));
         window.Close();

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using VVO.Core.Models;
 
 namespace VVO.UI.Messages;
@@ -61,3 +62,14 @@ public record SearchAllMessage(string Term, IReadOnlyList<SearchScope> Scopes);
 /// so every sidebar row sharing that tree can show the new size.
 /// </summary>
 public record TreeContentsChangedMessage(FileRecord Root);
+
+/// <summary>
+/// Sent by the explorer to have a folder it lists compared: with the second one when there is one,
+/// otherwise with whatever the user picks. The sidebar answers it, offering the folders it lists.
+/// </summary>
+public class CompareFoldersMessage(ViewModels.ComparedFolder left, ViewModels.ComparedFolder? right = null)
+    : AsyncRequestMessage<bool>
+{
+    public ViewModels.ComparedFolder Left { get; } = left;
+    public ViewModels.ComparedFolder? Right { get; } = right;
+}
