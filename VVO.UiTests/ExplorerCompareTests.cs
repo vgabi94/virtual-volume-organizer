@@ -18,6 +18,7 @@ public class ExplorerCompareTests : UiTestBase
     private VolumeExplorerViewModel Explorer { get; }
 
     private RootFolderMetadata _releases = null!;
+    private RootFolderMetadata _code = null!;
 
     public ExplorerCompareTests()
     {
@@ -29,7 +30,7 @@ public class ExplorerCompareTests : UiTestBase
     private async Task GivenReleasesShownAsync()
     {
         var volume = await Volumes.CreateVirtualVolumeAsync("test", "HardDrive");
-        await AddDeepFolderAsync(volume.Id, "Code");
+        _code = await AddDeepFolderAsync(volume.Id, "Code");
 
         var rootId = Guid.NewGuid();
         var v1 = Guid.NewGuid();
@@ -257,6 +258,336 @@ public class ExplorerCompareTests : UiTestBase
         await Until(() => code.Children is [{ Name: "lib" }], "the subfolders to be listed");
 
         Assert.True(code.IsExpanded);
+        window.Close();
+    }
+
+    #endregion
+
+    #region Hardening: what the selection can be
+
+    [AvaloniaFact]
+    public async Task TheCommandIsToldEveryTimeTheSelectionMoves()
+    {
+        await GivenReleasesShownAsync();
+        var told = 0;
+        Explorer.CompareCommand.CanExecuteChanged += (_, _) => told++;
+
+        Select("v1");
+        Select("v1", "v2");
+        Select("notes");
+
+        Assert.True(told >= 3, $"Told {told} times.");
+        Assert.False(Explorer.CompareCommand.CanExecute(null));
+    }
+
+    [AvaloniaFact]
+    public async Task FoldersFoundInTwoTreesAreComparedWithEachOther()
+    {
+        await GivenReleasesShownAsync();
+        await Explorer.SearchAllAsync(new SearchAllMessage("2",
+        [
+            new SearchScope(_code.TreeId, "Code", "test", _code.Path),
+            new SearchScope(_releases.TreeId, "Releases", "test", _releases.Path)
+        ]));
+        Select("2023", "v2");
+
+        await Explorer.CompareCommand.ExecuteAsync(null);
+
+        var results = Results!;
+        Assert.Equal(@"test:\Code\AdventOfCode\2023", results.SourceName);
+        Assert.Equal(@"test:\Releases\v2", results.TargetName);
+        Assert.Equal(["a.txt", "c.txt", "day1.txt"], results.Rows.Select(row => row.Path).Order());
+        Assert.Equal(@"D:\Code\AdventOfCode\2023\day1.txt", results.PathsFor(ComparisonStatus.Removed));
+    }
+
+    // Nothing to put in front of the paths on disk, so the rows are named by where they are below
+    [AvaloniaFact]
+    public async Task FoldersListedWithoutAPathOnDiskAreComparedByTheCatalogueAlone()
+    {
+        var volume = await Volumes.CreateVirtualVolumeAsync("test", "HardDrive");
+        var rootId = Guid.NewGuid();
+        var a = Guid.NewGuid();
+        var b = Guid.NewGuid();
+        await Volumes.AddFolderAsync(volume.Id,
+            new RootFolderMetadata { Id = Guid.NewGuid(), TreeId = rootId, Path = string.Empty, LastScanned = DateTime.UtcNow },
+            [
+                new() { Id = rootId, RootFolderId = rootId, IsFolder = true, Name = "Imported" },
+                new() { Id = a, RootFolderId = rootId, ParentId = rootId, IsFolder = true, Name = "a" },
+                new() { Id = Guid.NewGuid(), RootFolderId = rootId, ParentId = a, Name = "only-in-a.txt", Size = 1 },
+                new() { Id = b, RootFolderId = rootId, ParentId = rootId, IsFolder = true, Name = "b" }
+            ]);
+        await Sidebar.LoadAsync();
+        await Explorer.ShowFolderAsync(new FolderSelectedMessage(rootId, "Imported", "test"));
+        Select("a", "b");
+
+        await Explorer.CompareCommand.ExecuteAsync(null);
+
+        Assert.Equal("only-in-a.txt", Results!.PathsFor(ComparisonStatus.Removed));
+    }
+
+    #endregion
+
+    #region Hardening: folders that change underneath
+
+    [AvaloniaFact]
+    public async Task AFolderPickedThatIsGoneByTheTimeItIsComparedShowsNothing()
+    {
+        await GivenReleasesShownAsync();
+        Select("v1");
+
+        AnswerTheTargetDialog(async dialog =>
+        {
+            var releases = dialog.Folders.Single(choice => choice.Name == "Releases");
+            await releases.OpenAsync();
+            var v2 = releases.Children.Single(choice => choice.Name == "v2");
+            dialog.SelectedFolder = v2;
+
+            await Volumes.RemoveRecordsAsync([v2.FolderId]);
+        });
+
+        await Explorer.CompareCommand.ExecuteAsync(null);
+
+        Assert.Null(Results);
+        Assert.Empty(Told);
+    }
+
+    [AvaloniaFact]
+    public async Task ASelectedFolderDeletedBeforeTheComparisonShowsNothing()
+    {
+        await GivenReleasesShownAsync();
+        Select("v1", "v2");
+        await Volumes.RemoveRecordsAsync([Item("v1").Id]);
+
+        await Explorer.CompareCommand.ExecuteAsync(null);
+
+        Assert.Null(Results);
+        Assert.Empty(Told);
+    }
+
+    #endregion
+
+    #region Hardening: running
+
+    [AvaloniaFact]
+    public async Task TheStatusBarOffersToCallItOffAndIsClearedAfter()
+    {
+        await GivenReleasesShownAsync();
+        Select("v1", "v2");
+        using var reported = new MessageProbe<UpdateStatusMessage>();
+
+        await Explorer.CompareCommand.ExecuteAsync(null);
+
+        Assert.Contains(reported.All, message => message.IsVisible && message.IsCancellable);
+        Assert.False(reported.All[^1].IsVisible);
+    }
+
+    [AvaloniaFact]
+    public async Task CallingOffAComparisonWithDiskShowsNoResults()
+    {
+        await GivenReleasesShownAsync();
+        Select("v1");
+        AnswerDialogs<CompareTargetDialogViewModel>(dialog => dialog.LiveFolderPath = TempDirectory());
+        using var reported = new MessageProbe<UpdateStatusMessage>(_ => Sidebar.Receive(new CancelRequestedMessage()));
+
+        await Explorer.CompareCommand.ExecuteAsync(null);
+
+        Assert.Null(Results);
+        Assert.Empty(Told);
+    }
+
+    [AvaloniaFact]
+    public async Task WithNothingToAnswerItTheRequestIsReportedRatherThanLost()
+    {
+        await GivenReleasesShownAsync();
+        Select("v1", "v2");
+        Detach(Sidebar);
+
+        await Explorer.CompareCommand.ExecuteAsync(null);
+
+        Assert.Null(Results);
+        Assert.Equal("Error", Assert.Single(Told).Title);
+    }
+
+    [AvaloniaFact]
+    public async Task NothingIsComparedWithoutAWindowToShowItOver()
+    {
+        await GivenReleasesShownAsync();
+        Select("v1");
+        VVO.UI.Dialogs.Owner = () => null;
+
+        await Explorer.CompareCommand.ExecuteAsync(null);
+
+        Assert.Empty(Opened);
+        Assert.Empty(Told);
+    }
+
+    #endregion
+
+    #region Hardening: the dialog's folders
+
+    private static FolderChoice Choice(string name, string path, FileRecord[] folders) =>
+        new(folders[0].RootFolderId, name, path, _ => Task.FromResult<IReadOnlyCollection<FileRecord>>(folders));
+
+    private static FileRecord[] Folders(string root, params (string Name, string Parent)[] below)
+    {
+        var rootId = Guid.NewGuid();
+        var records = new List<FileRecord> { new() { Id = rootId, RootFolderId = rootId, IsFolder = true, Name = root } };
+        foreach (var (name, parent) in below)
+        {
+            records.Add(new FileRecord
+            {
+                Id = Guid.NewGuid(), RootFolderId = rootId, IsFolder = true, Name = name,
+                ParentId = parent == root ? rootId : records.Single(record => record.Name == parent).Id
+            });
+        }
+
+        return [.. records];
+    }
+
+    [AvaloniaFact]
+    public async Task AFolderThatCannotBeReadIsReportedAndLeftWithNothingToOpen()
+    {
+        var broken = new FolderChoice(Guid.NewGuid(), "Broken", @"D:\Broken",
+            _ => Task.FromException<IReadOnlyCollection<FileRecord>>(new IOException("the catalogue is gone")));
+
+        await broken.OpenAsync();
+
+        Assert.Empty(broken.Children);
+        Assert.Equal("Error", Assert.Single(Told).Title);
+    }
+
+    [AvaloniaFact]
+    public async Task OpeningAFolderTwiceAtOnceReadsItOnce()
+    {
+        var reads = 0;
+        var release = new TaskCompletionSource<IReadOnlyCollection<FileRecord>>();
+        var folders = Folders("r", ("a", "r"));
+        var choice = new FolderChoice(folders[0].Id, "r", @"D:\r", _ =>
+        {
+            reads++;
+            return release.Task;
+        });
+
+        var first = choice.OpenAsync();
+        var second = choice.OpenAsync();
+        release.SetResult(folders);
+        await Task.WhenAll(first, second);
+
+        Assert.Equal(1, reads);
+        Assert.Equal("a", Assert.Single(choice.Children).Name);
+    }
+
+    [AvaloniaFact]
+    public async Task SubfoldersAreOfferedInNameOrderWhateverTheirCase()
+    {
+        var choice = Choice("r", @"D:\r", Folders("r", ("beta", "r"), ("Alpha", "r"), ("gamma", "r"), ("Delta", "r")));
+
+        await choice.OpenAsync();
+
+        Assert.Equal(["Alpha", "beta", "Delta", "gamma"], choice.Children.Select(child => child.Name));
+    }
+
+    [AvaloniaFact]
+    public async Task AFolderListedWithoutAPathOffersItsSubfoldersWithoutOneEither()
+    {
+        var choice = Choice("r", string.Empty, Folders("r", ("a", "r"), ("b", "a")));
+
+        await choice.OpenAsync();
+        await choice.Children[0].OpenAsync();
+
+        Assert.Equal(string.Empty, choice.Children[0].Path);
+        Assert.Equal(string.Empty, choice.Children[0].Children[0].Path);
+        Assert.Equal(@"r\a\b", choice.Children[0].Children[0].Label);
+    }
+
+    // The sidebar's title heads what the results call a folder inside it, the label included
+    [AvaloniaFact]
+    public async Task ALabelledFolderHeadsTheNamesOfTheFoldersInsideIt()
+    {
+        await GivenReleasesShownAsync();
+        await Volumes.UpdateFolderAsync(_releases.Id, "Shipped", null, null, null);
+        await Sidebar.LoadAsync();
+        Select("v1");
+
+        AnswerTheTargetDialog(async dialog =>
+        {
+            var shipped = dialog.Folders.Single(choice => choice.Name == "Shipped");
+            await shipped.OpenAsync();
+            dialog.SelectedFolder = shipped.Children.Single(choice => choice.Name == "v2");
+        });
+
+        await Explorer.CompareCommand.ExecuteAsync(null);
+
+        Assert.Equal(@"Shipped\v2", Results!.TargetName);
+    }
+
+    [AvaloniaFact]
+    public async Task AFolderInsideAndAFolderOnDiskStandInForEachOther()
+    {
+        var choice = Choice("r", @"D:\r", Folders("r", ("a", "r")));
+        await choice.OpenAsync();
+        var dialog = new CompareTargetDialogViewModel([choice]) { SelectedFolder = choice.Children[0] };
+
+        dialog.LiveFolderPath = @"D:\Elsewhere";
+        Assert.Null(dialog.SelectedFolder);
+
+        dialog.SelectedFolder = choice.Children[0];
+        Assert.Empty(dialog.LiveFolderPath);
+        Assert.True(dialog.CanCompare);
+    }
+
+    // The sidebar's own Compare picks from the same tree of folders
+    [AvaloniaFact]
+    public async Task TheSidebarComparesAListedFolderWithOneInsideAnother()
+    {
+        await GivenReleasesShownAsync();
+        var code = Sidebar.VirtualVolumes.SelectMany(node => node.Folders).Single(folder => folder.Title == "Code");
+
+        AnswerTheTargetDialog(async dialog =>
+        {
+            var releases = dialog.Folders.Single(choice => choice.Name == "Releases");
+            await releases.OpenAsync();
+            dialog.SelectedFolder = releases.Children.Single(choice => choice.Name == "v1");
+        });
+
+        await Sidebar.CompareCommand.ExecuteAsync(code);
+
+        Assert.Equal("Code", Results!.SourceName);
+        Assert.Equal(@"Releases\v1", Results.TargetName);
+    }
+
+    #endregion
+
+    #region Hardening: the menu
+
+    [AvaloniaFact]
+    public async Task TheMenusCompareIsOnForTwoFoldersAndOffWithAFileAmongThem()
+    {
+        await GivenReleasesShownAsync();
+        var window = new Window { Content = new VolumeExplorerView { DataContext = Explorer }, Width = 1000, Height = 700 };
+        window.Show();
+        Pump();
+
+        var grid = window.GetVisualDescendants().OfType<DataGrid>().Single();
+
+        foreach (var (names, enabled) in new[] { (new[] { "v1", "v2" }, true), (new[] { "v1", "notes" }, false) })
+        {
+            grid.SelectedItems.Clear();
+            foreach (var name in names)
+            {
+                grid.SelectedItems.Add(Item(name));
+            }
+
+            Pump();
+            grid.ContextMenu!.Open(grid);
+            Pump();
+
+            // The menu takes the grid's data context only once it is open
+            var compare = grid.ContextMenu.Items.OfType<MenuItem>().Single(item => item.Command == Explorer.CompareCommand);
+            Assert.Equal(enabled, compare.IsEffectivelyEnabled);
+            grid.ContextMenu.Close();
+        }
+
         window.Close();
     }
 
