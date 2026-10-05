@@ -36,10 +36,26 @@
         <Setter Property="Padding" Value="10,5" />
     </Style>
 
-    <Style Selector="TextBox.SearchBox">
-        <Setter Property="CornerRadius" Value="4" />
-        <Setter Property="Padding" Value="8,6" />
+    <Style Selector="Border.PathViewStyle, TextBox.SearchBox">
+        <Setter Property="Border.BorderThickness" Value="{StaticResource FieldBorderThickness}"/>
+        <Setter Property="Border.Background" Value="{DynamicResource ControlBackground}"/>
+        <Setter Property="Border.BorderBrush" Value="{DynamicResource ControlBorderBrush}"/>
+        <Setter Property="Border.CornerRadius" Value="{StaticResource FieldCornerRadius}"/>
+    </Style>
+
+    <!-- Fluent repaints the frame on hover and focus; it keeps the Path box's, and focus only
+         takes the accent colour -->
+    <Style Selector="TextBox.SearchBox:pointerover /template/ Border#PART_BorderElement">
         <Setter Property="Background" Value="{DynamicResource ControlBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}"/>
+    </Style>
+    <Style Selector="TextBox.SearchBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource ControlBackground}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource FieldBorderThickness}"/>
+    </Style>
+
+    <Style Selector="TextBox.SearchBox">
+        <Setter Property="Padding" Value="8,6" />
         <Setter Property="InnerLeftContent">
             <Setter.Value>
                 <Template>
@@ -54,11 +70,7 @@
     </Style>
 
     <Style Selector="Border.PathViewStyle">
-        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="0"/>
-        <Setter Property="Background" Value="{DynamicResource ControlBackground}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}"/>
-        <Setter Property="CornerRadius" Value="4" />
         <Setter Property="Margin" Value="8, 0" />
     </Style>
 

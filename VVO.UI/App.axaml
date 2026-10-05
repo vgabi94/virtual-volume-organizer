@@ -55,6 +55,9 @@
         <Thickness x:Key="VolumeExplorerTitleMargin">10,0,20,0</Thickness>
         <Thickness x:Key="VolumeExplorerHorizontalMargin">10,0</Thickness>
         <sys:Double x:Key="VolumeExplorerSearchBoxWidth">300</sys:Double>
+        <!-- The frame the Path box and both search boxes share -->
+        <Thickness x:Key="FieldBorderThickness">1</Thickness>
+        <CornerRadius x:Key="FieldCornerRadius">4</CornerRadius>
         <sys:Double x:Key="VolumeExplorerIconFontSize">18</sys:Double>
         <sys:Double x:Key="VolumeExplorerCellSpacing">10</sys:Double>
         <!-- Wide enough to grab, narrow enough not to read as a rule between the crumbs and the search -->
