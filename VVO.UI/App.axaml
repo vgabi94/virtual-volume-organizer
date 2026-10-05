@@ -30,8 +30,6 @@
         <Thickness x:Key="SidebarToolbarMargin">8,0,15,4</Thickness>
         <sys:Double x:Key="SidebarTitleFontSize">16</sys:Double>
         <sys:Double x:Key="SidebarIconSmallFontSize">14</sys:Double>
-        <sys:Double x:Key="SidebarItemSubtitleFontSize">11</sys:Double>
-        <sys:Double x:Key="SidebarItemSubtitleOpacity">0.8</sys:Double>
         
         <sys:Double x:Key="StartPageContentWidth">460</sys:Double>
         <sys:Double x:Key="StartPageIconSize">56</sys:Double>
@@ -39,14 +37,115 @@
         <sys:Double x:Key="StartPageCaptionFontSize">14</sys:Double>
         <sys:Double x:Key="StartPageItemFontSize">14</sys:Double>
         <sys:Double x:Key="StartPageItemPathFontSize">13</sys:Double>
+        <!-- The Modern start page: the app's mark over its name, and the two ways in as cards -->
+        <sys:Double x:Key="StartPageLogoSize">76</sys:Double>
+        <sys:Double x:Key="StartPageTitleFontSize">28</sys:Double>
+        <sys:Double x:Key="StartPageHeroSpacing">22</sys:Double>
+        <!-- Half the content width, less half the gap between the two -->
+        <sys:Double x:Key="StartPageCardWidth">224</sys:Double>
+        <Thickness x:Key="StartPageCardPadding">18</Thickness>
+        <sys:Double x:Key="StartPageCardSpacing">14</sys:Double>
+        <sys:Double x:Key="StartPageCardIconSize">22</sys:Double>
+        <CornerRadius x:Key="CardCornerRadius">8</CornerRadius>
+        <sys:Double x:Key="AccentHoverOpacity">0.9</sys:Double>
+        <sys:Double x:Key="AccentPressedOpacity">0.8</sys:Double>
 
         <Thickness x:Key="VolumeExplorerHeaderMargin">20,10</Thickness>
         <Thickness x:Key="VolumeExplorerBackButtonMargin">0,0,5,0</Thickness>
         <Thickness x:Key="VolumeExplorerTitleMargin">10,0,20,0</Thickness>
         <Thickness x:Key="VolumeExplorerHorizontalMargin">10,0</Thickness>
         <sys:Double x:Key="VolumeExplorerSearchBoxWidth">300</sys:Double>
+        <!-- The frame the Path box and both search boxes share -->
+        <Thickness x:Key="FieldBorderThickness">1</Thickness>
+        <CornerRadius x:Key="FieldCornerRadius">4</CornerRadius>
         <sys:Double x:Key="VolumeExplorerIconFontSize">18</sys:Double>
         <sys:Double x:Key="VolumeExplorerCellSpacing">10</sys:Double>
+        <!-- Wide enough to grab, narrow enough not to read as a rule between the crumbs and the search -->
+        <sys:Double x:Key="VolumeExplorerSplitterWidth">2</sys:Double>
+        <sys:Double x:Key="PaneSplitterWidth">4</sys:Double>
+        <!-- The Modern explorer: a raised panel, the volume as a chip and each extension as a tag -->
+        <CornerRadius x:Key="PanelCornerRadius">8,0,0,0</CornerRadius>
+        <Thickness x:Key="PanelBorderThickness">1,1,0,0</Thickness>
+        <Thickness x:Key="VolumeChipMargin">4,0,0,0</Thickness>
+        <Thickness x:Key="VolumeChipPadding">8,2</Thickness>
+        <sys:Double x:Key="VolumeChipSpacing">6</sys:Double>
+        <sys:Double x:Key="VolumeChipIconSize">14</sys:Double>
+        <sys:Double x:Key="TintOpacity">0.14</sys:Double>
+        <CornerRadius x:Key="TagCornerRadius">5</CornerRadius>
+        <Thickness x:Key="ExtensionTagPadding">7,2</Thickness>
+        <sys:Double x:Key="ExtensionTagFontSize">11</sys:Double>
+        <!-- Where the grid's own text columns put their text -->
+        <Thickness x:Key="CellTextMargin">12,0</Thickness>
+
+        <!-- Shared by every row with a title over a fainter line: a sidebar folder, a folder to compare against -->
+        <sys:Double x:Key="ItemSubtitleFontSize">11</sys:Double>
+        <sys:Double x:Key="ItemSubtitleOpacity">0.8</sys:Double>
+
+        <CornerRadius x:Key="FrameCornerRadius">4</CornerRadius>
+        <Thickness x:Key="FrameThickness">1</Thickness>
+
+        <Thickness x:Key="DialogMargin">24</Thickness>
+        <sys:Double x:Key="DialogRowSpacing">14</sys:Double>
+        <!-- Between a label and the field under it -->
+        <sys:Double x:Key="DialogFieldSpacing">6</sys:Double>
+        <Thickness x:Key="DialogLabelMargin">0,0,0,6</Thickness>
+        <!-- Between a checkbox and the note under it, or a heading and the lines under it -->
+        <sys:Double x:Key="DialogNoteSpacing">4</sys:Double>
+        <sys:Double x:Key="DialogTitleSpacing">2</sys:Double>
+        <sys:Double x:Key="DialogContentSpacing">10</sys:Double>
+        <sys:Double x:Key="DialogSectionSpacing">16</sys:Double>
+        <Thickness x:Key="DialogSectionMargin">0,16,0,0</Thickness>
+        <sys:Double x:Key="DialogButtonSpacing">10</sys:Double>
+        <Thickness x:Key="DialogButtonRowMargin">0,20,0,0</Thickness>
+        <Thickness x:Key="DialogButtonPadding">18,7</Thickness>
+        <Thickness x:Key="DialogSmallButtonPadding">10,4</Thickness>
+        <Thickness x:Key="DialogBrowseButtonPadding">14,8</Thickness>
+        <Thickness x:Key="DialogBrowseButtonMargin">8,0,0,0</Thickness>
+        <Thickness x:Key="DialogTextBoxPadding">10,8</Thickness>
+        <Thickness x:Key="DialogListItemMargin">0,2</Thickness>
+        <sys:Double x:Key="DialogTextFontSize">13</sys:Double>
+        <sys:Double x:Key="DialogErrorFontSize">12</sys:Double>
+        <sys:Double x:Key="DialogTitleFontSize">18</sys:Double>
+        <!-- The name of what a confirmation is about, above the sentence saying what will happen to it -->
+        <sys:Double x:Key="DialogSubjectFontSize">15</sys:Double>
+        <sys:Double x:Key="DialogAlertIconSize">24</sys:Double>
+        <Thickness x:Key="DialogAlertIconMargin">0,2,14,0</Thickness>
+        <Thickness x:Key="IconChoicesPadding">4</Thickness>
+        <sys:Double x:Key="IconChoiceSize">26</sys:Double>
+        <sys:Double x:Key="DescriptionBoxHeight">70</sys:Double>
+        <sys:Double x:Key="OptionsSpacing">18</sys:Double>
+        <Thickness x:Key="OptionNoteMargin">28,0,0,0</Thickness>
+        <sys:Double x:Key="OptionsThemeWidth">200</sys:Double>
+        <sys:Double x:Key="OptionsNumberWidth">140</sys:Double>
+        <Thickness x:Key="ShortcutRowMargin">0,0,0,10</Thickness>
+        <Thickness x:Key="DocumentPadding">14</Thickness>
+        <sys:Double x:Key="DocumentFontSize">12</sys:Double>
+
+        <Thickness x:Key="CompareMargin">16</Thickness>
+        <Thickness x:Key="CompareHeaderMargin">4,0,4,12</Thickness>
+        <sys:Double x:Key="CompareHeaderSpacing">4</sys:Double>
+        <Thickness x:Key="CompareSummaryMargin">0,8,0,0</Thickness>
+        <Thickness x:Key="CompareFooterMargin">4,12,4,0</Thickness>
+        <sys:Double x:Key="CompareCopySpacing">8</sys:Double>
+        <Thickness x:Key="CompareCopyButtonPadding">14,7</Thickness>
+        <sys:Double x:Key="CompareSymbolFontSize">15</sys:Double>
+        <sys:Double x:Key="CompareSummaryPartSpacing">24</sys:Double>
+        <sys:Double x:Key="CompareSymbolSpacing">6</sys:Double>
+
+        <sys:Double x:Key="StatusSpacing">10</sys:Double>
+        <sys:Double x:Key="StatusMessageMinWidth">280</sys:Double>
+        <Thickness x:Key="StatusItemMargin">0,0,4,0</Thickness>
+        <sys:Double x:Key="StatusIndicatorHeight">30</sys:Double>
+        <Thickness x:Key="StatusButtonPadding">4</Thickness>
+        <Thickness x:Key="DatabaseStatusMargin">0,0,12,0</Thickness>
+        <sys:Double x:Key="StatusBarHeight">32</sys:Double>
+        <sys:Double x:Key="StatusBarFontSize">12</sys:Double>
+        <Thickness x:Key="StatusBarStartMargin">18,0,0,0</Thickness>
+        <Thickness x:Key="StatusBarEndMargin">0,0,18,0</Thickness>
+        <sys:Double x:Key="TitleBarHeight">40</sys:Double>
+        <Thickness x:Key="TitleBarIconMargin">12,0,6,0</Thickness>
+        <!-- Clear of the window's right edge, which a hovered Close would otherwise spill past -->
+        <Thickness x:Key="CaptionButtonsMargin">0,0,1,0</Thickness>
     </Application.Resources>
     
     <Application.Styles>
@@ -99,6 +198,9 @@
         <StyleInclude Source="/Styles/VolumeExplorerStyles.axaml"/>
         <StyleInclude Source="/Styles/MainWindowViewStyle.axaml"/>
         <StyleInclude Source="/Styles/StartPageStyles.axaml"/>
+        <StyleInclude Source="/Styles/DialogStyles.axaml"/>
+        <StyleInclude Source="/Styles/PopupStyles.axaml"/>
+        <StyleInclude Source="/Styles/FileTypeStyles.axaml"/>
     </Application.Styles>
 </Application>
 

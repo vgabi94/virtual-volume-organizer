@@ -1,0 +1,60 @@
+{
+  "left": {
+    "entryId": null,
+    "recordId": "00000000-0000-0000-0000-000000000202",
+    "title": "photos",
+    "path": "E:\\Photos\\photos"
+  },
+  "right": {
+    "entryId": null,
+    "recordId": "00000000-0000-0000-0000-000000000103",
+    "title": "photos",
+    "path": null
+  },
+  "skippedFolders": 0,
+  "counts": {
+    "added": 1,
+    "removed": 0,
+    "changed": 0,
+    "unchanged": 1
+  },
+  "rows": [
+    {
+      "relativePath": "",
+      "status": "changed",
+      "changes": [],
+      "descendantCount": null,
+      "left": {
+        "id": "00000000-0000-0000-0000-000000000202",
+        "isFolder": true,
+        "name": "photos",
+        "size": 2048,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2026-01-01T00:00:00Z"
+      },
+      "right": {
+        "id": "00000000-0000-0000-0000-000000000103",
+        "isFolder": true,
+        "name": "photos",
+        "size": 6144,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2026-01-01T00:00:00Z"
+      }
+    },
+    {
+      "relativePath": "trip",
+      "status": "added",
+      "changes": [],
+      "descendantCount": 1,
+      "left": null,
+      "right": {
+        "id": "00000000-0000-0000-0000-000000000105",
+        "isFolder": true,
+        "name": "trip",
+        "size": 4096,
+        "created": "2026-01-01T00:00:00Z",
+        "modified": "2026-01-01T00:00:00Z"
+      }
+    }
+  ]
+}

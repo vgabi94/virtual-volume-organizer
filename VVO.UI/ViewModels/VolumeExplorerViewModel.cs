@@ -19,6 +19,7 @@ namespace VVO.UI.ViewModels;
 public record FileItem
 {
     public required Guid Id { get; init; }
+    public Guid TreeId { get; init; }
     public required bool IsFolder { get; init; }
     public required string IconKey { get; init; }
     public string Name { get; init; } = string.Empty;
@@ -59,12 +60,13 @@ public record BreadcrumbItem
 /// What heads the paths of one scanned tree: the virtual volume holding it, which stands in
 /// for the drive, the name the folder itself is listed under, and the path it was scanned from.
 /// </summary>
-public record TreeLabel(string VolumeName, string FolderName, string RootPath = "");
+public record TreeLabel(string VolumeName, string FolderName, string RootPath = "", VirtualVolumeRecord? Volume = null);
 
 public partial class VolumeExplorerViewModel : ViewModelBase
     , IRecipient<FolderSelectedMessage>
     , IRecipient<SearchAllMessage>
     , IRecipient<CancelRequestedMessage>
+    , IRecipient<VirtualVolumeChangedMessage>
 {
     private const int SearchDelayMilliseconds = 300;
 
@@ -128,6 +130,16 @@ public partial class VolumeExplorerViewModel : ViewModelBase
     [ObservableProperty]
     public partial string VolumePrefix { get; set; } = string.Empty;
 
+    // The icon and colour of the volume the prefix names, none while a search lists several
+    [ObservableProperty]
+    public partial Geometry? VolumeIconData { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsVolumeIconFlipped { get; set; }
+
+    [ObservableProperty]
+    public partial IBrush? VolumeIconBrush { get; set; }
+
     // Root folder first, current folder last
     public AvaloniaList<BreadcrumbItem> Breadcrumbs { get; } = new();
 
@@ -178,7 +190,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
     public async Task ShowFolderAsync(FolderSelectedMessage message)
     {
         _treeId = message.TreeId;
-        _rootLabels[message.TreeId] = new TreeLabel(message.VolumeName, message.Name, message.RootPath);
+        _rootLabels[message.TreeId] = new TreeLabel(message.VolumeName, message.Name, message.RootPath, message.Volume);
         _folders.Clear();
         _paths.Clear();
         _physicalPaths.Clear();
@@ -198,7 +210,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
         foreach (var scope in message.Scopes)
         {
             _liveTrees.Add(scope.TreeId);
-            _rootLabels[scope.TreeId] = new TreeLabel(scope.VolumeName, scope.Name, scope.RootPath);
+            _rootLabels[scope.TreeId] = new TreeLabel(scope.VolumeName, scope.Name, scope.RootPath, scope.Volume);
         }
 
         if (string.IsNullOrWhiteSpace(message.Term))
@@ -315,6 +327,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
 
     private void NotifySelectionCommands()
     {
+        CompareCommand.NotifyCanExecuteChanged();
         CopyCommand.NotifyCanExecuteChanged();
         CopyPhysicalCommand.NotifyCanExecuteChanged();
         DeleteCommand.NotifyCanExecuteChanged();
@@ -325,6 +338,37 @@ public partial class VolumeExplorerViewModel : ViewModelBase
         CopyAllCommand.NotifyCanExecuteChanged();
         CopyPhysicalAllCommand.NotifyCanExecuteChanged();
     }
+
+    #endregion
+
+    #region Comparing
+
+    /// <summary>
+    /// Compares a selected folder with whatever the user picks, or two selected folders with
+    /// each other, the first selected on the left.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanCompare))]
+    private async Task CompareAsync()
+    {
+        var folders = Selection().Select(Compared).ToList();
+        if (folders.Count is not (1 or 2))
+            return;
+
+        try
+        {
+            await WeakReferenceMessenger.Default.Send(new CompareFoldersMessage(folders[0], folders.ElementAtOrDefault(1)));
+        }
+        catch (Exception e)
+        {
+            await Logger.ShowErrorAsync(e);
+        }
+    }
+
+    private bool CanCompare() => Selection() is { Count: 1 or 2 } selection && selection.All(item => item.IsFolder);
+
+    // Headed by where it is in the catalogue, since two folders compared often share a name
+    private static ComparedFolder Compared(FileItem folder) =>
+        new(folder.TreeId, folder.Id, folder.VirtualPath, folder.PhysicalPath);
 
     #endregion
 
@@ -390,6 +434,31 @@ public partial class VolumeExplorerViewModel : ViewModelBase
     public void Receive(CancelRequestedMessage message)
     {
         _writeCancellation?.Cancel();
+    }
+
+    // Only the look is taken up: a new name waits for the folder to be opened again, since every
+    // path already listed carries the old one
+    public void Receive(VirtualVolumeChangedMessage message)
+    {
+        foreach (var (treeId, label) in _rootLabels.ToList())
+        {
+            if (label.Volume?.Id == message.Record.Id)
+            {
+                _rootLabels[treeId] = label with { Volume = message.Record };
+            }
+        }
+
+        if (!IsFlatMode && Breadcrumbs.Count > 0 && _rootLabels.TryGetValue(Breadcrumbs[0].Id, out var open))
+        {
+            ShowVolume(open.Volume);
+        }
+    }
+
+    private void ShowVolume(VirtualVolumeRecord? volume)
+    {
+        VolumeIconData = volume == null ? null : VirtualVolumeIcons.Lookup(volume.Icon);
+        IsVolumeIconFlipped = VirtualVolumeIcons.IsFlipped(volume?.Icon);
+        VolumeIconBrush = volume == null ? null : IconColors.Brush(volume.Color);
     }
 
     private async Task WritingAsync(string what, Func<IProgress<string>, CancellationToken, Task> write)
@@ -742,6 +811,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
 
             var known = _rootLabels.TryGetValue(path[0].Id, out var label);
             VolumePrefix = known ? CataloguePath.Root(label!.VolumeName) : string.Empty;
+            ShowVolume(label?.Volume);
 
             NavigateUpCommand.NotifyCanExecuteChanged();
             NotifyAddCommands();
@@ -780,6 +850,11 @@ public partial class VolumeExplorerViewModel : ViewModelBase
         string physicalFolder = "")
     {
         IsFlatMode = flat;
+        if (flat)
+        {
+            ShowVolume(null);
+        }
+
         SelectedFile = null;
         SelectedFiles.Clear();
         NotifyAddCommands();
@@ -942,6 +1017,7 @@ public partial class VolumeExplorerViewModel : ViewModelBase
         return new FileItem
         {
             Id = record.Id,
+            TreeId = record.RootFolderId,
             IsFolder = record.IsFolder,
             IconKey = FileIcons.KeyFor(extension, record.IsFolder),
             Name = NameWithoutExtension(record),

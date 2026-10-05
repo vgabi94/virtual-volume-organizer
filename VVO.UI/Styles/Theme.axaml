@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="using:VVO.UI">
 
     <!-- The colours the application picks for itself. Everything else is the Fluent palette,
          which already carries a value for each variant. -->
@@ -9,13 +10,68 @@
             <!-- Set apart from the panel behind it, which the theme's own value is not -->
             <SolidColorBrush x:Key="TextControlBackground" Color="#1C1C1C"/>
 
-            <!-- Stated rather than laid over the window as a wash of white, which left the
-                 listing taking its colour from whatever happened to be behind it -->
-            <SolidColorBrush x:Key="ExplorerBackground" Color="#181818"/>
-
             <!-- Level with the menu bar, so a dialog reads as part of the application rather
                  than as a hole cut in it -->
             <SolidColorBrush x:Key="DialogBackground" Color="#1F1F1F"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <!-- Each surface, text weight and state by what it is for. The plain themes give each
+                 the Fluent colour it was drawn in before it had a name, so a theme that changes one
+                 role leaves the others where they were. -->
+            <SolidColorBrush x:Key="WindowBackground" Color="#000000"/>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#1F1F1F"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#2B2B2B"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#2B2B2B"/>
+            <!-- Stated rather than laid over the window as a wash of white, which left the
+                 listing taking its colour from whatever happened to be behind it -->
+            <SolidColorBrush x:Key="ContentBackground" Color="#181818"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#33FFFFFF"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#1F1F1F"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#33FFFFFF"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#99FFFFFF"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#33FFFFFF"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#99FFFFFF"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#19FFFFFF"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#33FFFFFF"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#0078D7" Opacity="0.6"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#19FFFFFF"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#1F1F1F"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#99FFFFFF"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#0078D7"/>
+            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="DangerBrush" Color="#F85149"/>
+            <SolidColorBrush x:Key="ErrorTextBrush" Color="#FFF000"/>
+
+            <!-- Every kind of file in the plain icon colour. A theme that colours them by kind
+                 names its own brush for each; one it leaves out is drawn as here. -->
+            <StaticResource x:Key="FolderSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileImageSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileVideoSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileZipperSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FilePdfSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileWordSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileExcelSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCsvSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FilePowerpointSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileLinesSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCodeSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
 
             <!-- Diff row tints, following the green/red a git diff uses on a dark background -->
             <SolidColorBrush x:Key="DiffAddedBackground" Color="#12261E"/>
@@ -31,8 +87,59 @@
 
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFF"/>
-            <SolidColorBrush x:Key="ExplorerBackground" Color="#FFFDFB"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#FAF9F7"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <SolidColorBrush x:Key="WindowBackground" Color="#FAF9F7"/>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#EDEBE7"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#F2F0EC"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#F2F0EC"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#FFFDFB"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#CBC6BE"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#EDEBE7"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#CBC6BE"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#22201D"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#6A655D"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#CBC6BE"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#6A655D"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#14000000"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#28000000"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#0078D7" Opacity="0.4"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#14000000"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#EDEBE7"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#C9C3BA"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#0078D7"/>
+            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="DangerBrush" Color="#C0362C"/>
+            <SolidColorBrush x:Key="ErrorTextBrush" Color="#C50500"/>
+
+            <StaticResource x:Key="FolderSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileImageSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileVideoSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileZipperSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FilePdfSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileWordSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileExcelSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCsvSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FilePowerpointSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileLinesSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCodeSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
 
             <!-- The shade that carries secondary text is too heavy for an edge on paper -->
             <SolidColorBrush x:Key="TextControlBorderBrush" Color="#C9C3BA"/>
@@ -48,6 +155,624 @@
             <SolidColorBrush x:Key="DiffChangedBackground" Color="#FBF3DE"/>
             <SolidColorBrush x:Key="DiffChangedSelectedBackground" Color="#F1E3BC"/>
             <SolidColorBrush x:Key="DiffChangedForeground" Color="#8A6116"/>
+        </ResourceDictionary>
+
+        <!-- Cool blue-greys: the frame, sidebar and bars are clear over one gradient the window is
+             painted with, and the content sits on a translucent raised layer. Whatever is not
+             named here is the plain theme's. -->
+        <ResourceDictionary x:Key="{x:Static local:Theme.SlateDark}">
+            <LinearGradientBrush x:Key="WindowBackground" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Offset="0" Color="#26282E"/>
+                <GradientStop Offset="1" Color="#1B1C20"/>
+            </LinearGradientBrush>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#D127282C"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#1CFFFFFF"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#12FFFFFF"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#C7FFFFFF"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#80FFFFFF"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#C7FFFFFF"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#0EFFFFFF"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#1FFFFFFF"/>
+            <!-- A tint rather than the accent, so a selection reads as quiet as the rest -->
+            <SolidColorBrush x:Key="SelectionBackground" Color="#16FFFFFF"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#16FFFFFF"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="PressedBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="PressedBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#0EFFFFFF"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#14FFFFFF"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#60CDFF"/>
+            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#00253A"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#2B2C30"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+            <!-- The plain theme's red, lifted to read on the lighter raised layer -->
+            <SolidColorBrush x:Key="DangerBrush" Color="#FF6A61"/>
+            <SolidColorBrush x:Key="DiffRemovedForeground" Color="#FF6A61"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#FFC83D"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#EE97C9"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#C3A5F9"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#EFA464"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#73CE95"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+        </ResourceDictionary>
+
+        <!-- Cool blue-greys: the frame, sidebar and bars are clear over one gradient the window is
+             painted with, and the content sits on a translucent raised layer. Whatever is not
+             named here is the plain theme's. -->
+        <ResourceDictionary x:Key="{x:Static local:Theme.SlateLight}">
+            <LinearGradientBrush x:Key="WindowBackground" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Offset="0" Color="#F7F8FB"/>
+                <GradientStop Offset="1" Color="#E8EBF1"/>
+            </LinearGradientBrush>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#C7FFFFFF"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#1A000000"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#11000000"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1A1A1A"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#B3000000"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#75000000"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#B3000000"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#0A000000"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#14000000"/>
+            <!-- A tint rather than the accent, so a selection reads as quiet as the rest -->
+            <SolidColorBrush x:Key="SelectionBackground" Color="#0E000000"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#1A1A1A"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#0E000000"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="PressedBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="PressedBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#BFFFFFFF"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#1A000000"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#005FB8"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#FAFAFA"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#E9A400"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#AF4A88"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#835CBE"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#B25900"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#008D4B"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+        </ResourceDictionary>
+
+        <!-- Violet as an accent and a glow along the title bar, over near-black or near-white
+             grounds. Whatever is not named here is the plain theme's. -->
+        <ResourceDictionary x:Key="{x:Static local:Theme.AmethystDark}">
+            <SolidColorBrush x:Key="WindowBackground" Color="#17151C"/>
+            <!-- The violet glow the title bar opens with, fading out a third of the way along -->
+            <LinearGradientBrush x:Key="ChromeBackground" StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Offset="0" Color="#31254C"/>
+                <GradientStop Offset="0.35" Color="#1E1929"/>
+                <GradientStop Offset="0.7" Color="#17151C"/>
+            </LinearGradientBrush>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#1A1820"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#141218"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#17151C"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#141218"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#25222D"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#25222D"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#ECE8F4"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#B3ACC3"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#7C7490"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#B3ACC3"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#12FFFFFF"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#24FFFFFF"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#33A882FF"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#F4EEFF"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#33A882FF"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="SelectionBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#110F15"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#2D2937"/>
+            <SolidColorBrush x:Key="TextControlBackground" Color="#110F15"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#2D2937"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#A882FF"/>
+            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#1B1230"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#1D1A25"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#CDB7F6"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#EE97C9"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#C3A5F9"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#EFA464"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#61C3F9"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#73CE95"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="{x:Static local:Theme.AmethystLight}">
+            <SolidColorBrush x:Key="WindowBackground" Color="#FBFAFD"/>
+            <!-- The violet glow the title bar opens with, fading out a third of the way along -->
+            <LinearGradientBrush x:Key="ChromeBackground" StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Offset="0" Color="#EAE1FB"/>
+                <GradientStop Offset="0.35" Color="#F7F4FD"/>
+                <GradientStop Offset="0.7" Color="#FBFAFD"/>
+            </LinearGradientBrush>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#F6F3FA"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#F9F7FC"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#ECE7F3"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#ECE7F3"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#211B2D"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#5A5168"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#8D849A"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#5A5168"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#12461E82"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#24461E82"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#1F7C3AED"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#2A1650"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#1F7C3AED"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="SelectionBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#DCD4E8"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#DCD4E8"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#7C3AED"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#FFFFFF"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#8E6AC7"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#AF4A88"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#835CBE"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#B25900"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#007FBF"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#008D4B"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+        </ResourceDictionary>
+
+        <!-- Warm paper and brown ink, with a burnt-orange accent and very little blue. Whatever is
+             not named here is the plain theme's. -->
+        <ResourceDictionary x:Key="{x:Static local:Theme.PaperDark}">
+            <SolidColorBrush x:Key="WindowBackground" Color="#1B1815"/>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#1B1815"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#1F1B17"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#181512"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#1B1815"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#181512"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#2A2520"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#2A2520"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#EDE4D6"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#BDB09D"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#85796A"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#BDB09D"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#0FEDE1CD"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#1FEDE1CD"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#1CE0A066"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#F6ECDC"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#1CE0A066"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="SelectionBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#14110F"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#352E27"/>
+            <SolidColorBrush x:Key="TextControlBackground" Color="#14110F"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#352E27"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#E0A066"/>
+            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#22160C"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#201C18"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#D7AB6B"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#D79DBD"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#B9A6DD"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#D7A57D"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#7EBADD"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#7EBADD"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#7EBADD"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#7EBADD"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#7EBADD"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#7EBADD"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#88C19B"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="{x:Static local:Theme.PaperLight}">
+            <SolidColorBrush x:Key="WindowBackground" Color="#FAF6EF"/>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#F3EDE2"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#F3EDE2"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#FFFCF6"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#F6F0E5"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#FFFCF6"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#E7DFD1"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#E7DFD1"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#2B241C"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#5F5446"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#958977"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#5F5446"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#0F5A4628"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#1F5A4628"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#14B0532B"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#2B1A10"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#14B0532B"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="SelectionBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#FFFEFA"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#D6CCBB"/>
+            <SolidColorBrush x:Key="TextControlBackground" Color="#FFFEFA"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#D6CCBB"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#B0532B"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#FFFCF6"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#B07A2A"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#8B4A70"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#6C5594"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#8C541F"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#136B94"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#136B94"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#136B94"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#136B94"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#136B94"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#136B94"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#2A7449"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+        </ResourceDictionary>
+
+        <!-- Soft greens at low contrast, for long sessions. Whatever is not named here is the plain
+             theme's. -->
+        <ResourceDictionary x:Key="{x:Static local:Theme.SageDark}">
+            <SolidColorBrush x:Key="WindowBackground" Color="#161A18"/>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#161A18"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#181D1A"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#141816"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#161A18"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#141816"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#222825"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#222825"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E1E7E2"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#A7B2AA"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#707C74"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#A7B2AA"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#0FDCF0E4"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#1FDCF0E4"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#1F8FC2A2"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#EEF6F0"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#1F8FC2A2"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="SelectionBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#111412"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#262D29"/>
+            <SolidColorBrush x:Key="TextControlBackground" Color="#111412"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#262D29"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#8FC2A2"/>
+            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#0F1F16"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#1B201D"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#C8BB8E"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#D7A7C1"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#BDAFDB"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#D7AE8E"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#8FBFDB"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#8FBFDB"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#8FBFDB"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#8FBFDB"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#8FBFDB"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#8FBFDB"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#97C4A5"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="{x:Static local:Theme.SageLight}">
+            <SolidColorBrush x:Key="WindowBackground" Color="#F5F7F3"/>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#EEF2EC"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#EEF2EC"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#FBFCFA"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#F2F5F0"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#FBFCFA"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#E2E8E1"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#E2E8E1"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1F2722"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#4E5A52"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#87928A"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#4E5A52"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#11285037"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#21285037"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#1A3D7A58"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#13261B"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#1A3D7A58"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="SelectionBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#D5DDD5"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#D5DDD5"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#3D7A58"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#FBFCFA"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#A28A3C"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#91607C"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#786897"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#926743"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#427997"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#427997"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#427997"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#427997"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#427997"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#427997"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#4C7F5E"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+        </ResourceDictionary>
+
+        <!-- Violet glass: the frame and bars are clear over a violet-to-indigo gradient the window
+             is painted with, and the panes over it let it through. Whatever is not named here is
+             the plain theme's. -->
+        <ResourceDictionary x:Key="{x:Static local:Theme.NebulaDark}">
+            <LinearGradientBrush x:Key="WindowBackground" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Offset="0" Color="#1C1240"/>
+                <GradientStop Offset="1" Color="#0B0D26"/>
+            </LinearGradientBrush>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#08FFFFFF"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#06FFFFFF"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#0FFFFFFF"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#0FFFFFFF"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F0ECFF"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#B6AED9"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#7A72A3"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#B6AED9"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#12FFFFFF"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#24FFFFFF"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#4C7C5CFF"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#4C7C5CFF"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="SelectionBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#40000000"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#14FFFFFF"/>
+            <SolidColorBrush x:Key="TextControlBackground" Color="#40000000"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#14FFFFFF"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#B197FC"/>
+            <SolidColorBrush x:Key="AccentForegroundBrush" Color="#160F33"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#151228"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#A99CFF"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#FD97D2"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#CCA8FF"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#FFA659"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#50CBFF"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#50CBFF"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#50CBFF"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#50CBFF"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#50CBFF"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#50CBFF"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#6AD895"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="{x:Static local:Theme.NebulaLight}">
+            <LinearGradientBrush x:Key="WindowBackground" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Offset="0" Color="#EFE9FF"/>
+                <GradientStop Offset="1" Color="#E3E6FA"/>
+            </LinearGradientBrush>
+            <SolidColorBrush x:Key="ChromeBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#99FFFFFF"/>
+            <SolidColorBrush x:Key="StartPageBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#00000000"/>
+            <SolidColorBrush x:Key="ContentBackground" Color="#C7FFFFFF"/>
+            <SolidColorBrush x:Key="ContentBorderBrush" Color="#176E50C8"/>
+            <SolidColorBrush x:Key="DividerBrush" Color="#176E50C8"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1E1936"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#57507A"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush" Color="#8F88AD"/>
+            <SolidColorBrush x:Key="IconBrush" Color="#57507A"/>
+            <SolidColorBrush x:Key="HoverBackground" Color="#136D4AFF"/>
+            <SolidColorBrush x:Key="PressedBackground" Color="#266D4AFF"/>
+            <SolidColorBrush x:Key="SelectionBackground" Color="#296D4AFF"/>
+            <SolidColorBrush x:Key="SelectionForeground" Color="#1A1240"/>
+            <SolidColorBrush x:Key="RowSelectionBackground" Color="#296D4AFF"/>
+            <!-- Fluent draws a selected list item from these, the accent at three strengths -->
+            <StaticResource x:Key="SystemControlHighlightListAccentLowBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentMediumBrush" ResourceKey="SelectionBackground"/>
+            <StaticResource x:Key="SystemControlHighlightListAccentHighBrush" ResourceKey="SelectionBackground"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#CCFFFFFF"/>
+            <SolidColorBrush x:Key="ControlBorderBrush" Color="#296E50C8"/>
+            <SolidColorBrush x:Key="TextControlBackground" Color="#CCFFFFFF"/>
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#296E50C8"/>
+            <SolidColorBrush x:Key="AccentBrush" Color="#6D4AFF"/>
+            <SolidColorBrush x:Key="DialogBackground" Color="#FDFEFF"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
+
+            <SolidColorBrush x:Key="FolderSolidBrush" Color="#7A62F0"/>
+            <SolidColorBrush x:Key="FileImageSolidBrush" Color="#B94C90"/>
+            <StaticResource x:Key="FileAudioSolidBrush" ResourceKey="IconBrush"/>
+            <SolidColorBrush x:Key="FileVideoSolidBrush" Color="#8A5FC9"/>
+            <SolidColorBrush x:Key="FileZipperSolidBrush" Color="#BC5D00"/>
+            <SolidColorBrush x:Key="FilePdfSolidBrush" Color="#0085CA"/>
+            <SolidColorBrush x:Key="FileWordSolidBrush" Color="#0085CA"/>
+            <SolidColorBrush x:Key="FileExcelSolidBrush" Color="#0085CA"/>
+            <SolidColorBrush x:Key="FileCsvSolidBrush" Color="#0085CA"/>
+            <SolidColorBrush x:Key="FilePowerpointSolidBrush" Color="#0085CA"/>
+            <SolidColorBrush x:Key="FileLinesSolidBrush" Color="#0085CA"/>
+            <SolidColorBrush x:Key="FileCodeSolidBrush" Color="#00944D"/>
+            <StaticResource x:Key="FileCogBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileEarmarkBinaryFillBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="CompactDiscSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="DatabaseSolidBrush" ResourceKey="IconBrush"/>
+            <StaticResource x:Key="FileSolidBrush" ResourceKey="IconBrush"/>
         </ResourceDictionary>
 
     </ResourceDictionary.ThemeDictionaries>

@@ -217,6 +217,27 @@ public class CompareResultsViewModelTests
         Assert.DoesNotContain("changed", viewModel.Summary);
     }
 
+    // The Modern layout draws the parts apart, so the line has to be nothing but them
+    [Fact]
+    public void TheSummaryIsItsPartsSpacedApart()
+    {
+        var without = Results(
+            Result("gone.txt", ComparisonStatus.Removed, leftSize: 1024),
+            Result("new.txt", ComparisonStatus.Added, rightSize: 2048));
+        var with = Results(
+            Result("gone.txt", ComparisonStatus.Removed, leftSize: 1024),
+            Result("edited.txt", ComparisonStatus.Changed, ChangeKind.Size));
+
+        Assert.Equal("1 removed · 1 KB", without.RemovedSummary);
+        Assert.Equal("1 added · 2 KB", without.AddedSummary);
+        Assert.False(without.HasChangedSummary);
+        Assert.Equal("1 removed · 1 KB     1 added · 2 KB", without.Summary);
+
+        Assert.Equal("1 changed", with.ChangedSummary);
+        Assert.True(with.HasChangedSummary);
+        Assert.Equal("1 removed · 1 KB     0 added · 0 B     1 changed", with.Summary);
+    }
+
     [Fact]
     public void AnEmptyComparisonStillReadsAsZeroes()
     {

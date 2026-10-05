@@ -188,7 +188,7 @@ public class ViewInteractionTests : UiTestBase
     }
 
     [AvaloniaFact]
-    public async Task TheContextMenuOffersTheCopyCommandsAndDelete()
+    public async Task TheContextMenuOffersTheCopyCommandsCompareAndDelete()
     {
         var explorer = await GivenAFolderShownWithItsDiskPathAsync();
         var view = new VolumeExplorerView { DataContext = explorer };
@@ -199,12 +199,13 @@ public class ViewInteractionTests : UiTestBase
         Pump();
 
         var items = grid.ContextMenu.Items.OfType<MenuItem>().ToList();
-        Assert.Equal(5, items.Count);
+        Assert.Equal(6, items.Count);
         Assert.Same(explorer.CopyCommand, items[0].Command);
         Assert.Same(explorer.CopyAllCommand, items[1].Command);
         Assert.Same(explorer.CopyPhysicalCommand, items[2].Command);
         Assert.Same(explorer.CopyPhysicalAllCommand, items[3].Command);
-        Assert.Same(explorer.DeleteCommand, items[4].Command);
+        Assert.Same(explorer.CompareCommand, items[4].Command);
+        Assert.Same(explorer.DeleteCommand, items[5].Command);
 
         grid.ContextMenu.Close();
     }
@@ -435,7 +436,7 @@ public class ViewInteractionTests : UiTestBase
         var pending = view.ShowDialog<bool>(Shell);
         Pump();
 
-        Press(ButtonNamed(view, "Rescan"));
+        Press(ButtonNamed(view, "Replace"));
         Pump();
 
         Assert.True(await pending);

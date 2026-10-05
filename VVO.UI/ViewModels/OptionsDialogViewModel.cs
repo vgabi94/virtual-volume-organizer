@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace VVO.UI.ViewModels;
 
@@ -15,8 +16,13 @@ public partial class OptionsDialogViewModel : ObservableObject
     [ObservableProperty]
     public partial bool ScanHiddenAndSystem { get; set; }
 
+    public IReadOnlyList<ColourTheme> ColourThemes => Theme.All;
+
     [ObservableProperty]
-    public partial bool DarkTheme { get; set; }
+    public partial ColourTheme ColourTheme { get; set; }
+
+    [ObservableProperty]
+    public partial bool ModernLayout { get; set; }
 
     public OptionsDialogViewModel(Settings settings)
     {
@@ -25,7 +31,8 @@ public partial class OptionsDialogViewModel : ObservableObject
         ShowFolderDetailsAlways = settings.Data.ShowFolderDetailsAlways;
         MaxRecentDatabases = settings.Data.MaxRecentFiles;
         ScanHiddenAndSystem = settings.Data.ScanHiddenAndSystem;
-        DarkTheme = settings.IsDarkTheme;
+        ColourTheme = settings.ColourTheme;
+        ModernLayout = settings.IsModernLayout;
     }
 
     /// <summary>
@@ -38,8 +45,11 @@ public partial class OptionsDialogViewModel : ObservableObject
         _settings.SetMaxRecentFiles(MaxRecentDatabases);
         _settings.SetScanHiddenAndSystem(ScanHiddenAndSystem);
 
-        // Nothing else owns the theme, so it is put on here rather than handed to a caller
-        _settings.SetDarkTheme(DarkTheme);
-        Theme.Apply(DarkTheme);
+        // Nothing else owns the theme or the layout, so they are put on here rather than handed to a caller
+        _settings.SetColourTheme(ColourTheme);
+        Theme.Apply(ColourTheme);
+
+        _settings.SetModernLayout(ModernLayout);
+        Layout.Apply(ModernLayout);
     }
 }

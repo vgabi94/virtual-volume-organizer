@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using VVO.Core.Models;
 
 namespace VVO.UI.Messages;
@@ -15,7 +16,11 @@ public record FolderAddedMessage(RootFolderMetadata Entry, FileRecord RootRecord
 /// tree, the name it is listed under, the virtual volume holding it and the path it was scanned
 /// from. An empty root path leaves the explorer listing catalogue paths alone.
 /// </summary>
-public record FolderSelectedMessage(Guid TreeId, string Name, string VolumeName, string RootPath = "");
+public record FolderSelectedMessage(
+    Guid TreeId, string Name, string VolumeName, string RootPath = "", VirtualVolumeRecord? Volume = null);
+
+/// <summary>Sent by the SidebarViewModel once a virtual volume's name, icon or colour is changed.</summary>
+public record VirtualVolumeChangedMessage(VirtualVolumeRecord Record);
 
 public record HideStartPage();
 
@@ -43,7 +48,8 @@ public record FocusFileSearchMessage();
 /// One scanned tree a search covers, under the name the sidebar lists it by, the virtual volume
 /// holding it and the path it was scanned from.
 /// </summary>
-public record SearchScope(Guid TreeId, string Name, string VolumeName, string RootPath = "");
+public record SearchScope(
+    Guid TreeId, string Name, string VolumeName, string RootPath = "", VirtualVolumeRecord? Volume = null);
 
 /// <summary>
 /// Sent by the sidebar's Search all box. An empty term calls the search off and puts the
@@ -56,3 +62,14 @@ public record SearchAllMessage(string Term, IReadOnlyList<SearchScope> Scopes);
 /// so every sidebar row sharing that tree can show the new size.
 /// </summary>
 public record TreeContentsChangedMessage(FileRecord Root);
+
+/// <summary>
+/// Sent by the explorer to have a folder it lists compared: with the second one when there is one,
+/// otherwise with whatever the user picks. The sidebar answers it, offering the folders it lists.
+/// </summary>
+public class CompareFoldersMessage(ViewModels.ComparedFolder left, ViewModels.ComparedFolder? right = null)
+    : AsyncRequestMessage<bool>
+{
+    public ViewModels.ComparedFolder Left { get; } = left;
+    public ViewModels.ComparedFolder? Right { get; } = right;
+}

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Avalonia.Collections;
-using VVO.Core;
 using VVO.Core.Models;
 
 namespace VVO.UI.ViewModels;
@@ -37,9 +36,23 @@ public class CompareResultsViewModel
     private readonly string _sourceRootPath;
     private readonly string _targetRootPath;
 
+    public const string AddedSymbol = "+";
+    public const string RemovedSymbol = "−";
+    public const string ChangedSymbol = "~";
+
     public string SourceName { get; }
     public string TargetName { get; }
-    public string Summary { get; }
+
+    // The summary's parts, which the Modern layout draws apart, each after its status symbol
+    public string RemovedSummary { get; }
+    public string AddedSummary { get; }
+    public string ChangedSummary { get; }
+    public bool HasChangedSummary => ChangedSummary.Length > 0;
+
+    public string Summary => HasChangedSummary
+        ? $"{RemovedSummary}     {AddedSummary}     {ChangedSummary}"
+        : $"{RemovedSummary}     {AddedSummary}";
+
     public AvaloniaList<ComparisonRow> Rows { get; }
 
     /// <summary>
@@ -52,8 +65,6 @@ public class CompareResultsViewModel
 
     // Turning the update down and closing the window are the same button
     public string CloseText => IsUpdate ? "Cancel" : "Close";
-
-    public string Proposal => IsUpdate ? ScanWarnings.RescanProposal : string.Empty;
 
     public bool HasDifferences => Rows.Count > 0;
 
@@ -96,26 +107,16 @@ public class CompareResultsViewModel
             .Where(result => result.Status != ComparisonStatus.Changed || result.Changes != ChangeKind.None)
             .Select(result => ToRow(result, sourceRootPath, targetRootPath)));
 
-        Summary = BuildSummary(results);
-    }
-
-    // A collapsed folder carries the rollup of everything beneath it and its descendants are
-    // never listed separately, so the rows can simply be added up.
-    private static string BuildSummary(IReadOnlyList<ComparisonResult> results)
-    {
+        // A collapsed folder carries the rollup of everything beneath it and its descendants are
+        // never listed separately, so the rows can simply be added up.
         var removed = results.Where(result => result.Status == ComparisonStatus.Removed).ToList();
         var added = results.Where(result => result.Status == ComparisonStatus.Added).ToList();
         var changed = results.Count(result =>
             result.Status == ComparisonStatus.Changed && result.Changes != ChangeKind.None);
 
-        var removedBytes = removed.Sum(result => result.Left?.Size ?? 0);
-        var addedBytes = added.Sum(result => result.Right?.Size ?? 0);
-
-        var summary =
-            $"{CountEntries(removed)} removed · {FormattingUtils.FormatBytes(removedBytes)}" +
-            $"     {CountEntries(added)} added · {FormattingUtils.FormatBytes(addedBytes)}";
-
-        return changed > 0 ? $"{summary}     {changed} changed" : summary;
+        RemovedSummary = $"{CountEntries(removed)} removed · {FormattingUtils.FormatBytes(removed.Sum(result => result.Left?.Size ?? 0))}";
+        AddedSummary = $"{CountEntries(added)} added · {FormattingUtils.FormatBytes(added.Sum(result => result.Right?.Size ?? 0))}";
+        ChangedSummary = changed > 0 ? $"{changed} changed" : string.Empty;
     }
 
     private static int CountEntries(IEnumerable<ComparisonResult> results)
@@ -153,9 +154,9 @@ public class CompareResultsViewModel
     {
         return status switch
         {
-            ComparisonStatus.Added => "+",
-            ComparisonStatus.Removed => "−",
-            _ => "~"
+            ComparisonStatus.Added => AddedSymbol,
+            ComparisonStatus.Removed => RemovedSymbol,
+            _ => ChangedSymbol
         };
     }
 

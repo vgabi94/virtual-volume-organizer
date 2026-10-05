@@ -1,9 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.VisualTree;
 using VVO.Core.Models;
 using VVO.UI;
 using VVO.UI.Messages;
 using VVO.UI.ViewModels;
+using VVO.UI.Views;
 
 namespace VVO.UiTests;
 
@@ -253,6 +255,71 @@ public class StartPageTests : UiTestBase
         Settings.AddRecentFile(@"D:\Archive\Discs.vvo");
 
         Assert.Equal("Discs", NewStartPage().RecentDatabases[0].Name);
+    }
+
+    #endregion
+
+    #region The page in either layout
+
+    private Window Shown(bool modern)
+    {
+        Settings.AddRecentFile(@"D:\Archive\Discs.vvo");
+        var window = new Window { Content = new StartPageView { DataContext = NewStartPage() }, Width = 900, Height = 700 };
+        window.Show();
+        Layout.Apply(modern);
+        Pump();
+
+        return window;
+    }
+
+    private static T Classed<T>(Window window, string name) where T : Control =>
+        window.GetVisualDescendants().OfType<T>().Single(control => control.Classes.Contains(name));
+
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheWaysInNameTheirShortcuts(bool modern)
+    {
+        var window = Shown(modern);
+
+        var tips = window.GetVisualDescendants().OfType<Button>()
+            .Where(button => button.Classes.Contains("BigButton"))
+            .Select(button => ToolTip.GetTip(button))
+            .ToList();
+
+        Assert.Equal(["New Database (Ctrl+N)", "Open Database (Ctrl+O)"], tips);
+        window.Close();
+    }
+
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void OnlyTheModernPageIsHeadedByTheAppsMarkAndName(bool modern)
+    {
+        var window = Shown(modern);
+
+        var hero = Classed<StackPanel>(window, "StartHero");
+        Assert.Equal(modern, hero.IsEffectivelyVisible);
+        Assert.Contains(hero.GetVisualDescendants().OfType<TextBlock>(), text => text.Text == "Virtual Volume Organizer");
+        Assert.Single(hero.GetVisualDescendants().OfType<Image>());
+        window.Close();
+    }
+
+    // Classic lists the path beside the name, Modern under it
+    [AvaloniaTheory]
+    [InlineData(true, 1, 0)]
+    [InlineData(false, 0, 1)]
+    public void ARecentDatabaseShowsItsNameAndPath(bool modern, int pathRow, int pathColumn)
+    {
+        var window = Shown(modern);
+
+        Assert.Equal("Discs", Classed<TextBlock>(window, "RecentName").Text);
+        var path = Classed<TextBlock>(window, "RecentPath");
+        Assert.Equal(@"D:\Archive\Discs.vvo", path.Text);
+        Assert.True(path.IsEffectivelyVisible);
+        Assert.Equal(pathRow, Grid.GetRow(path));
+        Assert.Equal(pathColumn, Grid.GetColumn(path));
+        window.Close();
     }
 
     #endregion

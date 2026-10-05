@@ -1,6 +1,9 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.VisualTree;
+using VVO.UI;
 using VVO.UI.Messages;
 using VVO.UI.ViewModels;
 using VVO.UI.Views;
@@ -216,6 +219,68 @@ public class SearchAndExplorerTests : UiTestBase
 
         Assert.False(Explorer.NavigateUpCommand.CanExecute(null));
     }
+
+    public static TheoryData<string, bool> EveryThemeInBothLayouts =>
+        new(Theme.All.SelectMany(theme => new[] { (theme.Key, true), (theme.Key, false) }));
+
+    // Hovered and focused too, which Fluent would otherwise repaint in its own frame. Focus keeps
+    // only its accent colour, hovered or not, so the caret is not the one sign of where typing goes.
+    [AvaloniaTheory]
+    [MemberData(nameof(EveryThemeInBothLayouts))]
+    public void BothSearchBoxesAreFramedLikeThePathBox(string theme, bool modern)
+    {
+        var window = new Window
+        {
+            Classes = { "AppWindow" },
+            RequestedThemeVariant = Theme.Named(theme).Variant,
+            Width = 1200,
+            Height = 600,
+            Content = new DockPanel
+            {
+                Children =
+                {
+                    new SidebarView { DataContext = Sidebar, [DockPanel.DockProperty] = Dock.Left },
+                    new VolumeExplorerView { DataContext = Explorer }
+                }
+            }
+        };
+        window.Classes.Set(Layout.ModernClass, modern);
+        window.Show();
+        Pump();
+
+        var path = window.GetVisualDescendants().OfType<Border>().Single(border => border.Classes.Contains("PathViewStyle"));
+        var boxes = window.GetVisualDescendants().OfType<TextBox>().Where(box => box.Classes.Contains("SearchBox")).ToList();
+        Assert.Equal(2, boxes.Count);
+
+        foreach (var box in boxes)
+        {
+            var frame = box.GetVisualDescendants().OfType<Border>().First(border => border.Name == "PART_BorderElement");
+            var states = (IPseudoClasses)box.Classes;
+            Color? focused = null;
+            foreach (var state in new[] { "", ":pointerover", ":focus", ":focus:pointerover" })
+            {
+                var set = state.Split(':', StringSplitOptions.RemoveEmptyEntries).Select(name => ":" + name).ToList();
+                set.ForEach(states.Add);
+                Pump();
+
+                if (state == ":focus")
+                    focused = ColourOf(frame.BorderBrush);
+                else if (state.StartsWith(":focus"))
+                    Assert.Equal(focused, ColourOf(frame.BorderBrush));
+                else
+                    Assert.Equal(ColourOf(path.BorderBrush), ColourOf(frame.BorderBrush));
+                Assert.Equal(path.BorderThickness, frame.BorderThickness);
+                Assert.Equal(path.CornerRadius, frame.CornerRadius);
+                Assert.Equal(ColourOf(path.Background), ColourOf(frame.Background));
+
+                set.ForEach(name => states.Remove(name));
+            }
+        }
+
+        window.Close();
+    }
+
+    private static Color? ColourOf(IBrush? brush) => (brush as ISolidColorBrush)?.Color;
 
     #endregion
 }

@@ -290,6 +290,7 @@ public abstract class UiTestBase : IDisposable
         Dialogs.Reset();
         DatabaseFiles.Reset();
         Theme.Reset();
+        Layout.Reset();
         FolderPicker.Reset();
         DiskFiles.Reset();
         TextClipboard.Reset();

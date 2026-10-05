@@ -23,8 +23,12 @@ every core service, `Settings`, and the four long-lived view models (`MainWindow
 `SidebarViewModel`, `VolumeExplorerViewModel`, `StartPageViewModel`) as singletons. Dialog view
 models are constructed where they are shown rather than resolved.
 
-The theme is applied before the main window is built, so the window is never painted in one theme
-and repainted in the other.
+The theme and the layout are applied before the main window is built, so the window is never
+painted one way and repainted another. They are chosen apart in Options: `Theme` sets the
+application's theme variant to the colour theme picked from `Theme.All` (Dark, Light, or one that
+inherits from them and names only the colours it changes, like Slate), and `Layout` puts the `Modern` class on every open window and on
+each one as it opens, which the styles key the modern layout on. Classic is the absence of the
+class, so a view laid out for it needs no styles of its own.
 
 Views are found by name, not by registration: `ViewLocator` replaces `ViewModel` with `View` in the
 type's full name and constructs the result. Two consequences — a view needs a parameterless
@@ -106,6 +110,11 @@ subtrees are expanded.
 
 `ChangeKind` covers size and modification time. Creation time is deliberately excluded: copying a
 file changes it without the contents differing.
+
+A comparison starts from whichever folder record the metadata's `TreeId` names, so a folder inside a
+tree is compared by naming it there and passing the whole tree: only what is below it is walked. The
+explorer asks the sidebar to run one through `CompareFoldersMessage`, since the sidebar holds the
+folders the target dialog offers.
 
 ## Export
 

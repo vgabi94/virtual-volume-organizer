@@ -4,7 +4,7 @@
              x:Class="VVO.UI.Views.VolumeExplorerView"
              x:DataType="vm:VolumeExplorerViewModel"
              x:Name="Explorer"
-             Background="{DynamicResource ExplorerBackground}">
+             Background="{DynamicResource ContentBackground}">
     <Grid RowDefinitions="Auto, *">
         <Grid Grid.Row="0" ColumnDefinitions="2*, Auto, *, Auto, Auto" Margin="{DynamicResource VolumeExplorerHeaderMargin}">
             <!-- A Grid, not a StackPanel: a horizontal stack measures its children with
@@ -15,10 +15,18 @@
                         <PathIcon Data="{StaticResource ArrowBack}" Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"/>
                     </Button>
                     <!-- Stays put while the crumbs scroll, the way a drive letter does -->
-                    <TextBlock Grid.Column="1"
-                               Classes="VolumePrefix"
-                               Text="{Binding VolumePrefix}"
-                               IsVisible="{Binding VolumePrefix, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    <Panel Grid.Column="1"
+                           Classes="VolumeChip"
+                           IsVisible="{Binding VolumePrefix, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <Border Classes="Tint" Background="{Binding VolumeIconBrush}"/>
+                        <StackPanel Classes="VolumeChip">
+                            <PathIcon Classes="VolumeChip"
+                                      Classes.FlipY="{Binding IsVolumeIconFlipped}"
+                                      Data="{Binding VolumeIconData}"
+                                      Foreground="{Binding VolumeIconBrush}"/>
+                            <TextBlock Classes="VolumePrefix" Text="{Binding VolumePrefix}"/>
+                        </StackPanel>
+                    </Panel>
                     <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" VerticalAlignment="Center">
                         <ItemsControl ItemsSource="{Binding Breadcrumbs}">
                             <ItemsControl.ItemsPanel>
@@ -43,7 +51,7 @@
                     </ScrollViewer>
                 </Grid>
             </Border>
-            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="Transparent" MinWidth="2" Width="2"/>
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="Transparent" MinWidth="{StaticResource VolumeExplorerSplitterWidth}" Width="{StaticResource VolumeExplorerSplitterWidth}"/>
             <TextBox Grid.Column="2" x:Name="FileSearchBox" Classes="SearchBox" PlaceholderText="Search files..." VerticalAlignment="Center" Text="{Binding SearchTerm}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
             <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                 <Button Classes="LowEmphasis" ToolTip.Tip="Add folder(s)" Command="{Binding AddFoldersCommand}">
@@ -53,7 +61,7 @@
                     <PathIcon Classes="SidebarIcon" Data="{StaticResource FilePlus}"/>
                 </Button>
             </StackPanel>
-            <TextBlock Grid.Column="4" Text="{Binding ItemSummary}" VerticalAlignment="Center" Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
+            <TextBlock Grid.Column="4" Classes="HeaderSummary" Text="{Binding ItemSummary}" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" Margin="{DynamicResource VolumeExplorerHorizontalMargin}"/>
         </Grid>
 
         <DataGrid Grid.Row="1" x:Name="FileGrid" ItemsSource="{Binding Files}" SelectedItem="{Binding SelectedFile, Mode=TwoWay}" SelectionMode="Extended" Classes="ExplorerGrid" AutoGenerateColumns="False" CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True" IsReadOnly="True" Margin="{DynamicResource VolumeExplorerHorizontalMargin}" DoubleTapped="OnFileGridDoubleTapped" ContextRequested="OnFileGridContextRequested" SelectionChanged="OnFileGridSelectionChanged">
@@ -64,6 +72,8 @@
                     <Separator/>
                     <MenuItem Header="Copy P_hysical Path" Command="{Binding CopyPhysicalCommand}"/>
                     <MenuItem Header="Copy All Ph_ysical Paths" Command="{Binding CopyPhysicalAllCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="_Compare..." Command="{Binding CompareCommand}"/>
                     <Separator/>
                     <MenuItem Header="_Delete" Command="{Binding DeleteCommand}"/>
                 </ContextMenu>
@@ -80,15 +90,28 @@
                                           Classes.FlipY="{Binding IsIconFlipped}"
                                           Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"
                                           VerticalAlignment="Center"
-                                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
-                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                          Classes="FileTypeIcon"
+                                          Tag="{Binding IconKey}"/>
+                                <TextBlock Text="{Binding Name}" Classes.Folder="{Binding IsFolder}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="*" SortMemberPath="Location" IsVisible="False" />
-                <DataGridTextColumn Header="Extension" Binding="{Binding Extension}" Width="*" SortMemberPath="Extension" />
-                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" SortMemberPath="SizeSortPath" />
+                <DataGridTemplateColumn Header="Extension" Width="*" SortMemberPath="Extension">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <!-- Coloured by the kind of file, the way its icon is (FileTypeStyles) -->
+                            <Panel Classes="ExtensionTag"
+                                   Tag="{Binding IconKey}"
+                                   IsVisible="{Binding Extension, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <Border Classes="Tint" Background="{Binding $self.(TextElement.Foreground)}"/>
+                                <TextBlock Text="{Binding Extension}"/>
+                            </Panel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*" SortMemberPath="SizeSortPath" CellStyleClasses="Number" />
                 <DataGridTextColumn Header="Modified" Binding="{Binding Modified}" Width="*" SortMemberPath="ModifiedSortPath" />
                 <DataGridTextColumn Header="Created" Binding="{Binding Created}" Width="*" SortMemberPath="CreatedSortPath" />
             </DataGrid.Columns>

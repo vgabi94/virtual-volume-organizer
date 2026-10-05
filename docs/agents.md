@@ -22,8 +22,10 @@ them when scanning.
   - `vvo search <text> [--folder <entry id>] [--limit N]` to find files by name.
 - Each record carries `entries[]`: its `cataloguePath` (`Volume:\Folder\sub\file`) and
   `physicalPath` (where it was on disk) for every folder entry it is listed under.
-- `vvo compare <entry id> --disk <path>` shows what changed on disk since the scan, and
-  `vvo compare <entry id> <other entry id>` diffs two folders. Neither writes anything.
+- `vvo compare <id> --disk <path>` shows what changed on disk since the scan, and
+  `vvo compare <id> <other id>` diffs two folders. Either id can be a folder entry, for the top of
+  its tree, or a folder record inside one; the rows' paths start below the folder compared. Neither
+  writes anything.
 - Run `vvo <command> --help` for the options of a command.
 
 ### Destructive commands need the user

@@ -266,6 +266,119 @@ public class CompareCommandTests : IAsyncLifetime
 
     #endregion
 
+    #region A folder inside a tree
+
+    private static TreeBuilder WithLib(string root, Action<TreeBuilder> lib) =>
+        TestTree.Root(root).File("outside.txt", 1).Folder("lib", lib);
+
+    private static Guid Id(FolderTree tree, string name) => tree.Record(name).Id;
+
+    [Fact]
+    public async Task ASubfolderIsComparedWithItsCopyInAnotherScan()
+    {
+        var older = WithLib("Code", lib => lib.File("a.cs", 1).File("b.cs", 1).File("same.cs", 1)).Build();
+        var newer = WithLib("Code", lib => lib.File("a.cs", 2).File("c.cs", 1).File("same.cs", 1))
+            .File("elsewhere.txt", 1).Build();
+        await AddAsync(older);
+        await AddAsync(newer);
+
+        var result = await CompareAsync(Id(older, "lib").ToString(), Id(newer, "lib").ToString());
+
+        Assert.Equal(0, result.ExitCode);
+        Assert.Equal(
+            ["", "a.cs", "b.cs", "c.cs"],
+            Rows(result).Select(row => row.GetProperty("relativePath").GetString()));
+        Assert.Equal("removed", Row(result, "b.cs").GetProperty("status").GetString());
+        Assert.Equal("added", Row(result, "c.cs").GetProperty("status").GetString());
+        Assert.Equal("lib", Row(result, "").GetProperty("left").GetProperty("name").GetString());
+    }
+
+    [Fact]
+    public async Task ASubfolderIsComparedWithTheTopOfAnEntry()
+    {
+        var tree = WithLib("Code", lib => lib.File("a.cs", 1).File("b.cs", 1)).Build();
+        await AddAsync(tree);
+        var library = await AddAsync(TestTree.Root("Library").File("a.cs", 1).File("b.cs", 1).Build());
+
+        var result = await CompareAsync(Id(tree, "lib").ToString(), library.Id.ToString(), "--exit-code");
+
+        Assert.Equal(0, result.ExitCode);
+        Assert.Empty(Rows(result));
+    }
+
+    [Fact]
+    public async Task ASubfolderIsComparedWithDisk()
+    {
+        using var disk = new DiskTree().File("top.txt", 1).File(@"sub\keep.txt", 5).File(@"sub\gone.txt", 5);
+        await CatalogueAsync(disk);
+        var sub = (await _catalogue.Database.FindItemsAsync<FileRecord>(record => record.Name == "sub")).Single();
+
+        File.Delete(disk.PathOf(@"sub\gone.txt"));
+        disk.File(@"sub\deeper\new.txt", 1).File("top level only.txt", 1);
+
+        var result = await CompareAsync(sub.Id.ToString(), "--disk", disk.PathOf("sub"));
+
+        Assert.Equal(
+            ["", "deeper", "gone.txt"],
+            Rows(result).Select(row => row.GetProperty("relativePath").GetString()));
+        Assert.Equal(disk.PathOf("sub"), result.Json.GetProperty("left").GetProperty("path").GetString());
+    }
+
+    [Fact]
+    public async Task ASubfolderSideIsDescribedByItsRecord()
+    {
+        var tree = WithLib("Code", lib => lib.File("a.cs", 1)).Build();
+        var entry = await AddAsync(tree);
+
+        var left = (await CompareAsync(Id(tree, "lib").ToString(), entry.Id.ToString())).Json;
+
+        Assert.Equal(JsonValueKind.Null, left.GetProperty("left").GetProperty("entryId").ValueKind);
+        Assert.Equal(Id(tree, "lib"), left.GetProperty("left").GetProperty("recordId").GetGuid());
+        Assert.Equal("lib", left.GetProperty("left").GetProperty("title").GetString());
+        Assert.Equal(@"C:\Code\lib",left.GetProperty("left").GetProperty("path").GetString());
+        Assert.Equal(entry.Id, left.GetProperty("right").GetProperty("entryId").GetGuid());
+        Assert.Equal(entry.TreeId, left.GetProperty("right").GetProperty("recordId").GetGuid());
+    }
+
+    // Each entry standing on the tree can put it somewhere else on disk
+    [Fact]
+    public async Task ASubfolderListedUnderSeveralEntriesHasNoOnePath()
+    {
+        var tree = WithLib("Code", lib => lib.File("a.cs", 1)).Build();
+        var entry = await AddAsync(tree);
+        await _catalogue.Volumes.CopyFolderAsync(entry.Id, _volume.Id, "Copy");
+
+        var json = (await CompareAsync(Id(tree, "lib").ToString(), entry.Id.ToString())).Json;
+
+        Assert.Equal(JsonValueKind.Null, json.GetProperty("left").GetProperty("path").ValueKind);
+    }
+
+    [Fact]
+    public async Task ASubfolderWhoseParentIsGoneIsNotCompared()
+    {
+        var tree = TestTree.Root("broken").Folder("gone", gone => gone.Folder("kept", kept => kept.File("a.txt", 1))).Build();
+        var entry = await AddAsync(tree);
+        await _catalogue.Database.RemoveItemsAsync<FileRecord>([tree.Record("gone").Id]);
+
+        var result = await CompareAsync(Id(tree, "kept").ToString(), entry.Id.ToString());
+
+        Assert.Equal(1, result.ExitCode);
+        Assert.Equal("error", result.ErrorCode);
+    }
+
+    [Fact]
+    public async Task ASubfolderCaughtInALoopOfParentsIsNotCompared()
+    {
+        var (entry, tree) = await Hardening.Awkward.ParentLoopAsync(_catalogue, _volume.Id);
+
+        var result = await CompareAsync(tree.Record("a").Id.ToString(), entry.Id.ToString());
+
+        Assert.Equal(1, result.ExitCode);
+        Assert.Equal("error", result.ErrorCode);
+    }
+
+    #endregion
+
     #region Mistakes
 
     [Fact]
@@ -280,14 +393,15 @@ public class CompareCommandTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ARecordIdIsNotAnEntry()
+    public async Task AFileIsNotAFolderToCompare()
     {
         var tree = Code().Build();
         var left = await AddAsync(tree);
 
         var result = await CompareAsync(left.Id.ToString(), tree.Record("readme.md").Id.ToString());
 
-        Assert.Equal(3, result.ExitCode);
+        Assert.Equal(2, result.ExitCode);
+        Assert.Equal("usage", result.ErrorCode);
     }
 
     [Fact]

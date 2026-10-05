@@ -12,6 +12,7 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        Layout.Track();
     }
 
     public override void OnFrameworkInitializationCompleted()
@@ -21,7 +22,9 @@ public partial class App : Application
             var serviceProvider = ServiceConfiguration.ConfigureServices();
 
             // Before the window is built, so it is never painted in one theme and then repainted
-            Theme.Apply(serviceProvider.GetRequiredService<Settings>().IsDarkTheme);
+            var settings = serviceProvider.GetRequiredService<Settings>();
+            Theme.Apply(settings.ColourTheme);
+            Layout.Apply(settings.IsModernLayout);
 
             var mainWindowVm = serviceProvider.GetRequiredService<MainWindowViewModel>();
 
@@ -29,6 +32,7 @@ public partial class App : Application
             {
                 DataContext = mainWindowVm,
             };
+            Layout.ApplyTo(window);
 
             desktop.MainWindow = window;
 

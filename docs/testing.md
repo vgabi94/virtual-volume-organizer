@@ -37,6 +37,7 @@ and a test sets deliberately:
 | `FolderPicker.Picking` | the folder picker a scan starts from |
 | `TextClipboard.Writing` | the system clipboard |
 | `Theme.Applying` | applying a theme to the live application |
+| `Layout.Applying` | switching every open window between the modern and classic layouts |
 | `Settings(string)` | the settings file, so a test writes its own instead of the one beside the executable |
 
 All but the last are static hooks a running application leaves at their defaults: null, meaning do

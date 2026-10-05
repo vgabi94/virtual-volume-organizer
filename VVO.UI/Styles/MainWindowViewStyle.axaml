@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:VVO.UI.ViewModels">
     <Design.PreviewWith>
     <Border Padding="20">
       <Menu Grid.Row="0" Classes="MenuBarStyle">
@@ -17,22 +18,133 @@
     </Design.PreviewWith>
     
     <Style Selector="Window">
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
     </Style>
 
+    <Style Selector="Window.AppWindow">
+        <Setter Property="Background" Value="{DynamicResource WindowBackground}"/>
+    </Style>
+
+    <Styles.Resources>
+        <!-- Avalonia draws the title bar of a window extended into it: only its caption buttons
+             are kept, since the menu row is the title bar and the window's title would be
+             written over the menu -->
+        <ControlTheme x:Key="MenuTitleBarDecorations"
+                      TargetType="WindowDrawnDecorations"
+                      BasedOn="{StaticResource {x:Type WindowDrawnDecorations}}">
+            <!-- Keyed on a pseudo-class: only a triggered style outranks the template's own bindings -->
+            <Style Selector="^:has-titlebar /template/ Panel#PART_TitleTextPanel">
+                <Setter Property="IsVisible" Value="False"/>
+            </Style>
+            <Style Selector="^:has-titlebar /template/ Panel#PART_TitleBar">
+                <Setter Property="Background" Value="Transparent"/>
+            </Style>
+            <Style Selector="^:not(:has-border) /template/ StackPanel#PART_OverlayPanel">
+                <Setter Property="Margin" Value="{StaticResource CaptionButtonsMargin}"/>
+            </Style>
+        </ControlTheme>
+    </Styles.Resources>
+
+    <!-- The Modern layout draws the menu row as the title bar, beside the caption buttons -->
+    <!-- Set from the start rather than with the layout: the decorations are built in the theme
+         the window has when it opens, and keep the parts built from it -->
+    <Style Selector="Window.MenuInTitleBar">
+        <Setter Property="WindowDecorationsTheme" Value="{StaticResource MenuTitleBarDecorations}"/>
+    </Style>
+    <Style Selector="Window.Modern.MenuInTitleBar">
+        <Setter Property="ExtendClientAreaToDecorationsHint" Value="True"/>
+        <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="{StaticResource TitleBarHeight}"/>
+    </Style>
+    <Style Selector="Window.Modern Grid.MenuBar">
+        <Setter Property="Height" Value="{StaticResource TitleBarHeight}"/>
+    </Style>
+    <Style Selector="Image.TitleBarIcon">
+        <Setter Property="IsVisible" Value="False"/>
+        <Setter Property="Width" Value="{StaticResource IconMedium}"/>
+        <Setter Property="Height" Value="{StaticResource IconMedium}"/>
+        <Setter Property="Margin" Value="{StaticResource TitleBarIconMargin}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Window.Modern Image.TitleBarIcon">
+        <Setter Property="IsVisible" Value="True"/>
+    </Style>
+    <!-- The platform moves, maximises and snaps the window from here; the role only takes effect
+         while the window is extended into its title bar -->
+    <Style Selector="Border.TitleBarDrag">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="WindowDecorationProperties.ElementRole" Value="TitleBar"/>
+    </Style>
+
+    <Style Selector="StackPanel.StatusMessage">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="Spacing" Value="{StaticResource StatusSpacing}"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <!-- Fixed width: a count that grows a digit would otherwise reflow the row and shift what
+         sits beside it -->
+    <Style Selector="TextBlock.StatusMessage">
+        <Setter Property="MinWidth" Value="{StaticResource StatusMessageMinWidth}"/>
+        <Setter Property="TextAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="{StaticResource StatusItemMargin}"/>
+    </Style>
+    <Style Selector="PathIcon.DatabaseStatus">
+        <Setter Property="Width" Value="{StaticResource IconMedium}"/>
+        <Setter Property="Height" Value="{StaticResource IconMedium}"/>
+        <Setter Property="Foreground" Value="{DynamicResource IconBrush}"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="{StaticResource DatabaseStatusMargin}"/>
+    </Style>
+
+    <Style Selector="Border.StatusBar, TextBlock.StatusSummary">
+        <Setter Property="IsVisible" Value="False"/>
+    </Style>
+    <Style Selector="Window.Modern Border.StatusBar" x:DataType="vm:MainWindowViewModel">
+        <Setter Property="IsVisible" Value="{Binding !IsStartPageVisible}"/>
+        <Setter Property="Height" Value="{StaticResource StatusBarHeight}"/>
+        <Setter Property="Background" Value="{DynamicResource StatusBarBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+    </Style>
+    <Style Selector="Window.Modern TextBlock.StatusSummary" x:DataType="vm:MainWindowViewModel">
+        <Setter Property="IsVisible" Value="{Binding !IsStartPageVisible}"/>
+        <Setter Property="FontSize" Value="{StaticResource StatusBarFontSize}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="{StaticResource StatusBarStartMargin}"/>
+    </Style>
+    <!-- In the Last Write icon's place, which is hidden while an operation runs -->
+    <Style Selector="Window.Modern StackPanel.StatusMessage">
+        <Setter Property="Grid.Row" Value="2"/>
+        <Setter Property="Margin" Value="{StaticResource StatusBarEndMargin}"/>
+    </Style>
+    <Style Selector="Window.Modern TextBlock.StatusMessage">
+        <Setter Property="FontSize" Value="{StaticResource StatusBarFontSize}"/>
+    </Style>
+    <Style Selector="Window.Modern PathIcon.DatabaseStatus">
+        <Setter Property="Grid.Row" Value="2"/>
+        <Setter Property="Margin" Value="{StaticResource StatusBarEndMargin}"/>
+    </Style>
+
+    <!-- Clear over the bar behind it, so a gradient chrome runs on unbroken rather than starting
+         again inside the menu -->
     <Style Selector="Menu.MenuBarStyle">
-      <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumBrush}" />
+      <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style Selector="Menu.MenuBarStyle > MenuItem">
-      <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     </Style>
 
     <!-- Invisible until the pointer lands on it. MinWidth has to be set as well as Width: the
          Fluent theme floors a GridSplitter at 6, and a floor outranks a width. -->
     <Style Selector="GridSplitter.PaneSplitter">
-      <Setter Property="MinWidth" Value="4" />
-      <Setter Property="Width" Value="4" />
+      <Setter Property="MinWidth" Value="{StaticResource PaneSplitterWidth}" />
+      <Setter Property="Width" Value="{StaticResource PaneSplitterWidth}" />
       <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Window.Modern GridSplitter.PaneSplitter:pointerover, Window.Modern GridSplitter.PaneSplitter:pressed">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
     </Style>
 </Styles>
 

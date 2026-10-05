@@ -45,8 +45,9 @@ public class DatabaseService : IDatabaseService
     private static BsonMapper CreateMapper()
     {
         // LiteDB trims every string it stores unless told not to, which cuts the spaces a file
-        // system allows at either end of a name
-        var mapper = new BsonMapper { TrimWhitespace = false };
+        // system allows at either end of a name. It also reads an empty string back as null,
+        // which a folder listed without a path on disk would come back with in place of its path.
+        var mapper = new BsonMapper { TrimWhitespace = false, EmptyStringToNull = false };
         mapper.RegisterType(
             serialize: (DateTime value) => value.ToUniversalTime(),
             deserialize: bson => bson.AsDateTime.ToUniversalTime());

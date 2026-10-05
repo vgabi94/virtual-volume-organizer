@@ -315,6 +315,60 @@ public class SettingsTests : UiTestBase
         Assert.Equal(written, File.GetLastWriteTimeUtc(PathOf(settings)));
     }
 
+    // Written before either choice existed, so it carries no answer for them
+    [AvaloniaFact]
+    public void AFileFromBeforeTheThemeAndTheLayoutReadsAsDarkAndTheModernLayout()
+    {
+        var path = TempPath("json");
+        File.WriteAllText(path, """{ "RecentFiles": [], "MaxRecentFiles": 7 }""");
+
+        var settings = At(path);
+
+        Assert.Equal(Theme.Default, settings.ColourTheme);
+        Assert.True(settings.IsModernLayout);
+    }
+
+    [AvaloniaTheory]
+    [InlineData("Light")]
+    [InlineData("SlateDark")]
+    public void TheThemeIsWhatTheNextStartReads(string key)
+    {
+        var settings = Fresh();
+        settings.SetColourTheme(Theme.Named("SlateLight"));
+
+        settings.SetColourTheme(Theme.Named(key));
+
+        Assert.Equal(key, Reopened(settings).ColourTheme.Key);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheLayoutIsWhatTheNextStartReads(bool modern)
+    {
+        var settings = Fresh();
+        settings.SetModernLayout(!modern);
+
+        settings.SetModernLayout(modern);
+
+        Assert.Equal(modern, Reopened(settings).IsModernLayout);
+    }
+
+    // The defaults count as held: the file says nothing, and nothing is what it already says
+    [AvaloniaFact]
+    public void ChoosingTheLayoutTheFileAlreadyHoldsDoesNotRewriteIt()
+    {
+        var path = TempPath("json");
+        File.WriteAllText(path, """{ "RecentFiles": [], "MaxRecentFiles": 7 }""");
+        var settings = At(path);
+        var written = File.GetLastWriteTimeUtc(path);
+
+        settings.SetModernLayout(true);
+
+        Assert.Equal(written, File.GetLastWriteTimeUtc(path));
+        Assert.DoesNotContain("Slate", File.ReadAllText(path));
+    }
+
     [AvaloniaFact]
     public void TheFileIsPlainEnoughToBeEditedByHand()
     {

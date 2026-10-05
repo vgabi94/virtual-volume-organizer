@@ -10,11 +10,13 @@
         x:Name="MainWindow"
         Icon="/Assets/vvo2.ico"
         Title="Virtual Volume Organizer"
-        Background="{DynamicResource SystemRegionBrush}">
+        Classes="AppWindow MenuInTitleBar">
 
-    <Grid RowDefinitions="Auto, *">
-        <Grid ColumnDefinitions="Auto, *, Auto" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
-            <Menu Classes="MenuBarStyle">
+    <Grid RowDefinitions="Auto, *, Auto" ColumnDefinitions="Auto, *">
+        <Grid Grid.ColumnSpan="2" Classes="MenuBar" ColumnDefinitions="Auto, Auto, *" Background="{DynamicResource ChromeBackground}">
+            <Image Classes="TitleBarIcon" Source="/Assets/vvo2.png"/>
+            <Border Grid.Column="2" Classes="TitleBarDrag"/>
+            <Menu Grid.Column="1" Classes="MenuBarStyle">
                 <MenuItem Header="_File">
                     <MenuItem Header="_New Database..." HotKey="Ctrl+N" InputGesture="Ctrl+N" Command="{Binding SidebarViewModel.NewDatabaseCommand}" CommandParameter="{Binding #MainWindow}"/>
                     <MenuItem Header="_Open Database..." HotKey="Ctrl+O" InputGesture="Ctrl+O" Command="{Binding SidebarViewModel.OpenDatabaseCommand}" CommandParameter="{Binding #MainWindow}"/>
@@ -75,29 +77,9 @@
                     <MenuItem Header="_About" Command="{Binding ShowAboutCommand}" CommandParameter="{Binding #MainWindow}"/>
                 </MenuItem>
             </Menu>
-            <Panel Grid.Column="2" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="10" IsVisible="{Binding IsStatusMessageVisible}">
-                    <!-- Fixed width and right-aligned: a count that grows a digit would
-                         otherwise reflow the row and shift what sits beside it -->
-                    <TextBlock Text="{Binding StatusMessage}"
-                               VerticalAlignment="Center"
-                               MinWidth="280"
-                               TextAlignment="Right"
-                               Margin="0,0,4,0" />
-                    <LoadingIndicator IsActive="{Binding IsStatusMessageVisible}" Mode="Wave" Height="30" />
-                    <Button Content="Cancel" Padding="4" Margin="0,0,4,0" Command="{Binding CancelCommand}" IsVisible="{Binding IsCancelVisible}"/>
-                </StackPanel>
-                <PathIcon Data="{StaticResource DatabaseCheck}"
-                          Width="{StaticResource IconMedium}" Height="{StaticResource IconMedium}"
-                          Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                          HorizontalAlignment="Right" VerticalAlignment="Center"
-                          Margin="0,0,12,0"
-                          IsVisible="{Binding IsDatabaseStatusVisible}"
-                          ToolTip.Tip="{Binding LastWriteText}"/>
-            </Panel>
         </Grid>
         
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Grid.ColumnSpan="2">
             <Grid IsVisible="{Binding !IsStartPageVisible}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="250" MinWidth="180" MaxWidth="600"/>
@@ -110,6 +92,21 @@
             </Grid>
             <ContentControl Content="{Binding StartPageViewModel}" IsVisible="{Binding IsStartPageVisible}" />
         </Grid>
+
+        <Border Grid.Row="2" Grid.ColumnSpan="2" Classes="StatusBar"/>
+        <TextBlock Grid.Row="2" Classes="StatusSummary" Text="{Binding VolumeExplorerViewModel.ItemSummary}"/>
+
+        <!-- In the menu bar, or the status bar under the Modern layout -->
+        <StackPanel Grid.Column="1" Classes="StatusMessage" IsVisible="{Binding IsStatusMessageVisible}">
+            <TextBlock Classes="StatusMessage" Text="{Binding StatusMessage}"/>
+            <LoadingIndicator IsActive="{Binding IsStatusMessageVisible}" Mode="Wave" Height="{StaticResource StatusIndicatorHeight}" />
+            <Button Content="Cancel" Padding="{StaticResource StatusButtonPadding}" Margin="{StaticResource StatusItemMargin}" Command="{Binding CancelCommand}" IsVisible="{Binding IsCancelVisible}"/>
+        </StackPanel>
+        <PathIcon Grid.Column="1"
+                  Classes="DatabaseStatus"
+                  Data="{StaticResource DatabaseCheck}"
+                  IsVisible="{Binding IsDatabaseStatusVisible}"
+                  ToolTip.Tip="{Binding LastWriteText}"/>
     </Grid>
 
 </Window>

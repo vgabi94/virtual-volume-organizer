@@ -18,22 +18,22 @@
         <Setter Property="Padding" Value="35,8,10,8" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="CornerRadius" Value="4" />
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     </Style>
 
     <Style Selector="ListBox.SidebarList ListBoxItem:selected">
-        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListAccentLowBrush}" />
-        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Background" Value="{DynamicResource SelectionBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource SelectionForeground}" />
     </Style>
 
     <Style Selector="ListBox.SidebarList ListBoxItem:pointerover">
-        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+        <Setter Property="Background" Value="{DynamicResource HoverBackground}" />
     </Style>
 
     <Style Selector="TextBlock.SectionHeader">
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
         <Setter Property="Margin" Value="15,10,10,5" />
     </Style>
 
@@ -45,16 +45,16 @@
         <Setter Property="Padding" Value="15,10" />
     </Style>
     <Style Selector="ToggleButton.SidebarHeader:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+        <Setter Property="Background" Value="{DynamicResource HoverBackground}" />
     </Style>
     <Style Selector="ToggleButton.SidebarHeader:pressed /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListMediumBrush}" />
+        <Setter Property="Background" Value="{DynamicResource PressedBackground}" />
     </Style>
     <Style Selector="ToggleButton.SidebarHeader:checked /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style Selector="ToggleButton.SidebarHeader:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+        <Setter Property="Background" Value="{DynamicResource HoverBackground}" />
     </Style>
     
     <!-- Left padding lines the chevron up with the search box above -->
@@ -72,14 +72,29 @@
         <Setter Property="Width" Value="1" />
         <Setter Property="Height" Value="16" />
         <Setter Property="Margin" Value="4,0" />
-        <Setter Property="Background" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DividerBrush}" />
     </Style>
 
     <!-- Sets the toolbar apart from the volumes it acts on -->
     <Style Selector="Separator.SidebarToolbarRule">
         <Setter Property="Height" Value="1" />
         <Setter Property="Margin" Value="0,0,0,4" />
-        <Setter Property="Background" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DividerBrush}" />
+    </Style>
+    <Style Selector="Window.Modern Separator.SidebarToolbarRule">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <!-- The Modern layout keeps a volume's actions out of sight, its folder count standing in
+         for them, until the row is pointed at or selected -->
+    <Style Selector="Window.Modern ToggleButton.VirtualVolumeGroup Button.VolumeAction">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="Window.Modern ToggleButton.VirtualVolumeGroup:pointerover Button.VolumeAction, Window.Modern ToggleButton.VirtualVolumeGroup.Selected Button.VolumeAction">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="Window.Modern ToggleButton.VirtualVolumeGroup:pointerover TextBlock.VolumeCount, Window.Modern ToggleButton.VirtualVolumeGroup.Selected TextBlock.VolumeCount">
+        <Setter Property="IsVisible" Value="False" />
     </Style>
 
     <Style Selector="Button.LowEmphasis">
@@ -88,13 +103,13 @@
     </Style>
     
     <Style Selector="PathIcon.SidebarIcon">
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource IconBrush}"/>
         <Setter Property="Width" Value="{StaticResource IconMedium}"/>
         <Setter Property="Height" Value="{StaticResource IconMedium}"/>
     </Style>
 
     <Style Selector="PathIcon.SidebarChevron">
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource IconBrush}"/>
         <Setter Property="Width" Value="{StaticResource IconChevron}"/>
         <Setter Property="Height" Value="{StaticResource IconChevron}"/>
     </Style>
@@ -108,8 +123,8 @@
          them on for good. Never set IsVisible on these locally or the styles stop winning. -->
     <Style Selector="ListBox.VirtualVolumeFolders TextBlock.FolderDetail">
         <Setter Property="IsVisible" Value="False"/>
-        <Setter Property="FontSize" Value="{StaticResource SidebarItemSubtitleFontSize}"/>
-        <Setter Property="Opacity" Value="{StaticResource SidebarItemSubtitleOpacity}"/>
+        <Setter Property="FontSize" Value="{StaticResource ItemSubtitleFontSize}"/>
+        <Setter Property="Opacity" Value="{StaticResource ItemSubtitleOpacity}"/>
         <Setter Property="Margin" Value="10,0,0,0"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>

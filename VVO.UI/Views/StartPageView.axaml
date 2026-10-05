@@ -7,20 +7,25 @@
              x:Class="VVO.UI.Views.StartPageView"
              x:DataType="vm:StartPageViewModel"
              x:Name="StartPage"
-             Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+             Background="{DynamicResource StartPageBackground}">
 
     <!-- Everything shares one centred column so headings, rows and buttons keep a single
          left edge whatever the window width -->
     <StackPanel Classes="StartPage" Width="{StaticResource StartPageContentWidth}">
 
+        <StackPanel Classes="StartHero">
+            <Image Source="/Assets/vvo2.png"/>
+            <TextBlock Text="Virtual Volume Organizer"/>
+        </StackPanel>
+
         <StackPanel Classes="BigButtonsGroup">
-            <Button Classes="BigButton" Command="{Binding NewDatabaseCommand}" CommandParameter="{Binding #StartPage}">
+            <Button Classes="BigButton" ToolTip.Tip="New Database (Ctrl+N)" Command="{Binding NewDatabaseCommand}" CommandParameter="{Binding #StartPage}">
                 <StackPanel>
                     <PathIcon Data="{StaticResource FilePlus}"/>
                     <TextBlock Text="New Database"/>
                 </StackPanel>
             </Button>
-            <Button Classes="BigButton" Command="{Binding OpenDatabaseCommand}" CommandParameter="{Binding #StartPage}">
+            <Button Classes="BigButton" ToolTip.Tip="Open Database (Ctrl+O)" Command="{Binding OpenDatabaseCommand}" CommandParameter="{Binding #StartPage}">
                 <StackPanel>
                     <PathIcon Data="{StaticResource FileOpenRound}"/>
                     <TextBlock Text="Open Database"/>
@@ -50,13 +55,13 @@
                                     Classes="RecentLink"
                                     Command="{Binding #StartPage.((vm:StartPageViewModel)DataContext).OpenRecentCommand}"
                                     CommandParameter="{Binding}">
-                                <Grid>
+                                <Grid RowDefinitions="Auto, Auto">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" SharedSizeGroup="RecentName"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" Classes="RecentName" Text="{Binding Name}"/>
-                                    <TextBlock Grid.Column="1" Classes="RecentPath" Text="{Binding Path}"
+                                    <TextBlock Classes="RecentPath" Text="{Binding Path}"
                                                TextTrimming="CharacterEllipsis"/>
                                 </Grid>
                             </Button>

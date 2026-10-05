@@ -58,6 +58,10 @@ public partial class VirtualVolumeNode : ObservableObject
     [ObservableProperty]
     public partial FolderItem? SelectedFolder { get; set; }
 
+    // Whether this is the sidebar's SelectedVirtualVolume, for the row to show it by
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
+
     public Guid Id => Record.Id;
     public string Name => Record.Name;
     public Geometry? IconData => VirtualVolumeIcons.Lookup(Record.Icon);
@@ -80,6 +84,7 @@ public partial class SidebarViewModel : ViewModelBase
     , IRecipient<DatabaseReady>
     , IRecipient<CancelRequestedMessage>
     , IRecipient<TreeContentsChangedMessage>
+    , IRecipient<CompareFoldersMessage>
 {
     private const int SearchDelayMilliseconds = 300;
 
@@ -107,6 +112,19 @@ public partial class SidebarViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(EditVirtualVolumeCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteVirtualVolumeCommand))]
     public partial VirtualVolumeNode? SelectedVirtualVolume { get; set; }
+
+    partial void OnSelectedVirtualVolumeChanged(VirtualVolumeNode? oldValue, VirtualVolumeNode? newValue)
+    {
+        if (oldValue != null)
+        {
+            oldValue.IsSelected = false;
+        }
+
+        if (newValue != null)
+        {
+            newValue.IsSelected = true;
+        }
+    }
 
     // The selection lives on whichever volume owns it, mirrored here so the menu bar has a
     // single place to reach it from
@@ -242,7 +260,7 @@ public partial class SidebarViewModel : ViewModelBase
 
         WeakReferenceMessenger.Default.Send(new FolderSelectedMessage(
             node.SelectedFolder.Entry.TreeId, node.SelectedFolder.Title, node.Name,
-            node.SelectedFolder.Entry.Path));
+            node.SelectedFolder.Entry.Path, node.Record));
     }
 
     #region Search
@@ -280,7 +298,7 @@ public partial class SidebarViewModel : ViewModelBase
         return VirtualVolumes
             .SelectMany(node => node.Folders.Select(
                 folder => new SearchScope(
-                    folder.Entry.TreeId, folder.Title, node.Name, folder.Entry.Path)))
+                    folder.Entry.TreeId, folder.Title, node.Name, folder.Entry.Path, node.Record)))
             .GroupBy(scope => scope.TreeId)
             .Select(group => group.First())
             .ToList();
@@ -482,6 +500,8 @@ public partial class SidebarViewModel : ViewModelBase
         {
             node.Record = record;
         }
+
+        WeakReferenceMessenger.Default.Send(new VirtualVolumeChangedMessage(record));
     }
 
     #endregion
@@ -735,20 +755,61 @@ public partial class SidebarViewModel : ViewModelBase
 
             var choices = AllFolders
                 .Where(folder => folder.Entry.Id != item.Entry.Id)
-                .Select(folder => new FolderChoice(folder.Entry.Id, folder.Title, folder.Path))
+                .Select(ChoiceFor)
                 .ToList();
 
-            var target = new CompareTargetDialogViewModel(choices);
-            var dialog = new Views.CompareTargetDialogView { DataContext = target };
-
-            if (await Dialogs.ShowAsync(dialog, window))
-            {
-                await RunComparisonAsync(item, target, window);
-            }
+            await AskAndCompareAsync(new ComparedFolder(item.Entry.TreeId, item.Entry.TreeId, item.Title, item.Path), choices, window);
         }
         catch (Exception e)
         {
             await Logger.ShowErrorAsync(e);
+        }
+    }
+
+    public void Receive(CompareFoldersMessage message)
+    {
+        message.Reply(CompareFromExplorerAsync(message));
+    }
+
+    // Any folder the explorer lists can be compared with any other, its own tree included
+    private async Task<bool> CompareFromExplorerAsync(CompareFoldersMessage request)
+    {
+        try
+        {
+            var window = Dialogs.Owner();
+            if (window == null)
+                return false;
+
+            if (request.Right != null)
+            {
+                await RunComparisonAsync(request.Left, request.Right, null, window);
+            }
+            else
+            {
+                await AskAndCompareAsync(request.Left, AllFolders.Select(ChoiceFor).ToList(), window);
+            }
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            await Logger.ShowErrorAsync(e);
+            return false;
+        }
+    }
+
+    private FolderChoice ChoiceFor(FolderItem folder) =>
+        new(folder.Entry.TreeId, folder.Title, folder.Path, treeId =>
+            _databaseService.FindItemsAsync<FileRecord>(record => record.RootFolderId == treeId && record.IsFolder));
+
+    private async Task AskAndCompareAsync(ComparedFolder left, IReadOnlyList<FolderChoice> choices, Window owner)
+    {
+        var target = new CompareTargetDialogViewModel(choices);
+        var dialog = new Views.CompareTargetDialogView { DataContext = target };
+
+        if (await Dialogs.ShowAsync(dialog, owner))
+        {
+            await RunComparisonAsync(left, target.SelectedFolder?.Compared, target.SelectedFolder == null ? target.LiveFolderPath : null, owner);
         }
     }
 
@@ -948,7 +1009,12 @@ public partial class SidebarViewModel : ViewModelBase
 
     #region Database commands
 
-    private async Task RunComparisonAsync(FolderItem left, CompareTargetDialogViewModel target, Window owner)
+    /// <summary>
+    /// Compares the folder with another catalogued one, or with the folder on disk when there is
+    /// none, and shows the differences. Either folder may have gone since it was offered, which
+    /// shows nothing rather than failing.
+    /// </summary>
+    private async Task RunComparisonAsync(ComparedFolder left, ComparedFolder? right, string? diskPath, Window owner)
     {
         using var cancellation = new CancellationTokenSource();
         _compareCancellation = cancellation;
@@ -960,53 +1026,49 @@ public partial class SidebarViewModel : ViewModelBase
         {
             WeakReferenceMessenger.Default.Send(new UpdateStatusMessage(true, "Reading folder...", true));
 
-            // The whole tree is needed, root record included: the comparison is anchored on it
-            var leftRecords = await _databaseService.FindItemsAsync<FileRecord>(
-                record => record.RootFolderId == left.Entry.TreeId);
+            var leftRecords = await TreeOfAsync(left);
+            if (leftRecords == null)
+                return;
 
-            RootFolderMetadata rightEntry;
+            RootFolderMetadata rightAnchor;
             IReadOnlyCollection<FileRecord> rightRecords;
             string rightName;
 
-            if (target.SelectedFolder != null)
+            if (right != null)
             {
-                var entryId = target.SelectedFolder.Id;
-                var entry = (await _databaseService.FindItemsAsync<RootFolderMetadata>(
-                    record => record.Id == entryId)).SingleOrDefault();
-
-                if (entry == null)
+                var records = await TreeOfAsync(right);
+                if (records == null)
                     return;
 
-                rightEntry = entry;
-                rightName = target.SelectedFolder.Name;
-                rightRecords = await _databaseService.FindItemsAsync<FileRecord>(
-                    record => record.RootFolderId == entry.TreeId);
+                rightAnchor = Anchor(right);
+                rightRecords = records;
+                rightName = right.Name;
             }
             else
             {
                 // Matching the setting the catalogued side was scanned under, or everything
                 // it left out would read as removed
                 var scan = await _fileScannerService.ScanDirectoryAsync(
-                    target.LiveFolderPath, progress, cancellation.Token,
+                    diskPath!, progress, cancellation.Token,
                     includeHiddenAndSystem: _settings.Data.ScanHiddenAndSystem);
 
-                rightEntry = scan.Metadata;
-                rightName = target.LiveFolderPath;
+                rightAnchor = scan.Metadata;
+                rightName = diskPath!;
                 rightRecords = scan.Records.ToList();
 
                 // Anything the scan was refused reads as removed against the catalogued side,
                 // so the differences below are wrong rather than merely incomplete
-                await ScanWarning.TellIfShortAsync(scan, target.LiveFolderPath);
+                await ScanWarning.TellIfShortAsync(scan, diskPath!);
             }
 
             var results = await _folderCompareService.CompareAsync(
-                left.Entry, leftRecords, rightEntry, rightRecords,
+                Anchor(left), leftRecords, rightAnchor, rightRecords,
                 includeUnchanged: false, progress, cancellation.Token);
 
             new Views.CompareResultsView
             {
                 DataContext = new CompareResultsViewModel(
-                    left.Title, left.Entry.Path, rightName, rightEntry.Path, results)
+                    left.Name, left.Path, rightName, rightAnchor.Path, results)
             }.Show(owner);
         }
         catch (OperationCanceledException)
@@ -1017,6 +1079,33 @@ public partial class SidebarViewModel : ViewModelBase
             _compareCancellation = null;
             WeakReferenceMessenger.Default.Send(new UpdateStatusMessage(false, "Done"));
         }
+    }
+
+    // The comparison walks down from the folder the anchor names, so the whole tree is read
+    // whichever folder in it that is
+    private static RootFolderMetadata Anchor(ComparedFolder folder) => new() { TreeId = folder.FolderId, Path = folder.Path };
+
+    /// <summary>
+    /// The tree holding the folder, or null when the folder is no longer in it.
+    /// </summary>
+    private async Task<IReadOnlyCollection<FileRecord>?> TreeOfAsync(ComparedFolder folder)
+    {
+        var treeId = folder.TreeId;
+        var records = await _databaseService.FindItemsAsync<FileRecord>(record => record.RootFolderId == treeId);
+
+        var byId = records.ToDictionary(record => record.Id);
+        if (!byId.ContainsKey(folder.FolderId))
+            return null;
+
+        // Below a folder caught in a loop of parents the comparison would go round for ever
+        var visited = new HashSet<Guid>();
+        for (var current = byId[folder.FolderId]; current.ParentId is { } parentId;)
+        {
+            if (!visited.Add(current.Id) || !byId.TryGetValue(parentId, out current!))
+                throw new InvalidOperationException($"The folder '{folder.Name}' has lost its place in its tree, and cannot be compared.");
+        }
+
+        return records;
     }
 
     [RelayCommand]

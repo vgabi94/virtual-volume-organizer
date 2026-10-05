@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
+using Avalonia.Styling;
 using VVO.UI;
 
 namespace VVO.UiTests;
@@ -107,6 +108,29 @@ public class AppResourceTests
         Assert.Equal(Color.Parse("#FF3366"), brush.Color);
     }
 
+    // An icon drawn before the theme changes is still on screen after it
+    [AvaloniaFact]
+    public void AnIconWithNoColourOfItsOwnFollowsTheTheme()
+    {
+        var application = Application.Current!;
+        var before = application.RequestedThemeVariant;
+        var brush = Assert.IsAssignableFrom<ISolidColorBrush>(IconColors.Brush(null));
+
+        try
+        {
+            foreach (var variant in new[] { ThemeVariant.Light, Theme.SlateDark, ThemeVariant.Dark })
+            {
+                application.RequestedThemeVariant = variant;
+
+                Assert.Equal(IconColors.Default, brush.Color);
+            }
+        }
+        finally
+        {
+            application.RequestedThemeVariant = before;
+        }
+    }
+
     [AvaloniaFact]
     public void TheSizesTheIconsAreDrawnAtAreDefined()
     {
@@ -115,5 +139,47 @@ public class AppResourceTests
             Assert.True(Application.Current!.TryFindResource(key, out var resource), $"missing '{key}'");
             Assert.IsType<double>(resource);
         }
+    }
+
+    // The views name these instead of carrying numbers, so one missing is a view that will not load
+    [AvaloniaFact]
+    public void EverySizeTheViewsAreLaidOutWithIsDefined()
+    {
+        string[] lengths =
+        [
+            "CompareCopySpacing", "CompareHeaderSpacing", "CompareSymbolFontSize", "DescriptionBoxHeight",
+            "DialogAlertIconSize", "DialogButtonSpacing", "DialogContentSpacing", "DialogErrorFontSize",
+            "DialogFieldSpacing", "DialogNoteSpacing", "DialogRowSpacing", "DialogSectionSpacing",
+            "DialogSubjectFontSize", "DialogTextFontSize", "DialogTitleFontSize", "DialogTitleSpacing",
+            "DocumentFontSize", "IconChoiceSize", "ItemSubtitleFontSize", "ItemSubtitleOpacity",
+            "OptionsNumberWidth", "OptionsSpacing", "StatusIndicatorHeight", "StatusMessageMinWidth",
+            "StatusSpacing", "VolumeExplorerSplitterWidth", "StatusBarHeight", "StatusBarFontSize", "TitleBarHeight",
+            "VolumeChipSpacing", "VolumeChipIconSize", "TintOpacity", "ExtensionTagFontSize", "PaneSplitterWidth",
+            "StartPageLogoSize", "StartPageTitleFontSize", "StartPageHeroSpacing", "StartPageCardWidth",
+            "StartPageCardSpacing", "StartPageCardIconSize", "AccentHoverOpacity", "AccentPressedOpacity", "CompareSummaryPartSpacing", "CompareSymbolSpacing"
+        ];
+        string[] thicknesses =
+        [
+            "CompareCopyButtonPadding", "CompareFooterMargin", "CompareHeaderMargin", "CompareMargin",
+            "CompareSummaryMargin", "DatabaseStatusMargin", "DialogAlertIconMargin", "DialogBrowseButtonMargin",
+            "DialogBrowseButtonPadding", "DialogButtonPadding", "DialogButtonRowMargin", "DialogLabelMargin",
+            "DialogListItemMargin", "DialogMargin", "DialogSectionMargin", "DialogSmallButtonPadding",
+            "DialogTextBoxPadding", "DocumentPadding", "FrameThickness", "IconChoicesPadding",
+            "OptionNoteMargin", "ShortcutRowMargin", "StatusButtonPadding", "StatusItemMargin",
+            "StatusBarStartMargin", "StatusBarEndMargin", "TitleBarIconMargin", "PanelBorderThickness",
+            "VolumeChipMargin", "VolumeChipPadding", "ExtensionTagPadding", "CellTextMargin", "StartPageCardPadding"
+        ];
+
+        Assert.All(lengths, key => Assert.IsType<double>(Resource(key)));
+        Assert.All(thicknesses, key => Assert.IsType<Thickness>(Resource(key)));
+        Assert.All(["FrameCornerRadius", "PanelCornerRadius", "TagCornerRadius", "CardCornerRadius"],
+            key => Assert.IsType<CornerRadius>(Resource(key)));
+    }
+
+    private static object? Resource(string key)
+    {
+        Assert.True(Application.Current!.TryFindResource(key, out var resource), $"missing '{key}'");
+
+        return resource;
     }
 }

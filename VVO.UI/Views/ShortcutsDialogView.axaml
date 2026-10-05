@@ -9,17 +9,13 @@
         ShowInTaskbar="False"
         Background="{DynamicResource DialogBackground}">
 
-    <Grid RowDefinitions="*, Auto" Margin="24">
+    <Grid RowDefinitions="*, Auto" Margin="{StaticResource DialogMargin}">
         <ItemsControl Grid.Row="0" ItemsSource="{Binding Shortcuts}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:ShortcutRow">
-                    <Grid ColumnDefinitions="120, *" Margin="0,0,0,10">
-                        <TextBlock Grid.Column="0" Text="{Binding Gesture}" FontWeight="Bold" FontSize="13"/>
-                        <TextBlock Grid.Column="1"
-                                   Text="{Binding Action}"
-                                   FontSize="13"
-                                   TextWrapping="Wrap"
-                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                    <Grid ColumnDefinitions="120, *" Margin="{StaticResource ShortcutRowMargin}">
+                        <TextBlock Grid.Column="0" Text="{Binding Gesture}" FontWeight="Bold" FontSize="{StaticResource DialogTextFontSize}"/>
+                        <TextBlock Grid.Column="1" Classes="DialogNote" Text="{Binding Action}"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -31,7 +27,7 @@
                 IsDefault="True"
                 IsCancel="True"
                 HorizontalAlignment="Right"
-                Margin="0,16,0,0"
-                Padding="18,7"/>
+                Margin="{StaticResource DialogSectionMargin}"
+                Classes="Dialog"/>
     </Grid>
 </Window>

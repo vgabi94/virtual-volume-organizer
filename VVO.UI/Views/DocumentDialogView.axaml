@@ -8,17 +8,11 @@
         ShowInTaskbar="False"
         Background="{DynamicResource DialogBackground}">
 
-    <Grid RowDefinitions="*, Auto" Margin="24" RowSpacing="14">
+    <Grid RowDefinitions="*, Auto" Margin="{StaticResource DialogMargin}" RowSpacing="{StaticResource DialogRowSpacing}">
 
-        <Border Grid.Row="0"
-                BorderThickness="1"
-                CornerRadius="4"
-                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
-            <ScrollViewer Padding="14" HorizontalScrollBarVisibility="Auto">
-                <SelectableTextBlock Text="{Binding Text}"
-                                     FontFamily="Consolas,Menlo,Monospace"
-                                     FontSize="12"
-                                     Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Border Grid.Row="0" Classes="DocumentFrame">
+            <ScrollViewer Padding="{StaticResource DocumentPadding}" HorizontalScrollBarVisibility="Auto">
+                <SelectableTextBlock Classes="DocumentText" Text="{Binding Text}"/>
             </ScrollViewer>
         </Border>
 
@@ -28,6 +22,6 @@
                 IsDefault="True"
                 IsCancel="True"
                 HorizontalAlignment="Right"
-                Padding="18,7"/>
+                Classes="Dialog"/>
     </Grid>
 </Window>

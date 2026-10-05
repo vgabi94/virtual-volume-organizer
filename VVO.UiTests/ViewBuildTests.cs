@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
+using VVO.Core;
 using VVO.Core.Models;
 using VVO.UI;
 using VVO.UI.ViewModels;
@@ -151,14 +152,20 @@ public class ViewBuildTests : UiTestBase
     [AvaloniaFact]
     public void TheOptionsDialogShowsWhatIsStored()
     {
-        Settings.SetDarkTheme(false);
+        Settings.SetColourTheme(Theme.Named("SlateLight"));
+        Settings.SetModernLayout(false);
         Settings.SetShowFolderDetailsAlways(true);
         Settings.SetScanHiddenAndSystem(false);
         var window = Laid(new OptionsDialogView { DataContext = new OptionsDialogViewModel(Settings) });
 
+        var theme = Assert.Single(window.GetVisualDescendants().OfType<ComboBox>());
+        Assert.Equal(Theme.All, theme.ItemsSource);
+        Assert.Equal(Theme.Named("SlateLight"), theme.SelectedItem);
+
         // One box per flag, in the order the dialog lists them
         var checks = window.GetVisualDescendants().OfType<CheckBox>().ToList();
         Assert.Equal(3, checks.Count);
+        Assert.Equal("Modern layout", checks[0].Content);
         Assert.False(checks[0].IsChecked);
         Assert.True(checks[1].IsChecked);
         Assert.False(checks[2].IsChecked);
@@ -235,7 +242,7 @@ public class ViewBuildTests : UiTestBase
             DataContext = new CompareTargetDialogViewModel(choices)
         });
 
-        var list = window.GetVisualDescendants().OfType<ListBox>().Single();
+        var list = window.GetVisualDescendants().OfType<TreeView>().Single();
         Assert.Equal(choices, list.ItemsSource);
         Assert.Contains("Code", TextOf(window).Select(block => block.Text));
         window.Close();
@@ -272,6 +279,24 @@ public class ViewBuildTests : UiTestBase
         window.Close();
     }
 
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheCompareSummaryIsOneLineInClassicAndItsPartsInModern(bool modern)
+    {
+        var viewModel = new CompareResultsViewModel("Source", @"D:\Source", "Target", @"E:\Target", []);
+        var window = Laid(new CompareResultsView { DataContext = viewModel });
+        Layout.Apply(modern);
+        Pump();
+
+        var line = TextOf(window).Single(block => block.Classes.Contains("CompareSummary"));
+        var parts = window.GetVisualDescendants().OfType<StackPanel>().Single(panel => panel.Classes.Contains("CompareSummaryParts"));
+        Assert.Equal(!modern, line.IsEffectivelyVisible);
+        Assert.Equal(modern, parts.IsEffectivelyVisible);
+        Assert.Contains(viewModel.RemovedSummary, TextOf(parts).Select(block => block.Text));
+        window.Close();
+    }
+
     // Shown to have an update approved, the same window offers a button to approve it with and
     // turns its Close into the way of turning the update down
     [AvaloniaFact]
@@ -284,9 +309,9 @@ public class ViewBuildTests : UiTestBase
         var buttons = window.GetVisualDescendants().OfType<Button>().ToList();
 
         Assert.Equal("Rescan Folder", window.Title);
-        Assert.Contains(buttons, button => Equals(button.Content, "Rescan") && button.IsVisible);
+        Assert.Contains(buttons, button => Equals(button.Content, "Replace") && button.IsVisible);
         Assert.Contains(buttons, button => Equals(button.Content, "Cancel") && button.IsCancel);
-        Assert.Contains(viewModel.Proposal, TextOf(window).Select(block => block.Text));
+        Assert.DoesNotContain(TextOf(window), block => block.Text == ScanWarnings.RescanProposal);
 
         window.Close();
     }

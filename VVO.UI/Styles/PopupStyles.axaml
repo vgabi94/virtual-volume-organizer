@@ -1,0 +1,15 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- A menu item pointed at or pressed in the theme's own tint rather than Fluent's grey -->
+    <Style Selector="MenuItem:selected /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource HoverBackground}" />
+    </Style>
+    <Style Selector="MenuItem:pressed /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="{DynamicResource PressedBackground}" />
+    </Style>
+
+    <Style Selector="MenuItem > Separator, ContextMenu > Separator">
+        <Setter Property="Background" Value="{DynamicResource DividerBrush}" />
+    </Style>
+</Styles>
