@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace VVO.UI
 {
@@ -24,13 +25,19 @@ namespace VVO.UI
             // is most of ProgramData and every AppData
             public bool ScanHiddenAndSystem { get; init; }
 
-            // Nullable so that a file written before there was a theme to choose reads as the
-            // dark one it was wearing, rather than as a light one the user never asked for
+            // The colour theme by key, null until one is chosen
+            public string? ColourTheme { get; init; }
+
+            // What files from before the list of themes chose with instead. Read until a theme
+            // is chosen, and dropped from the file then.
+            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
             public bool? DarkTheme { get; init; }
 
-            // Nullable for the same reason: a file from before either choice existed reads as
-            // the theme it was wearing and the layout new users get
+            [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
             public bool? SlateTheme { get; init; }
+
+            // Nullable so that a file from before the choice existed reads as the layout new
+            // users get
             public bool? ClassicLayout { get; init; }
         }
 
@@ -40,8 +47,7 @@ namespace VVO.UI
         {
             RecentFiles = [],
             MaxRecentFiles = DefaultMaxRecentFiles,
-            CollapsedVolumes = [],
-            DarkTheme = true
+            CollapsedVolumes = []
         };
 
         private readonly string _filePath;
@@ -76,6 +82,7 @@ namespace VVO.UI
                         CollapsedVolumes = loaded.CollapsedVolumes ?? [],
                         ShowFolderDetailsAlways = loaded.ShowFolderDetailsAlways,
                         ScanHiddenAndSystem = loaded.ScanHiddenAndSystem,
+                        ColourTheme = loaded.ColourTheme,
                         DarkTheme = loaded.DarkTheme,
                         SlateTheme = loaded.SlateTheme,
                         ClassicLayout = loaded.ClassicLayout
@@ -136,25 +143,19 @@ namespace VVO.UI
             Save();
         }
 
-        /// <summary>The theme to open on, dark until the user says otherwise.</summary>
-        public bool IsDarkTheme => Data.DarkTheme ?? true;
+        /// <summary>
+        /// The colour theme to open on: the one chosen, else what an older file's flags chose,
+        /// else dark, which is what a file from before any choice was wearing.
+        /// </summary>
+        public ColourTheme ColourTheme => Data.ColourTheme != null
+            ? Theme.Named(Data.ColourTheme)
+            : Theme.Named(Theme.KeyFor(Data.DarkTheme ?? true, Data.SlateTheme ?? false));
 
-        public void SetDarkTheme(bool value)
+        public void SetColourTheme(ColourTheme value)
         {
-            if (Data.DarkTheme == value) return;
+            if (Data.ColourTheme == value.Key) return;
 
-            Data = Data with { DarkTheme = value };
-            Save();
-        }
-
-        /// <summary>Whether the dark or light theme is its Slate variant, off until the user says otherwise.</summary>
-        public bool IsSlateTheme => Data.SlateTheme ?? false;
-
-        public void SetSlateTheme(bool value)
-        {
-            if (IsSlateTheme == value) return;
-
-            Data = Data with { SlateTheme = value };
+            Data = Data with { ColourTheme = value.Key, DarkTheme = null, SlateTheme = null };
             Save();
         }
 

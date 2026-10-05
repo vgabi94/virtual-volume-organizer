@@ -112,6 +112,7 @@
         <sys:Double x:Key="DescriptionBoxHeight">70</sys:Double>
         <sys:Double x:Key="OptionsSpacing">18</sys:Double>
         <Thickness x:Key="OptionNoteMargin">28,0,0,0</Thickness>
+        <sys:Double x:Key="OptionsThemeWidth">200</sys:Double>
         <sys:Double x:Key="OptionsNumberWidth">140</sys:Double>
         <Thickness x:Key="ShortcutRowMargin">0,0,0,10</Thickness>
         <Thickness x:Key="DocumentPadding">14</Thickness>

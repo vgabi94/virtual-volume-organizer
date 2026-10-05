@@ -12,8 +12,8 @@ using VVO.UI.Views;
 namespace VVO.UiTests;
 
 /// <summary>
-/// The two themes and the setting that chooses between them. Every colour the application names
-/// has to resolve under both, or a variant lands on screen with holes in it.
+/// The colour themes and the setting that chooses between them. Every colour the application
+/// names has to resolve under each, or a variant lands on screen with holes in it.
 /// </summary>
 public class ThemeTests : UiTestBase
 {
@@ -100,46 +100,46 @@ public class ThemeTests : UiTestBase
         };
     }
 
-    #region Both themes are complete
+    #region Every theme is complete
+
+    public static TheoryData<string> EveryTheme => new(Theme.All.Select(theme => theme.Key));
+
+    // Each of these inherits Dark or Light and names only what it changes
+    public static TheoryData<string> EveryDerivedTheme =>
+        new(Theme.All.Where(theme => theme.Variant.InheritVariant != null).Select(theme => theme.Key));
 
     [AvaloniaTheory]
-    [InlineData(true, false)]
-    [InlineData(false, false)]
-    [InlineData(true, true)]
-    [InlineData(false, true)]
-    public void EveryColourTheApplicationNamesResolvesInEveryTheme(bool dark, bool slate)
+    [MemberData(nameof(EveryTheme))]
+    public void EveryColourTheApplicationNamesResolvesInEveryTheme(string key)
     {
-        var variant = Theme.VariantFor(dark, slate);
+        var variant = Theme.Named(key).Variant;
 
-        Assert.All(OwnBrushes.Concat(FluentBrushes).Concat(FileKinds), key =>
-            Assert.True(Application.Current!.TryGetResource(key, variant, out _), $"missing '{key}'"));
+        Assert.All(OwnBrushes.Concat(FluentBrushes).Concat(FileKinds), name =>
+            Assert.True(Application.Current!.TryGetResource(name, variant, out _), $"missing '{name}'"));
     }
 
-    // Slate inherits its plain theme, so whatever it does not name is that theme's
     [AvaloniaTheory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void ASlateThemeFallsBackToItsPlainOneForEveryColourItDoesNotName(bool dark)
+    [MemberData(nameof(EveryDerivedTheme))]
+    public void ADerivedThemeFallsBackToItsBaseForEveryColourItDoesNotName(string key)
     {
-        var plain = Theme.VariantFor(dark, slate: false);
-        var slate = Theme.VariantFor(dark, slate: true);
-        var named = NamedBy(slate);
+        var derived = Theme.Named(key).Variant;
+        var plain = derived.InheritVariant!;
+        var named = NamedBy(derived);
 
-        Assert.All(OwnBrushes.Concat(FluentBrushes).Where(key => !named.Contains(key)), key =>
-            Assert.Equal(PaintOf(key, plain), PaintOf(key, slate)));
+        Assert.All(OwnBrushes.Concat(FluentBrushes).Where(name => !named.Contains(name)), name =>
+            Assert.Equal(PaintOf(name, plain), PaintOf(name, derived)));
     }
 
-    // A colour Slate names only to repeat the plain theme's is one that should not be there
+    // A colour named only to repeat the base theme's is one that should not be there
     [AvaloniaTheory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void EveryColourASlateThemeNamesDiffersFromThePlainOne(bool dark)
+    [MemberData(nameof(EveryDerivedTheme))]
+    public void EveryColourADerivedThemeNamesDiffersFromItsBase(string key)
     {
-        var plain = Theme.VariantFor(dark, slate: false);
-        var slate = Theme.VariantFor(dark, slate: true);
+        var derived = Theme.Named(key).Variant;
+        var plain = derived.InheritVariant!;
 
-        Assert.All(NamedBy(slate).Where(key => Application.Current!.TryGetResource(key, plain, out _)), key =>
-            Assert.NotEqual(PaintOf(key, plain), PaintOf(key, slate)));
+        Assert.All(NamedBy(derived).Where(name => Application.Current!.TryGetResource(name, plain, out _)), name =>
+            Assert.NotEqual(PaintOf(name, plain), PaintOf(name, derived)));
     }
 
     // Two variants resolving to one colour is a value that was never given a second reading
@@ -244,11 +244,11 @@ public class ThemeTests : UiTestBase
 
     // Painted by the window itself, so it moves with the window rather than staying put on the desktop
     [AvaloniaTheory]
-    [InlineData(true, "#26282E", "#1B1C20")]
-    [InlineData(false, "#F7F8FB", "#E8EBF1")]
-    public void ASlateWindowIsPaintedWithItsThemesGradient(bool dark, string from, string to)
+    [InlineData("SlateDark", "#26282E", "#1B1C20")]
+    [InlineData("SlateLight", "#F7F8FB", "#E8EBF1")]
+    public void ASlateWindowIsPaintedWithItsThemesGradient(string key, string from, string to)
     {
-        var window = new Window { Classes = { "AppWindow" }, RequestedThemeVariant = Theme.VariantFor(dark, slate: true) };
+        var window = new Window { Classes = { "AppWindow" }, RequestedThemeVariant = Theme.Named(key).Variant };
         window.Show();
 
         var gradient = Assert.IsType<LinearGradientBrush>(window.Background);
@@ -257,13 +257,10 @@ public class ThemeTests : UiTestBase
     }
 
     [AvaloniaTheory]
-    [InlineData(true, true)]
-    [InlineData(false, true)]
-    [InlineData(true, false)]
-    [InlineData(false, false)]
-    public void NoThemeAsksTheSystemToDrawBehindTheWindow(bool dark, bool slate)
+    [MemberData(nameof(EveryTheme))]
+    public void NoThemeAsksTheSystemToDrawBehindTheWindow(string key)
     {
-        Shell.RequestedThemeVariant = Theme.VariantFor(dark, slate);
+        Shell.RequestedThemeVariant = Theme.Named(key).Variant;
 
         Assert.Empty(Shell.TransparencyLevelHint);
     }
@@ -297,7 +294,7 @@ public class ThemeTests : UiTestBase
 
         try
         {
-            Theme.Apply(dark: false, slate: true);
+            Theme.Apply(Theme.Named("SlateLight"));
             Layout.Apply(true);
 
             Assert.All(new Window[] { compare, dialog }, window =>
@@ -320,22 +317,17 @@ public class ThemeTests : UiTestBase
     #region Choosing one
 
     [AvaloniaTheory]
-    [InlineData(true, false, "Dark")]
-    [InlineData(false, false, "Light")]
-    [InlineData(true, true, "SlateDark")]
-    [InlineData(false, true, "SlateLight")]
-    public void ApplyingPutsOnTheVariantForEachChoice(bool dark, bool slate, string expected)
+    [MemberData(nameof(EveryTheme))]
+    public void ApplyingPutsOnEachThemesVariant(string key)
     {
         var application = Application.Current!;
         var before = application.RequestedThemeVariant;
 
         try
         {
-            Theme.Apply(dark, slate);
+            Theme.Apply(Theme.Named(key));
 
-            Assert.Equal(expected, application.ActualThemeVariant.Key);
-            Assert.Equal(dark ? ThemeVariant.Dark : ThemeVariant.Light,
-                application.ActualThemeVariant.InheritVariant ?? application.ActualThemeVariant);
+            Assert.Equal(key, application.ActualThemeVariant.Key);
         }
         finally
         {
@@ -346,8 +338,9 @@ public class ThemeTests : UiTestBase
     [AvaloniaFact]
     public void TheApplicationOpensDarkUntilItIsToldOtherwise()
     {
-        Assert.True(Settings.IsDarkTheme);
-        Assert.True(new OptionsDialogViewModel(Settings).DarkTheme);
+        Assert.Equal(Theme.Default, Settings.ColourTheme);
+        Assert.Equal(ThemeVariant.Dark, Settings.ColourTheme.Variant);
+        Assert.Equal(Theme.Default, new OptionsDialogViewModel(Settings).ColourTheme);
     }
 
     // Written before there was a theme to choose, so it carries no answer for one
@@ -357,93 +350,117 @@ public class ThemeTests : UiTestBase
         var path = TempPath("json");
         File.WriteAllText(path, """{ "RecentFiles": [], "MaxRecentFiles": 7 }""");
 
-        Assert.True(new Settings(path).IsDarkTheme);
+        Assert.Equal(ThemeVariant.Dark, new Settings(path).ColourTheme.Variant);
+    }
+
+    // Written when the theme was two checkboxes
+    [AvaloniaTheory]
+    [InlineData("true", "false", "Dark")]
+    [InlineData("false", "false", "Light")]
+    [InlineData("true", "true", "SlateDark")]
+    [InlineData("false", "true", "SlateLight")]
+    [InlineData("false", "null", "Light")]
+    [InlineData("null", "true", "SlateDark")]
+    public void ASettingsFileWithTheOldFlagsOpensOnTheThemeTheyDescribe(string dark, string slate, string expected)
+    {
+        var path = TempPath("json");
+        File.WriteAllText(path, $$"""{ "RecentFiles": [], "DarkTheme": {{dark}}, "SlateTheme": {{slate}} }""");
+
+        Assert.Equal(expected, new Settings(path).ColourTheme.Key);
     }
 
     [AvaloniaFact]
-    public void ChoosingTheLightThemePutsItOnAndRemembersIt()
+    public void ChoosingAThemeDropsTheOldFlagsFromTheFile()
     {
-        var applied = new List<bool>();
-        Theme.Applying = (dark, _) => applied.Add(dark);
+        var path = TempPath("json");
+        File.WriteAllText(path, """{ "RecentFiles": [], "DarkTheme": false, "SlateTheme": true }""");
+        var settings = new Settings(path);
 
-        var options = new OptionsDialogViewModel(Settings) { DarkTheme = false };
-        options.Apply();
+        settings.SetColourTheme(Theme.Named("Dark"));
 
-        Assert.Equal([false], applied);
-        Assert.False(Settings.IsDarkTheme);
-        Assert.False(new Settings(SettingsPath).IsDarkTheme);
+        var text = File.ReadAllText(path);
+        Assert.DoesNotContain("DarkTheme", text);
+        Assert.DoesNotContain("SlateTheme", text);
+        Assert.Equal("Dark", new Settings(path).ColourTheme.Key);
+    }
+
+    // Hand-edited, or a theme since dropped from the list
+    [AvaloniaFact]
+    public void AThemeNoLongerOnTheListOpensOnTheDefault()
+    {
+        var path = TempPath("json");
+        File.WriteAllText(path, """{ "RecentFiles": [], "ColourTheme": "Mica" }""");
+
+        Assert.Equal(Theme.Default, new Settings(path).ColourTheme);
     }
 
     [AvaloniaFact]
-    public void ChoosingTheDarkThemeAgainPutsItBack()
+    public void TheOptionsDialogOffersEveryTheme()
     {
-        Settings.SetDarkTheme(false);
+        Assert.Equal(Theme.All, new OptionsDialogViewModel(Settings).ColourThemes);
+        Assert.Equal(Theme.All.Count, Theme.All.Select(theme => theme.Key).Distinct().Count());
+        Assert.Equal(Theme.All.Count, Theme.All.Select(theme => theme.Name).Distinct().Count());
+    }
 
-        var applied = new List<bool>();
-        Theme.Applying = (dark, _) => applied.Add(dark);
+    [AvaloniaTheory]
+    [MemberData(nameof(EveryTheme))]
+    public void ChoosingAThemePutsItOnAndRemembersIt(string key)
+    {
+        Settings.SetColourTheme(Theme.Named(key) == Theme.Default ? Theme.All[1] : Theme.Default);
+        var applied = new List<ColourTheme>();
+        Theme.Applying = applied.Add;
 
-        new OptionsDialogViewModel(Settings) { DarkTheme = true }.Apply();
+        new OptionsDialogViewModel(Settings) { ColourTheme = Theme.Named(key) }.Apply();
 
-        Assert.Equal([true], applied);
-        Assert.True(Settings.IsDarkTheme);
+        Assert.Equal([Theme.Named(key)], applied);
+        Assert.Equal(key, Settings.ColourTheme.Key);
+        Assert.Equal(key, new Settings(SettingsPath).ColourTheme.Key);
     }
 
     [AvaloniaFact]
-    public void TheOptionsDialogStartsFromTheStoredSlateAndLayout()
+    public void TheOptionsDialogStartsFromTheStoredThemeAndLayout()
     {
-        Settings.SetSlateTheme(true);
+        Settings.SetColourTheme(Theme.Named("SlateLight"));
         Settings.SetModernLayout(false);
 
         var options = new OptionsDialogViewModel(Settings);
 
-        Assert.True(options.SlateTheme);
+        Assert.Equal(Theme.Named("SlateLight"), options.ColourTheme);
         Assert.False(options.ModernLayout);
     }
 
     [AvaloniaFact]
-    public void SavingTheOptionsPutsOnAndRemembersTheSlateAndLayoutChosen()
+    public void SavingTheOptionsPutsOnAndRemembersTheThemeAndLayoutChosen()
     {
-        var themes = new List<(bool Dark, bool Slate)>();
+        var themes = new List<ColourTheme>();
         var layouts = new List<bool>();
-        Theme.Applying = (dark, slate) => themes.Add((dark, slate));
+        Theme.Applying = themes.Add;
         Layout.Applying = modern => layouts.Add(modern);
 
-        new OptionsDialogViewModel(Settings) { SlateTheme = true, ModernLayout = false }.Apply();
+        new OptionsDialogViewModel(Settings) { ColourTheme = Theme.Named("SlateDark"), ModernLayout = false }.Apply();
 
-        Assert.Equal([(true, true)], themes);
+        Assert.Equal([Theme.Named("SlateDark")], themes);
         Assert.Equal([false], layouts);
         var reopened = new Settings(SettingsPath);
-        Assert.True(reopened.IsSlateTheme);
+        Assert.Equal("SlateDark", reopened.ColourTheme.Key);
         Assert.False(reopened.IsModernLayout);
     }
 
     [AvaloniaFact]
-    public void CancellingTheOptionsDialogLeavesSlateAndTheLayoutAlone()
+    public void CancellingTheOptionsDialogLeavesTheThemeAndLayoutAlone()
     {
-        var themes = new List<(bool Dark, bool Slate)>();
+        var themes = new List<ColourTheme>();
         var layouts = new List<bool>();
-        Theme.Applying = (dark, slate) => themes.Add((dark, slate));
+        Theme.Applying = themes.Add;
         Layout.Applying = modern => layouts.Add(modern);
 
-        _ = new OptionsDialogViewModel(Settings) { SlateTheme = true, ModernLayout = false };
+        // Filled in and never applied, which is what pressing Cancel amounts to
+        _ = new OptionsDialogViewModel(Settings) { ColourTheme = Theme.Named("SlateLight"), ModernLayout = false };
 
         Assert.Empty(themes);
         Assert.Empty(layouts);
-        Assert.False(Settings.IsSlateTheme);
+        Assert.Equal(Theme.Default, Settings.ColourTheme);
         Assert.True(Settings.IsModernLayout);
-    }
-
-    [AvaloniaFact]
-    public void CancellingTheOptionsDialogLeavesTheThemeAlone()
-    {
-        var applied = new List<bool>();
-        Theme.Applying = (dark, _) => applied.Add(dark);
-
-        // Filled in and never applied, which is what pressing Cancel amounts to
-        _ = new OptionsDialogViewModel(Settings) { DarkTheme = false };
-
-        Assert.Empty(applied);
-        Assert.True(Settings.IsDarkTheme);
     }
 
     #endregion
@@ -475,10 +492,11 @@ public class ThemeTests : UiTestBase
         window.Show();
         Pump();
 
-        var first = window.GetVisualDescendants().OfType<CheckBox>().First();
+        var first = window.GetVisualDescendants().OfType<Control>().First(control => control is ComboBox or CheckBox);
 
-        Assert.Equal("Dark theme", first.Content);
-        Assert.True(first.IsChecked);
+        var themes = Assert.IsType<ComboBox>(first);
+        Assert.Equal(Theme.Default, themes.SelectedItem);
+        Assert.Equal(Theme.All.Count, themes.ItemCount);
         window.Close();
     }
 

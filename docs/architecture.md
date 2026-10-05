@@ -25,8 +25,8 @@ models are constructed where they are shown rather than resolved.
 
 The theme and the layout are applied before the main window is built, so the window is never
 painted one way and repainted another. They are chosen apart in Options: `Theme` sets the
-application's theme variant (Dark, Light, or the Slate variants, which inherit from them and name
-only the colours they change), and `Layout` puts the `Modern` class on every open window and on
+application's theme variant to the colour theme picked from `Theme.All` (Dark, Light, or one that
+inherits from them and names only the colours it changes, like Slate), and `Layout` puts the `Modern` class on every open window and on
 each one as it opens, which the styles key the modern layout on. Classic is the absence of the
 class, so a view laid out for it needs no styles of its own.
 

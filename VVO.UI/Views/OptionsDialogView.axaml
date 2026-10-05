@@ -11,14 +11,12 @@
 
     <Grid RowDefinitions="*, Auto" Margin="{StaticResource DialogMargin}">
         <StackPanel Grid.Row="0" Spacing="{StaticResource OptionsSpacing}">
-            <StackPanel Spacing="{StaticResource DialogNoteSpacing}">
-                <CheckBox Content="Dark theme"
-                          IsChecked="{Binding DarkTheme, Mode=TwoWay}"/>
-                <TextBlock Classes="DialogNote OptionNote" Text="When off the application wears its light theme instead."/>
+            <StackPanel Classes="DialogField">
+                <TextBlock Text="Colour theme"/>
+                <ComboBox ItemsSource="{Binding ColourThemes}"
+                          SelectedItem="{Binding ColourTheme, Mode=TwoWay}"
+                          Width="{StaticResource OptionsThemeWidth}"/>
             </StackPanel>
-
-            <CheckBox Content="Slate theme"
-                      IsChecked="{Binding SlateTheme, Mode=TwoWay}"/>
 
             <CheckBox Content="Modern layout"
                       IsChecked="{Binding ModernLayout, Mode=TwoWay}"/>

@@ -23,7 +23,7 @@ public partial class App : Application
 
             // Before the window is built, so it is never painted in one theme and then repainted
             var settings = serviceProvider.GetRequiredService<Settings>();
-            Theme.Apply(settings.IsDarkTheme, settings.IsSlateTheme);
+            Theme.Apply(settings.ColourTheme);
             Layout.Apply(settings.IsModernLayout);
 
             var mainWindowVm = serviceProvider.GetRequiredService<MainWindowViewModel>();

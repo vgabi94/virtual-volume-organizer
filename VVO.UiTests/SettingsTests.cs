@@ -317,28 +317,28 @@ public class SettingsTests : UiTestBase
 
     // Written before either choice existed, so it carries no answer for them
     [AvaloniaFact]
-    public void AFileFromBeforeSlateAndTheLayoutReadsAsNoSlateAndTheModernLayout()
+    public void AFileFromBeforeTheThemeAndTheLayoutReadsAsDarkAndTheModernLayout()
     {
         var path = TempPath("json");
         File.WriteAllText(path, """{ "RecentFiles": [], "MaxRecentFiles": 7 }""");
 
         var settings = At(path);
 
-        Assert.False(settings.IsSlateTheme);
+        Assert.Equal(Theme.Default, settings.ColourTheme);
         Assert.True(settings.IsModernLayout);
     }
 
     [AvaloniaTheory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void SlateIsWhatTheNextStartReads(bool slate)
+    [InlineData("Light")]
+    [InlineData("SlateDark")]
+    public void TheThemeIsWhatTheNextStartReads(string key)
     {
         var settings = Fresh();
-        settings.SetSlateTheme(!slate);
+        settings.SetColourTheme(Theme.Named("SlateLight"));
 
-        settings.SetSlateTheme(slate);
+        settings.SetColourTheme(Theme.Named(key));
 
-        Assert.Equal(slate, Reopened(settings).IsSlateTheme);
+        Assert.Equal(key, Reopened(settings).ColourTheme.Key);
     }
 
     [AvaloniaTheory]
@@ -356,14 +356,13 @@ public class SettingsTests : UiTestBase
 
     // The defaults count as held: the file says nothing, and nothing is what it already says
     [AvaloniaFact]
-    public void ChoosingTheSlateAndLayoutTheFileAlreadyHoldsDoesNotRewriteIt()
+    public void ChoosingTheLayoutTheFileAlreadyHoldsDoesNotRewriteIt()
     {
         var path = TempPath("json");
         File.WriteAllText(path, """{ "RecentFiles": [], "MaxRecentFiles": 7 }""");
         var settings = At(path);
         var written = File.GetLastWriteTimeUtc(path);
 
-        settings.SetSlateTheme(false);
         settings.SetModernLayout(true);
 
         Assert.Equal(written, File.GetLastWriteTimeUtc(path));

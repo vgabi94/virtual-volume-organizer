@@ -152,22 +152,23 @@ public class ViewBuildTests : UiTestBase
     [AvaloniaFact]
     public void TheOptionsDialogShowsWhatIsStored()
     {
-        Settings.SetDarkTheme(false);
-        Settings.SetSlateTheme(true);
+        Settings.SetColourTheme(Theme.Named("SlateLight"));
         Settings.SetModernLayout(false);
         Settings.SetShowFolderDetailsAlways(true);
         Settings.SetScanHiddenAndSystem(false);
         var window = Laid(new OptionsDialogView { DataContext = new OptionsDialogViewModel(Settings) });
 
+        var theme = Assert.Single(window.GetVisualDescendants().OfType<ComboBox>());
+        Assert.Equal(Theme.All, theme.ItemsSource);
+        Assert.Equal(Theme.Named("SlateLight"), theme.SelectedItem);
+
         // One box per flag, in the order the dialog lists them
         var checks = window.GetVisualDescendants().OfType<CheckBox>().ToList();
-        Assert.Equal(5, checks.Count);
-        Assert.Equal(["Dark theme", "Slate theme", "Modern layout"], checks.Take(3).Select(check => check.Content));
+        Assert.Equal(3, checks.Count);
+        Assert.Equal("Modern layout", checks[0].Content);
         Assert.False(checks[0].IsChecked);
         Assert.True(checks[1].IsChecked);
         Assert.False(checks[2].IsChecked);
-        Assert.True(checks[3].IsChecked);
-        Assert.False(checks[4].IsChecked);
         window.Close();
     }
 
