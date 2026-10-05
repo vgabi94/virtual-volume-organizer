@@ -563,6 +563,17 @@ public class ThemeTests : UiTestBase
 
     [AvaloniaTheory]
     [MemberData(nameof(EveryTheme))]
+    public void TheCaptionButtonsLightUpInTheThemesOwnTint(string key)
+    {
+        var variant = Theme.Named(key).Variant;
+
+        Assert.Equal(ColourOf("HoverBackground", variant), ColourOf("CaptionButtonBackground", variant));
+        Assert.Equal(ColourOf("PressedBackground", variant), ColourOf("CaptionButtonBorderBrush", variant));
+        Assert.Equal(ColourOf("ContentBorderBrush", variant), ColourOf("MenuFlyoutPresenterBorderBrush", variant));
+    }
+
+    [AvaloniaTheory]
+    [MemberData(nameof(EveryTheme))]
     public void MenusOpenOnTheThemesRaisedSurfaceAndHighlightInItsTint(string key)
     {
         var variant = Theme.Named(key).Variant;

@@ -20,6 +20,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <!-- Each surface, text weight and state by what it is for. The plain themes give each
                  the Fluent colour it was drawn in before it had a name, so a theme that changes one
@@ -92,6 +95,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <SolidColorBrush x:Key="WindowBackground" Color="#FAF9F7"/>
             <SolidColorBrush x:Key="ChromeBackground" Color="#EDEBE7"/>
@@ -190,6 +196,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
             <!-- The plain theme's red, lifted to read on the lighter raised layer -->
             <SolidColorBrush x:Key="DangerBrush" Color="#FF6A61"/>
             <SolidColorBrush x:Key="DiffRemovedForeground" Color="#FF6A61"/>
@@ -253,6 +262,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#E9A400"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#AF4A88"/>
@@ -316,6 +328,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#CDB7F6"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#EE97C9"/>
@@ -375,6 +390,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#8E6AC7"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#AF4A88"/>
@@ -433,6 +451,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#D7AB6B"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#D79DBD"/>
@@ -488,6 +509,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#B07A2A"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#8B4A70"/>
@@ -546,6 +570,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#C8BB8E"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#D7A7C1"/>
@@ -600,6 +627,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#A28A3C"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#91607C"/>
@@ -661,6 +691,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#A99CFF"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#FD97D2"/>
@@ -719,6 +752,9 @@
             <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
             <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
             <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <!-- Fluent leaves the caption buttons its light theme's grey to light up in, whatever the theme -->
+            <StaticResource x:Key="CaptionButtonBackground" ResourceKey="HoverBackground"/>
+            <StaticResource x:Key="CaptionButtonBorderBrush" ResourceKey="PressedBackground"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#7A62F0"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#B94C90"/>
