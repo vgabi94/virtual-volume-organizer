@@ -13,6 +13,13 @@
             <!-- Level with the menu bar, so a dialog reads as part of the application rather
                  than as a hole cut in it -->
             <SolidColorBrush x:Key="DialogBackground" Color="#1F1F1F"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <!-- Each surface, text weight and state by what it is for. The plain themes give each
                  the Fluent colour it was drawn in before it had a name, so a theme that changes one
@@ -78,6 +85,13 @@
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFF"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#FAF9F7"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <SolidColorBrush x:Key="WindowBackground" Color="#FAF9F7"/>
             <SolidColorBrush x:Key="ChromeBackground" Color="#EDEBE7"/>
@@ -169,6 +183,13 @@
             <SolidColorBrush x:Key="AccentBrush" Color="#60CDFF"/>
             <SolidColorBrush x:Key="AccentForegroundBrush" Color="#00253A"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#2B2C30"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
             <!-- The plain theme's red, lifted to read on the lighter raised layer -->
             <SolidColorBrush x:Key="DangerBrush" Color="#FF6A61"/>
             <SolidColorBrush x:Key="DiffRemovedForeground" Color="#FF6A61"/>
@@ -225,6 +246,13 @@
             <SolidColorBrush x:Key="ControlBorderBrush" Color="#1A000000"/>
             <SolidColorBrush x:Key="AccentBrush" Color="#005FB8"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#FAFAFA"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#E9A400"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#AF4A88"/>
@@ -281,6 +309,13 @@
             <SolidColorBrush x:Key="AccentBrush" Color="#A882FF"/>
             <SolidColorBrush x:Key="AccentForegroundBrush" Color="#1B1230"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#1D1A25"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#CDB7F6"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#EE97C9"/>
@@ -333,6 +368,13 @@
             <SolidColorBrush x:Key="TextControlBorderBrush" Color="#DCD4E8"/>
             <SolidColorBrush x:Key="AccentBrush" Color="#7C3AED"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#FFFFFF"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#8E6AC7"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#AF4A88"/>
@@ -384,6 +426,13 @@
             <SolidColorBrush x:Key="AccentBrush" Color="#E0A066"/>
             <SolidColorBrush x:Key="AccentForegroundBrush" Color="#22160C"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#201C18"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#D7AB6B"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#D79DBD"/>
@@ -432,6 +481,13 @@
             <SolidColorBrush x:Key="TextControlBorderBrush" Color="#D6CCBB"/>
             <SolidColorBrush x:Key="AccentBrush" Color="#B0532B"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#FFFCF6"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#B07A2A"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#8B4A70"/>
@@ -483,6 +539,13 @@
             <SolidColorBrush x:Key="AccentBrush" Color="#8FC2A2"/>
             <SolidColorBrush x:Key="AccentForegroundBrush" Color="#0F1F16"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#1B201D"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#C8BB8E"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#D7A7C1"/>
@@ -530,6 +593,13 @@
             <SolidColorBrush x:Key="TextControlBorderBrush" Color="#D5DDD5"/>
             <SolidColorBrush x:Key="AccentBrush" Color="#3D7A58"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#FBFCFA"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#A28A3C"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#91607C"/>
@@ -584,6 +654,13 @@
             <SolidColorBrush x:Key="AccentBrush" Color="#B197FC"/>
             <SolidColorBrush x:Key="AccentForegroundBrush" Color="#160F33"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#151228"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#A99CFF"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#FD97D2"/>
@@ -635,6 +712,13 @@
             <SolidColorBrush x:Key="TextControlBorderBrush" Color="#296E50C8"/>
             <SolidColorBrush x:Key="AccentBrush" Color="#6D4AFF"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#FDFEFF"/>
+            <!-- Fluent's menus, drop-downs and tooltips, on the raised surface rather than its own grey -->
+            <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="ContentBorderBrush"/>
+            <StaticResource x:Key="ToolTipBackground" ResourceKey="DialogBackground"/>
+            <StaticResource x:Key="ToolTipBorderBrush" ResourceKey="ContentBorderBrush"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#7A62F0"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#B94C90"/>

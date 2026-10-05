@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
@@ -557,6 +558,29 @@ public class ThemeTests : UiTestBase
         var bar = Assert.IsType<Grid>(menu.Parent);
         Assert.IsType<LinearGradientBrush>(bar.Background);
         Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(menu.Background).Color);
+        window.Close();
+    }
+
+    [AvaloniaTheory]
+    [MemberData(nameof(EveryTheme))]
+    public void MenusOpenOnTheThemesRaisedSurfaceAndHighlightInItsTint(string key)
+    {
+        var variant = Theme.Named(key).Variant;
+        var window = new MainWindowView { DataContext = NewMainWindow(), RequestedThemeVariant = variant };
+        window.Show();
+        Pump();
+
+        var file = window.GetVisualDescendants().OfType<Menu>().Single().Items.OfType<MenuItem>().First();
+        file.IsSubMenuOpen = true;
+        Pump();
+        var item = file.Items.OfType<MenuItem>().First(item => item.IsEffectivelyEnabled);
+        item.IsSelected = true;
+        Pump();
+
+        var dropDown = Assert.IsType<Border>(file.GetVisualDescendants().OfType<Popup>().First().Child);
+        Assert.Equal(ColourOf("DialogBackground", variant), Assert.IsAssignableFrom<ISolidColorBrush>(dropDown.Background).Color);
+        var highlight = item.GetVisualDescendants().OfType<Border>().Single(border => border.Name == "PART_LayoutRoot");
+        Assert.Equal(ColourOf("HoverBackground", variant), Assert.IsAssignableFrom<ISolidColorBrush>(highlight.Background).Color);
         window.Close();
     }
 

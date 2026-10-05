@@ -199,6 +199,7 @@
         <StyleInclude Source="/Styles/MainWindowViewStyle.axaml"/>
         <StyleInclude Source="/Styles/StartPageStyles.axaml"/>
         <StyleInclude Source="/Styles/DialogStyles.axaml"/>
+        <StyleInclude Source="/Styles/PopupStyles.axaml"/>
         <StyleInclude Source="/Styles/FileTypeStyles.axaml"/>
     </Application.Styles>
 </Application>
