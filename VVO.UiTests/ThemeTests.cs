@@ -142,21 +142,15 @@ public class ThemeTests : UiTestBase
             Assert.NotEqual(PaintOf(name, plain), PaintOf(name, derived)));
     }
 
-    public static TheoryData<string> TheMockupThemes =>
-    [
-        "AmethystDark", "AmethystLight", "PaperDark", "PaperLight",
-        "SageDark", "SageLight", "NebulaDark", "NebulaLight"
-    ];
-
     [AvaloniaTheory]
     [MemberData(nameof(EveryTheme))]
     public void TextReadsOnTheContentOfEveryTheme(string key) =>
         AssertReadable(key, "TextPrimaryBrush", "TextSecondaryBrush");
 
-    // Inherited from the plain themes, so read again on each new ground
+    // Inherited from the plain themes unless named, so read again on each theme's own ground
     [AvaloniaTheory]
-    [MemberData(nameof(TheMockupThemes))]
-    public void DiffColoursAndWarningsReadOnTheContentOfEachMockupTheme(string key) =>
+    [MemberData(nameof(EveryTheme))]
+    public void DiffColoursAndWarningsReadOnTheContentOfEveryTheme(string key) =>
         AssertReadable(key, "DiffAddedForeground", "DiffRemovedForeground", "DiffChangedForeground", "DangerBrush", "ErrorTextBrush");
 
     // Read where they land: on the content layer, over whatever of the window's gradient it lets through
@@ -548,6 +542,21 @@ public class ThemeTests : UiTestBase
         Pump();
 
         Assert.NotEmpty(window.GetVisualDescendants().OfType<Menu>());
+        window.Close();
+    }
+
+    // Amethyst's glow runs along the whole bar; a menu painting its own would start it over
+    [AvaloniaFact]
+    public void TheMenuLetsTheTitleBarsGradientRunUnderIt()
+    {
+        var window = new MainWindowView { DataContext = NewMainWindow(), RequestedThemeVariant = Theme.AmethystDark };
+        window.Show();
+        Pump();
+
+        var menu = window.GetVisualDescendants().OfType<Menu>().Single();
+        var bar = Assert.IsType<Grid>(menu.Parent);
+        Assert.IsType<LinearGradientBrush>(bar.Background);
+        Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(menu.Background).Color);
         window.Close();
     }
 

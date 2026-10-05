@@ -169,6 +169,9 @@
             <SolidColorBrush x:Key="AccentBrush" Color="#60CDFF"/>
             <SolidColorBrush x:Key="AccentForegroundBrush" Color="#00253A"/>
             <SolidColorBrush x:Key="DialogBackground" Color="#2B2C30"/>
+            <!-- The plain theme's red, lifted to read on the lighter raised layer -->
+            <SolidColorBrush x:Key="DangerBrush" Color="#FF6A61"/>
+            <SolidColorBrush x:Key="DiffRemovedForeground" Color="#FF6A61"/>
 
             <SolidColorBrush x:Key="FolderSolidBrush" Color="#FFC83D"/>
             <SolidColorBrush x:Key="FileImageSolidBrush" Color="#EE97C9"/>

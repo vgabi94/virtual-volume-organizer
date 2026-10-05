@@ -127,8 +127,10 @@
         <Setter Property="Margin" Value="{StaticResource StatusBarEndMargin}"/>
     </Style>
 
+    <!-- Clear over the bar behind it, so a gradient chrome runs on unbroken rather than starting
+         again inside the menu -->
     <Style Selector="Menu.MenuBarStyle">
-      <Setter Property="Background" Value="{DynamicResource ChromeBackground}" />
+      <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style Selector="Menu.MenuBarStyle > MenuItem">
       <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
