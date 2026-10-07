@@ -222,6 +222,26 @@ public class ViewBuildTests : UiTestBase
         window.Close();
     }
 
+    // Modern offers swatches in place of the drop-down and the reset, and previews the icon
+    [AvaloniaTheory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheAppearanceDialogsOfferTheColourTheirLayoutDrawsIt(bool modern)
+    {
+        Layout.Apply(modern);
+        var viewModel = VirtualVolumeDialogViewModel.ForNewVolume();
+        var window = Laid(new VirtualVolumeDialogView { DataContext = viewModel });
+
+        bool Shown<T>(Func<T, bool> which) where T : Control =>
+            window.GetVisualDescendants().OfType<T>().Where(which).Any(control => control.IsEffectivelyVisible);
+
+        Assert.Equal(modern, Shown<ItemsControl>(list => list.ItemsSource == viewModel.Swatches));
+        Assert.Equal(modern, Shown<Panel>(panel => panel.Classes.Contains("AppearancePreview")));
+        Assert.Equal(!modern, Shown<ColorPicker>(_ => true));
+        Assert.Equal(!modern, Shown<Button>(button => button.Classes.Contains("ResetColor")));
+        window.Close();
+    }
+
     [AvaloniaFact]
     public void TheFolderDialogOpensOnTheFolderItIsEditing()
     {

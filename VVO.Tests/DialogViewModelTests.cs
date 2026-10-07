@@ -301,6 +301,79 @@ public class DialogViewModelTests
     }
 
     [Fact]
+    public void TheDefaultSwatchComesFirstAndIsChosenUntilAColourIs()
+    {
+        var viewModel = VirtualVolumeDialogViewModel.ForNewVolume();
+
+        Assert.True(viewModel.Swatches[0].IsDefault);
+        Assert.Same(viewModel.Swatches[0], viewModel.SelectedSwatch);
+        Assert.False(viewModel.IsCustomColor);
+    }
+
+    [Fact]
+    public void PickingASwatchChoosesItsColour()
+    {
+        var viewModel = VirtualVolumeDialogViewModel.ForNewVolume();
+        var swatch = viewModel.Swatches[3];
+
+        viewModel.SelectedSwatch = swatch;
+
+        Assert.Equal(swatch.Color, viewModel.SelectedColor);
+        Assert.Equal(swatch.Color.ToString(), viewModel.ColorHex);
+    }
+
+    [Fact]
+    public void PickingTheDefaultSwatchPutsTheColourBackOnTheDefault()
+    {
+        var viewModel = VirtualVolumeDialogViewModel.ForNewVolume();
+        viewModel.SelectedColor = Color.Parse("#FF3366");
+
+        viewModel.SelectedSwatch = viewModel.Swatches[0];
+
+        Assert.True(viewModel.IsDefaultColor);
+        Assert.Null(viewModel.ColorHex);
+    }
+
+    [Fact]
+    public void AColourNoSwatchHoldsIsCustom()
+    {
+        var viewModel = VirtualVolumeDialogViewModel.ForNewVolume();
+
+        viewModel.SelectedColor = Color.Parse("#FF3366");
+
+        Assert.Null(viewModel.SelectedSwatch);
+        Assert.True(viewModel.IsCustomColor);
+    }
+
+    // The swatch list clears its selection when the colour moves off every swatch
+    [Fact]
+    public void ClearingTheSwatchKeepsACustomColour()
+    {
+        var viewModel = VirtualVolumeDialogViewModel.ForNewVolume();
+        viewModel.SelectedColor = Color.Parse("#FF3366");
+
+        viewModel.SelectedSwatch = null;
+
+        Assert.Equal(Color.Parse("#FF3366"), viewModel.SelectedColor);
+    }
+
+    [Fact]
+    public void AStoredColourOnASwatchOpensWithThatSwatchChosen()
+    {
+        var record = new VirtualVolumeRecord
+        {
+            Id = Guid.NewGuid(),
+            Name = "Backups",
+            Icon = "HardDrive",
+            Color = IconColors.Presets[2].ToString()
+        };
+
+        var viewModel = VirtualVolumeDialogViewModel.ForExistingVolume(record);
+
+        Assert.Equal(IconColors.Presets[2], viewModel.SelectedSwatch?.Color);
+    }
+
+    [Fact]
     public void TheChosenColourIsWhatThePreviewIsPainted()
     {
         var viewModel = VirtualVolumeDialogViewModel.ForNewVolume();

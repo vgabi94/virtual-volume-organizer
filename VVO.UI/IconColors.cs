@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -7,6 +8,23 @@ namespace VVO.UI;
 
 public static class IconColors
 {
+    /// <summary>
+    /// The colours offered as swatches. Mid tones, so an icon in any of them reads on the dark
+    /// themes and the light ones alike.
+    /// </summary>
+    public static IReadOnlyList<Color> Presets { get; } =
+    [
+        Color.Parse("#E35D5D"),
+        Color.Parse("#E8893C"),
+        Color.Parse("#D9A82B"),
+        Color.Parse("#4CAF6E"),
+        Color.Parse("#2BB3A3"),
+        Color.Parse("#3D8FE0"),
+        Color.Parse("#7B6CF0"),
+        Color.Parse("#B06AD9"),
+        Color.Parse("#E0609A")
+    ];
+
     /// <summary>
     /// The shade the application's own icons are drawn in, which a virtual volume follows
     /// until the user picks a colour of its own.

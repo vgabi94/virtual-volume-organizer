@@ -1,83 +1,68 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:VVO.UI.ViewModels"
+        xmlns:views="using:VVO.UI.Views"
         x:Class="VVO.UI.Views.FolderDialogView"
         x:DataType="vm:FolderDialogViewModel"
-        x:Name="Dialog"
-        Title="{Binding Header}" Width="460" Height="560"
+        Title="{Binding Header}" Width="460"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         ShowInTaskbar="False"
         Background="{DynamicResource DialogBackground}">
 
-    <Grid RowDefinitions="Auto, Auto, Auto, *, Auto, Auto" Margin="{StaticResource DialogMargin}" RowSpacing="{StaticResource DialogRowSpacing}">
+    <Window.Styles>
+        <Style Selector="Window">
+            <Setter Property="Height" Value="560"/>
+        </Style>
+        <Style Selector="Window.Modern">
+            <Setter Property="Height" Value="NaN"/>
+            <Setter Property="SizeToContent" Value="Height"/>
+        </Style>
+    </Window.Styles>
 
-        <StackPanel Grid.Row="0" Classes="DialogField">
-            <TextBlock Text="Name" Classes="DialogLabel"/>
-            <TextBox Text="{Binding FolderName, Mode=TwoWay}" Classes="DialogInput"/>
-            <TextBlock Text="{Binding NameProblem}"
-                       IsVisible="{Binding NameProblem, Converter={x:Static ObjectConverters.IsNotNull}}"
-                       Classes="DialogError"/>
-        </StackPanel>
-
-        <StackPanel Grid.Row="1" Classes="DialogField">
-            <TextBlock Text="Description" Classes="DialogLabel"/>
-            <TextBox Text="{Binding Description, Mode=TwoWay}"
-                     AcceptsReturn="True"
-                     TextWrapping="Wrap"
-                     Height="{StaticResource DescriptionBoxHeight}"
-                     Classes="DialogInput"/>
-        </StackPanel>
-
-        <TextBlock Grid.Row="2" Text="Icon" Classes="DialogLabel"/>
-
-        <Border Grid.Row="3"
-                Classes="IconChoices">
-            <ScrollViewer>
-                <ListBox ItemsSource="{Binding Icons}"
-                         SelectedItem="{Binding SelectedIcon, Mode=TwoWay}"
-                         SelectionMode="Single"
-                         Background="Transparent">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel/>
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:IconChoice">
-                            <PathIcon Data="{Binding Data}"
-                                      Classes.FlipY="{Binding IsFlipped}"
-                                      Classes="IconChoice"
-                                      Foreground="{Binding #Dialog.((vm:FolderDialogViewModel)DataContext).SelectedBrush}"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </ScrollViewer>
+    <DockPanel>
+        <Border DockPanel.Dock="Bottom" Classes="DialogFooter">
+            <StackPanel Classes="DialogButtons">
+                <Button Content="Cancel"
+                        Click="OnCancelClicked"
+                        IsCancel="True"
+                        Classes="Dialog"/>
+                <Button Content="{Binding ConfirmText}"
+                        Click="OnConfirmClicked"
+                        IsDefault="True"
+                        IsEnabled="{Binding CanConfirm}"
+                        Classes="DialogPrimary"/>
+            </StackPanel>
         </Border>
 
-        <StackPanel Grid.Row="4" Classes="DialogField">
-            <Grid ColumnDefinitions="*, Auto">
-                <TextBlock Text="Colour" Classes="DialogLabel" VerticalAlignment="Center"/>
-                <Button Grid.Column="1"
-                        Content="Reset Color"
-                        Command="{Binding ResetColorCommand}"
-                        Classes="DialogSmall"/>
-            </Grid>
-            <ColorPicker Color="{Binding SelectedColor, Mode=TwoWay}"
-                         IsAlphaVisible="False"
-                         HorizontalAlignment="Left"/>
-        </StackPanel>
+        <Grid RowDefinitions="Auto, Auto, *" Classes="DialogBody" RowSpacing="{StaticResource DialogRowSpacing}">
 
-        <StackPanel Grid.Row="5" Classes="DialogButtons">
-            <Button Content="Cancel"
-                    Click="OnCancelClicked"
-                    IsCancel="True"
-                    Classes="Dialog"/>
-            <Button Content="{Binding ConfirmText}"
-                    Click="OnConfirmClicked"
-                    IsDefault="True"
-                    IsEnabled="{Binding CanConfirm}"
-                    Classes="DialogPrimary"/>
-        </StackPanel>
-    </Grid>
+            <DockPanel Grid.Row="0">
+                <Panel DockPanel.Dock="Left" Classes="AppearancePreview">
+                    <Border Classes="Tint" Background="{Binding SelectedBrush}"/>
+                    <PathIcon Data="{Binding SelectedIcon.Data}"
+                              Classes.FlipY="{Binding SelectedIcon.IsFlipped}"
+                              Foreground="{Binding SelectedBrush}"/>
+                </Panel>
+                <StackPanel Classes="DialogField">
+                    <TextBlock Text="Name" Classes="DialogLabel"/>
+                    <TextBox Text="{Binding FolderName, Mode=TwoWay}" Classes="DialogInput"/>
+                    <TextBlock Text="{Binding NameProblem}"
+                               IsVisible="{Binding NameProblem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                               Classes="DialogError"/>
+                </StackPanel>
+            </DockPanel>
+
+            <StackPanel Grid.Row="1" Classes="DialogField">
+                <TextBlock Text="Description" Classes="DialogLabel"/>
+                <TextBox Text="{Binding Description, Mode=TwoWay}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         Height="{StaticResource DescriptionBoxHeight}"
+                         Classes="DialogInput"/>
+            </StackPanel>
+
+            <views:AppearanceChoices Grid.Row="2"/>
+        </Grid>
+    </DockPanel>
 </Window>

@@ -156,7 +156,9 @@ public class AppResourceTests
             "StatusSpacing", "VolumeExplorerSplitterWidth", "StatusBarHeight", "StatusBarFontSize", "TitleBarHeight",
             "VolumeChipSpacing", "VolumeChipIconSize", "TintOpacity", "ExtensionTagFontSize", "PaneSplitterWidth",
             "StartPageLogoSize", "StartPageTitleFontSize", "StartPageHeroSpacing", "StartPageCardWidth",
-            "StartPageCardSpacing", "StartPageCardIconSize", "AccentHoverOpacity", "AccentPressedOpacity", "CompareSummaryPartSpacing", "CompareSymbolSpacing"
+            "StartPageCardSpacing", "StartPageCardIconSize", "AccentHoverOpacity", "AccentPressedOpacity", "CompareSummaryPartSpacing", "CompareSymbolSpacing",
+            "DialogFooterButtonMinWidth", "AppearancePreviewSize", "AppearancePreviewIconSize", "SectionTitleFontSize",
+            "SectionTitleLetterSpacing", "IconTileSize", "IconTileSpacing", "IconTileIconSize", "SwatchSize", "SwatchSpacing"
         ];
         string[] thicknesses =
         [
@@ -167,12 +169,16 @@ public class AppResourceTests
             "DialogTextBoxPadding", "DocumentPadding", "FrameThickness", "IconChoicesPadding",
             "OptionNoteMargin", "ShortcutRowMargin", "StatusButtonPadding", "StatusItemMargin",
             "StatusBarStartMargin", "StatusBarEndMargin", "TitleBarIconMargin", "PanelBorderThickness",
-            "VolumeChipMargin", "VolumeChipPadding", "ExtensionTagPadding", "CellTextMargin", "StartPageCardPadding"
+            "VolumeChipMargin", "VolumeChipPadding", "ExtensionTagPadding", "CellTextMargin", "StartPageCardPadding",
+            "DialogBodyMargin", "DialogFooterPadding", "ModernDialogBodyMargin", "ModernDialogFooterPadding",
+            "AppearancePreviewMargin", "AppearanceHeadingPadding", "IconTileBorderThickness", "SwatchPadding",
+            "SwatchRingThickness", "DefaultSwatchMargin", "CustomSwatchMargin", "CustomSwatchFillMargin"
         ];
 
         Assert.All(lengths, key => Assert.IsType<double>(Resource(key)));
         Assert.All(thicknesses, key => Assert.IsType<Thickness>(Resource(key)));
-        Assert.All(["FrameCornerRadius", "PanelCornerRadius", "TagCornerRadius", "CardCornerRadius"],
+        Assert.All(["FrameCornerRadius", "PanelCornerRadius", "TagCornerRadius", "CardCornerRadius",
+                "AppearancePreviewCornerRadius", "SwatchCornerRadius"],
             key => Assert.IsType<CornerRadius>(Resource(key)));
     }
 
