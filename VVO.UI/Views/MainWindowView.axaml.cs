@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.VisualTree;
 
 namespace VVO.UI.Views;
 
@@ -18,10 +19,22 @@ public partial class MainWindowView : Window
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == WindowStateProperty
-            && change.GetNewValue<WindowState>() == WindowState.FullScreen)
+        if (change.Property == WindowStateProperty)
         {
-            _beforeFullScreen = change.GetOldValue<WindowState>();
+            var fullScreen = change.GetNewValue<WindowState>() == WindowState.FullScreen;
+            Classes.Set("FullScreen", fullScreen);
+
+            if (fullScreen)
+            {
+                _beforeFullScreen = change.GetOldValue<WindowState>();
+
+                // The full screen caption button lives outside the window, and keeps the focus
+                // after it is clicked: Esc pressed there would never reach the window
+                if (FocusManager?.GetFocusedElement() is not Visual focused || !this.IsVisualAncestorOf(focused))
+                {
+                    Focus();
+                }
+            }
         }
     }
 

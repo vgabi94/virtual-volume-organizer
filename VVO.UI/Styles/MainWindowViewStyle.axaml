@@ -74,6 +74,11 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="WindowDecorationProperties.ElementRole" Value="TitleBar"/>
     </Style>
+    <!-- Windows keeps the pointer over a title bar to itself, and the bar that drops down in full
+         screen only opens on the pointer reaching the window's top edge -->
+    <Style Selector="Window.FullScreen Border.TitleBarDrag">
+        <Setter Property="WindowDecorationProperties.ElementRole" Value="None"/>
+    </Style>
 
     <Style Selector="StackPanel.StatusMessage">
         <Setter Property="Orientation" Value="Horizontal"/>
