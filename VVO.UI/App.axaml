@@ -113,6 +113,36 @@
         <Thickness x:Key="IconChoicesPadding">4</Thickness>
         <sys:Double x:Key="IconChoiceSize">26</sys:Double>
         <sys:Double x:Key="DescriptionBoxHeight">70</sys:Double>
+        <!-- Classic keeps the old spacing above the buttons: the body's bottom margin is the row gap -->
+        <Thickness x:Key="DialogBodyMargin">24,24,24,14</Thickness>
+        <Thickness x:Key="DialogFooterPadding">24,0,24,24</Thickness>
+        <!-- The Modern appearance dialogs: the icon as it will look beside the name, the
+             choices as tiles and swatches, and the buttons in a band of their own -->
+        <Thickness x:Key="ModernDialogBodyMargin">24,22</Thickness>
+        <Thickness x:Key="ModernDialogFooterPadding">24,16</Thickness>
+        <sys:Double x:Key="DialogFooterButtonMinWidth">96</sys:Double>
+        <sys:Double x:Key="AppearancePreviewSize">64</sys:Double>
+        <sys:Double x:Key="AppearancePreviewIconSize">34</sys:Double>
+        <Thickness x:Key="AppearancePreviewMargin">0,0,16,0</Thickness>
+        <CornerRadius x:Key="AppearancePreviewCornerRadius">14</CornerRadius>
+        <Thickness x:Key="AppearanceHeadingPadding">0,16,0,0</Thickness>
+        <sys:Double x:Key="SectionTitleFontSize">11</sys:Double>
+        <sys:Double x:Key="SectionTitleLetterSpacing">1</sys:Double>
+        <sys:Double x:Key="IconTileSize">44</sys:Double>
+        <sys:Double x:Key="IconTileSpacing">6</sys:Double>
+        <sys:Double x:Key="IconTileIconSize">24</sys:Double>
+        <Thickness x:Key="IconTileBorderThickness">1.5</Thickness>
+        <!-- A swatch is its colour inside a gap inside a ring, the ring only drawn when chosen or pointed at -->
+        <sys:Double x:Key="SwatchSize">32</sys:Double>
+        <sys:Double x:Key="SwatchSpacing">4</sys:Double>
+        <Thickness x:Key="SwatchPadding">2</Thickness>
+        <Thickness x:Key="SwatchRingThickness">2</Thickness>
+        <CornerRadius x:Key="SwatchCornerRadius">16</CornerRadius>
+        <Thickness x:Key="DefaultSwatchMargin">0,0,8,0</Thickness>
+        <Thickness x:Key="CustomSwatchMargin">8,0,0,0</Thickness>
+        <Thickness x:Key="CustomSwatchFillMargin">4</Thickness>
+        <!-- A shade over whatever the theme's dialog is, so every theme gets a band without a colour of its own -->
+        <SolidColorBrush x:Key="DialogFooterBackground" Color="#0F000000"/>
         <sys:Double x:Key="OptionsSpacing">18</sys:Double>
         <Thickness x:Key="OptionNoteMargin">28,0,0,0</Thickness>
         <sys:Double x:Key="OptionsThemeWidth">200</sys:Double>

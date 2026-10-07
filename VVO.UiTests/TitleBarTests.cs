@@ -128,4 +128,20 @@ public class TitleBarTests : UiTestBase
             WindowDecorationProperties.GetElementRole(Classed<Border>(window, "TitleBarDrag")));
         window.Close();
     }
+
+    [AvaloniaFact]
+    public void InFullScreenTheMenuRowLetsThePointerReachTheTopEdge()
+    {
+        Layout.Apply(true);
+        var window = Opened();
+        window.WindowState = WindowState.FullScreen;
+
+        Assert.Equal(WindowDecorationsElementRole.None,
+            WindowDecorationProperties.GetElementRole(Classed<Border>(window, "TitleBarDrag")));
+
+        window.WindowState = WindowState.Normal;
+        Assert.Equal(WindowDecorationsElementRole.TitleBar,
+            WindowDecorationProperties.GetElementRole(Classed<Border>(window, "TitleBarDrag")));
+        window.Close();
+    }
 }

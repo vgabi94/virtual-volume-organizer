@@ -8,6 +8,9 @@ namespace VVO.UI.ViewModels;
 
 public record IconChoice(string Key, Geometry? Data, bool IsFlipped);
 
+/// <summary>A colour offered as one click; the default one stands for following the application.</summary>
+public record ColorSwatch(Color Color, bool IsDefault);
+
 /// <summary>
 /// The icon and colour a sidebar row is drawn with, shared by everything that lets the user
 /// choose them. Adding and editing differ only in the header, the button and where the
@@ -18,6 +21,7 @@ public abstract partial class AppearanceDialogViewModel : ObservableObject
     public string Header { get; }
     public string ConfirmText { get; }
     public IReadOnlyList<IconChoice> Icons { get; }
+    public IReadOnlyList<ColorSwatch> Swatches { get; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanConfirm))]
@@ -26,12 +30,32 @@ public abstract partial class AppearanceDialogViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsDefaultColor))]
     [NotifyPropertyChangedFor(nameof(SelectedBrush))]
+    [NotifyPropertyChangedFor(nameof(SelectedSwatch))]
+    [NotifyPropertyChangedFor(nameof(IsCustomColor))]
     [NotifyCanExecuteChangedFor(nameof(ResetColorCommand))]
     public partial Color SelectedColor { get; set; }
 
     public bool IsDefaultColor => SelectedColor == IconColors.Default;
 
     public IBrush SelectedBrush => new SolidColorBrush(SelectedColor);
+
+    /// <summary>
+    /// The swatch the colour matches, or null for one picked freely. Clearing it leaves the
+    /// colour alone, so a list that drops its selection does not undo a custom pick.
+    /// </summary>
+    public ColorSwatch? SelectedSwatch
+    {
+        get => Swatches.FirstOrDefault(swatch => swatch.Color == SelectedColor);
+        set
+        {
+            if (value != null)
+            {
+                SelectedColor = value.Color;
+            }
+        }
+    }
+
+    public bool IsCustomColor => SelectedSwatch == null;
 
     public virtual bool CanConfirm => SelectedIcon != null;
 
@@ -52,6 +76,11 @@ public abstract partial class AppearanceDialogViewModel : ObservableObject
         Header = header;
         ConfirmText = confirmText;
         Icons = icons.ToList();
+        Swatches =
+        [
+            new ColorSwatch(IconColors.Default, true),
+            .. IconColors.Presets.Select(color => new ColorSwatch(color, false))
+        ];
 
         SelectedIcon = Icons.FirstOrDefault(choice => choice.Key == icon) ?? Icons[0];
         SelectedColor = !string.IsNullOrWhiteSpace(color) && Color.TryParse(color, out var parsed)

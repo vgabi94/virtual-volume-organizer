@@ -134,6 +134,114 @@
         <Setter Property="Height" Value="{StaticResource IconChoiceSize}"/>
     </Style>
 
+    <Style Selector="Grid.DialogBody">
+        <Setter Property="Margin" Value="{StaticResource DialogBodyMargin}"/>
+    </Style>
+
+    <Style Selector="Border.DialogFooter">
+        <Setter Property="Padding" Value="{StaticResource DialogFooterPadding}"/>
+    </Style>
+
+    <!-- Only the Modern layout shows the preview, the heading and the swatches -->
+    <Style Selector="Panel.AppearancePreview">
+        <Setter Property="IsVisible" Value="False"/>
+        <Setter Property="Width" Value="{StaticResource AppearancePreviewSize}"/>
+        <Setter Property="Height" Value="{StaticResource AppearancePreviewSize}"/>
+        <Setter Property="Margin" Value="{StaticResource AppearancePreviewMargin}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Panel.AppearancePreview Border.Tint">
+        <Setter Property="CornerRadius" Value="{StaticResource AppearancePreviewCornerRadius}"/>
+    </Style>
+    <Style Selector="Panel.AppearancePreview PathIcon">
+        <Setter Property="Width" Value="{StaticResource AppearancePreviewIconSize}"/>
+        <Setter Property="Height" Value="{StaticResource AppearancePreviewIconSize}"/>
+    </Style>
+
+    <Style Selector="Border.AppearanceHeading">
+        <Setter Property="IsVisible" Value="False"/>
+    </Style>
+
+    <Style Selector="TextBlock.SectionTitle">
+        <Setter Property="FontSize" Value="{StaticResource SectionTitleFontSize}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="LetterSpacing" Value="{StaticResource SectionTitleLetterSpacing}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}"/>
+    </Style>
+
+    <Style Selector="StackPanel.Swatches">
+        <Setter Property="IsVisible" Value="False"/>
+        <Setter Property="Orientation" Value="Horizontal"/>
+    </Style>
+    <Style Selector="StackPanel.Swatches StackPanel">
+        <Setter Property="Spacing" Value="{StaticResource SwatchSpacing}"/>
+    </Style>
+
+    <!-- The ring says which swatch is chosen, so the list paints no selection of its own -->
+    <Style Selector="StackPanel.Swatches ListBoxItem">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="StackPanel.Swatches ListBoxItem /template/ ContentPresenter#PART_ContentPresenter, StackPanel.Swatches ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter, StackPanel.Swatches ListBoxItem:pressed /template/ ContentPresenter#PART_ContentPresenter, StackPanel.Swatches ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter, StackPanel.Swatches ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <Style Selector="Border.Swatch">
+        <Setter Property="Width" Value="{StaticResource SwatchSize}"/>
+        <Setter Property="Height" Value="{StaticResource SwatchSize}"/>
+        <Setter Property="Padding" Value="{StaticResource SwatchPadding}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource SwatchRingThickness}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="CornerRadius" Value="{StaticResource SwatchCornerRadius}"/>
+    </Style>
+    <Style Selector="Border.Swatch.Default">
+        <Setter Property="Margin" Value="{StaticResource DefaultSwatchMargin}"/>
+    </Style>
+    <Style Selector="StackPanel.Swatches ListBoxItem:pointerover Border.Swatch, Button.CustomColor:pointerover Border.Swatch">
+        <Setter Property="BorderBrush" Value="{DynamicResource TextTertiaryBrush}"/>
+    </Style>
+    <Style Selector="StackPanel.Swatches ListBoxItem:selected Border.Swatch, Button.CustomColor.Selected Border.Swatch">
+        <Setter Property="BorderBrush" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+
+    <Style Selector="Line.DefaultMark">
+        <Setter Property="StartPoint" Value="5,19"/>
+        <Setter Property="EndPoint" Value="19,5"/>
+        <Setter Property="StrokeThickness" Value="2"/>
+        <Setter Property="Stroke" Value="{DynamicResource DialogBackground}"/>
+    </Style>
+
+    <Style Selector="Button.CustomColor">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="{StaticResource CustomSwatchMargin}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.CustomColor:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.CustomColor:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <!-- Every hue, for a colour of the user's own; filled in the middle once one is chosen -->
+    <Style Selector="Ellipse.Spectrum">
+        <Setter Property="Fill">
+            <ConicGradientBrush>
+                <GradientStop Offset="0" Color="#FF6B6B"/>
+                <GradientStop Offset="0.17" Color="#F7C948"/>
+                <GradientStop Offset="0.33" Color="#6BD88E"/>
+                <GradientStop Offset="0.5" Color="#5EC8F0"/>
+                <GradientStop Offset="0.67" Color="#9C8CFF"/>
+                <GradientStop Offset="0.83" Color="#F07AC0"/>
+                <GradientStop Offset="1" Color="#FF6B6B"/>
+            </ConicGradientBrush>
+        </Setter>
+    </Style>
+    <Style Selector="Ellipse.CustomFill">
+        <Setter Property="Margin" Value="{StaticResource CustomSwatchFillMargin}"/>
+    </Style>
+
     <!-- The Modern layout -->
 
     <!-- Filled in the accent through every state the template would otherwise paint grey, all
@@ -158,9 +266,61 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="0"/>
     </Style>
+
+    <!-- Every icon on a tile of one size, the chosen one ringed in the accent -->
+    <Style Selector="Window.Modern Border.IconChoices WrapPanel">
+        <Setter Property="ItemSpacing" Value="{StaticResource IconTileSpacing}"/>
+        <Setter Property="LineSpacing" Value="{StaticResource IconTileSpacing}"/>
+    </Style>
+    <Style Selector="Window.Modern Border.IconChoices ListBoxItem">
+        <Setter Property="Width" Value="{StaticResource IconTileSize}"/>
+        <Setter Property="Height" Value="{StaticResource IconTileSize}"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Window.Modern Border.IconChoices ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}"/>
+        <Setter Property="BorderThickness" Value="{StaticResource IconTileBorderThickness}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+    </Style>
     <Style Selector="Window.Modern Border.IconChoices ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter, Window.Modern Border.IconChoices ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource SelectionBackground}"/>
-        <Setter Property="CornerRadius" Value="{StaticResource FrameCornerRadius}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+    <Style Selector="Window.Modern Border.IconChoices PathIcon.IconChoice">
+        <Setter Property="Width" Value="{StaticResource IconTileIconSize}"/>
+        <Setter Property="Height" Value="{StaticResource IconTileIconSize}"/>
+    </Style>
+
+    <Style Selector="Window.Modern Grid.DialogBody">
+        <Setter Property="Margin" Value="{StaticResource ModernDialogBodyMargin}"/>
+    </Style>
+
+    <!-- The buttons in a band of their own, as Windows 11 ends a dialog -->
+    <Style Selector="Window.Modern Border.DialogFooter">
+        <Setter Property="Padding" Value="{StaticResource ModernDialogFooterPadding}"/>
+        <Setter Property="Background" Value="{StaticResource DialogFooterBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+    </Style>
+    <Style Selector="Window.Modern Border.DialogFooter Button">
+        <Setter Property="MinWidth" Value="{StaticResource DialogFooterButtonMinWidth}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="Window.Modern Panel.AppearancePreview, Window.Modern Border.AppearanceHeading, Window.Modern StackPanel.Swatches">
+        <Setter Property="IsVisible" Value="True"/>
+    </Style>
+    <Style Selector="Window.Modern Border.AppearanceHeading">
+        <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="Padding" Value="{StaticResource AppearanceHeadingPadding}"/>
+    </Style>
+    <!-- The swatches stand in for the drop-down, and the default swatch for the reset -->
+    <Style Selector="Window.Modern ColorPicker.ClassicColor, Window.Modern Button.ResetColor">
+        <Setter Property="IsVisible" Value="False"/>
     </Style>
 
     <Style Selector="Border.DocumentFrame">

@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:VVO.UI.ViewModels"
+             x:Class="VVO.UI.Views.AppearanceChoices"
+             x:DataType="vm:AppearanceDialogViewModel"
+             x:Name="Choices">
+
+    <!-- The icon and colour pickers both appearance dialogs end with -->
+    <Grid RowDefinitions="Auto, *, Auto" RowSpacing="{StaticResource DialogRowSpacing}">
+
+        <StackPanel Grid.Row="0" Spacing="{StaticResource DialogRowSpacing}">
+            <Border Classes="AppearanceHeading">
+                <TextBlock Text="APPEARANCE" Classes="SectionTitle"/>
+            </Border>
+            <TextBlock Text="Icon" Classes="DialogLabel"/>
+        </StackPanel>
+
+        <Border Grid.Row="1"
+                Classes="IconChoices">
+            <ScrollViewer>
+                <ListBox ItemsSource="{Binding Icons}"
+                         SelectedItem="{Binding SelectedIcon, Mode=TwoWay}"
+                         SelectionMode="Single"
+                         Background="Transparent">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:IconChoice">
+                            <PathIcon Data="{Binding Data}"
+                                      Classes.FlipY="{Binding IsFlipped}"
+                                      Classes="IconChoice"
+                                      Foreground="{Binding #Choices.((vm:AppearanceDialogViewModel)DataContext).SelectedBrush}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </Border>
+
+        <StackPanel Grid.Row="2" Classes="DialogField">
+            <Grid ColumnDefinitions="*, Auto">
+                <TextBlock Text="Colour" Classes="DialogLabel" VerticalAlignment="Center"/>
+                <Button Grid.Column="1"
+                        Content="Reset Color"
+                        Command="{Binding ResetColorCommand}"
+                        Classes="DialogSmall ResetColor"/>
+            </Grid>
+            <ColorPicker Classes="ClassicColor"
+                         Color="{Binding SelectedColor, Mode=TwoWay}"
+                         IsAlphaVisible="False"
+                         HorizontalAlignment="Left"/>
+
+            <StackPanel Classes="Swatches">
+                <ListBox ItemsSource="{Binding Swatches}"
+                         SelectedItem="{Binding SelectedSwatch, Mode=TwoWay}"
+                         SelectionMode="Single"
+                         Background="Transparent">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ColorSwatch">
+                            <Border Classes="Swatch" Classes.Default="{Binding IsDefault}">
+                                <Panel>
+                                    <Ellipse>
+                                        <Ellipse.Fill>
+                                            <SolidColorBrush Color="{Binding Color}"/>
+                                        </Ellipse.Fill>
+                                    </Ellipse>
+                                    <!-- Struck through: following the theme rather than a colour of its own -->
+                                    <Line Classes="DefaultMark" IsVisible="{Binding IsDefault}"/>
+                                </Panel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Button Classes="CustomColor"
+                        Classes.Selected="{Binding IsCustomColor}"
+                        ToolTip.Tip="Custom colour">
+                    <Border Classes="Swatch">
+                        <Panel>
+                            <Ellipse Classes="Spectrum"/>
+                            <Ellipse Classes="CustomFill"
+                                     Fill="{Binding SelectedBrush}"
+                                     IsVisible="{Binding IsCustomColor}"/>
+                        </Panel>
+                    </Border>
+                    <Button.Flyout>
+                        <Flyout Placement="TopEdgeAlignedLeft">
+                            <ColorView Color="{Binding SelectedColor, Mode=TwoWay}"
+                                       IsAlphaVisible="False"
+                                       IsAlphaEnabled="False"/>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
