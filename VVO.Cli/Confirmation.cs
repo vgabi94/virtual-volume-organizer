@@ -19,6 +19,19 @@ public sealed record ConfirmationRequest(
     IReadOnlyDictionary<string, object?>? Facts = null);
 
 /// <summary>
+/// Somewhere other than the terminal to ask the user, such as an MCP client's elicitation form.
+/// The answer has to come from the user, never from the agent calling the command.
+/// </summary>
+public interface IConfirmationPrompt
+{
+    /// <summary>False when the other end has no way to ask the user.</summary>
+    bool CanAsk { get; }
+
+    /// <returns>What the user typed, or null when they declined.</returns>
+    Task<string?> AskAsync(ConfirmationRequest request, CancellationToken cancellationToken);
+}
+
+/// <summary>
 /// The terminal's counterpart to the GUI's confirm dialogs: the same warning, and a word the
 /// user has to type. There is deliberately no flag to skip it.
 /// </summary>
@@ -40,8 +53,14 @@ public static class Confirmation
     /// Returns once the user has typed the word. Throws <see cref="CliException"/> when there is
     /// no one at a terminal to ask, or when they answer anything else.
     /// </summary>
-    public static void Require(CommandContext context, ConfirmationRequest request)
+    public static async Task RequireAsync(CommandContext context, ConfirmationRequest request)
     {
+        if (context.OptionalService<IConfirmationPrompt>() is { CanAsk: true } prompt)
+        {
+            Check(await prompt.AskAsync(request, context.CancellationToken), request);
+            return;
+        }
+
         var terminal = context.Service<ITerminal>();
 
         if (!terminal.IsInteractive)
@@ -70,8 +89,13 @@ public static class Confirmation
         context.Error.Write($"Type {request.Word} to confirm: ");
         context.Error.Flush();
 
+        Check(terminal.ReadLine(), request);
+    }
+
+    private static void Check(string? answer, ConfirmationRequest request)
+    {
         // Compared exactly, as the GUI does: the typing is the whole point of the confirmation
-        if (!string.Equals(terminal.ReadLine(), request.Word, StringComparison.Ordinal))
+        if (!string.Equals(answer, request.Word, StringComparison.Ordinal))
         {
             throw new CliException(
                 ExitCode.Cancelled, ErrorCodes.Cancelled, "Not confirmed. Nothing was changed.");
@@ -81,9 +105,9 @@ public static class Confirmation
     /// <summary>
     /// Asks about a deletion in the words the GUI's delete dialog uses.
     /// </summary>
-    public static void RequireDeletion(CommandContext context, DeletionWarning warning)
+    public static Task RequireDeletionAsync(CommandContext context, DeletionWarning warning)
     {
-        Require(context, new ConfirmationRequest(
+        return RequireAsync(context, new ConfirmationRequest(
             warning.Title, warning.ItemName, warning.Message, DeletionWarnings.ConfirmationWord));
     }
 

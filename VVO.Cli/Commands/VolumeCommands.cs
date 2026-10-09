@@ -133,7 +133,7 @@ public static class VolumeCommands
             var volume = await Catalogue.VolumeAsync(context, context.ParseResult.GetValue(id));
             var folderCount = (await FolderCountsAsync(context)).GetValueOrDefault(volume.Id);
 
-            Confirmation.RequireDeletion(context, DeletionWarnings.ForVirtualVolume(volume.Name, folderCount));
+            await Confirmation.RequireDeletionAsync(context, DeletionWarnings.ForVirtualVolume(volume.Name, folderCount));
 
             await context.Service<IVirtualVolumeService>()
                 .DeleteVirtualVolumeAsync(volume.Id, context.Progress, context.CancellationToken);

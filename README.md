@@ -26,7 +26,7 @@ Built with C#, .NET 10, and [Avalonia UI](https://avaloniaui.net/).
 - **Undo / Redo** for folder and volume edits.
 - **JSON import/export**, database snapshots, and compaction.
 - **Twelve colour themes**: Dark, Light, Slate, Amethyst, Paper & Ink, Nordic Sage and Nebula, each but the first two in dark and light, in a modern or classic layout.
-- **Command line** (`vvo`) for scripts and AI agents, with JSON output.
+- **Command line** (`vvo`) for scripts and AI agents, with JSON output, and an **MCP server** (`vvo mcp`).
 
 ## Shortcuts
 
@@ -105,6 +105,7 @@ vvo search holiday --db D:\Catalogues\backup.vvo --format table
 | `compare` | Diff two folders, or a folder against the disk |
 | `add`, `rm` | Add files from disk under a folder, or remove records |
 | `about` | Version, license and third-party notices |
+| `mcp`, `mcp stop` | Run an MCP server offering these commands as tools (see [docs/mcp.md](docs/mcp.md)), or stop the ones running |
 
 `vvo <command> --help` describes each one.
 
@@ -129,6 +130,12 @@ and the exact `command` for the user to run themselves. `compare <folder> --disk
 rescan would change without asking anything.
 
 Instructions to give an agent are in [docs/agents.md](docs/agents.md).
+
+## MCP Server
+
+`vvo mcp` runs an [MCP](https://modelcontextprotocol.io) server over stdio that offers every command as a
+tool; `vvo mcp stop` stops it. How it works and how to add it to Claude, Codex, Copilot and other
+clients is in [docs/mcp.md](docs/mcp.md).
 
 ## File Association
 

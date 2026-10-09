@@ -58,7 +58,7 @@ public static class DatabaseFile
     public static async Task<string> CreateOrReplaceAsync(CommandContext context, string path)
     {
         path = FullPath(path);
-        var replace = ConfirmReplacing(context, path);
+        var replace = await ConfirmReplacingAsync(context, path);
 
         await context.Service<IDatabaseService>().EnsureDatabaseReadyAsync(path, replace);
         return path;
@@ -69,12 +69,12 @@ public static class DatabaseFile
     /// picker does.
     /// </summary>
     /// <returns>Whether there was a file to replace.</returns>
-    public static bool ConfirmReplacing(CommandContext context, string path)
+    public static async Task<bool> ConfirmReplacingAsync(CommandContext context, string path)
     {
         if (!File.Exists(path))
             return false;
 
-        Confirmation.Require(context, new ConfirmationRequest(
+        await Confirmation.RequireAsync(context, new ConfirmationRequest(
             "Replace File",
             path,
             $"'{path}' already exists and will be replaced. This cannot be undone.",

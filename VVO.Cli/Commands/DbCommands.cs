@@ -105,7 +105,7 @@ public static class DbCommands
             if (Directory.Exists(path))
                 throw CliException.Usage($"'{path}' is a folder. Give the file to write the copy to.");
 
-            DatabaseFile.ConfirmReplacing(context, path);
+            await DatabaseFile.ConfirmReplacingAsync(context, path);
             await context.Service<IDatabaseService>().CopyToAsync(path);
 
             return new { Path = path };
@@ -162,7 +162,7 @@ public static class DbCommands
             if (Directory.Exists(path))
                 throw CliException.Usage($"'{path}' is a folder. Give the file to write the export to.");
 
-            DatabaseFile.ConfirmReplacing(context, path);
+            await DatabaseFile.ConfirmReplacingAsync(context, path);
             await context.Service<IDatabaseTransferService>().ExportAsync(path, context.Progress);
 
             return new { Path = path };
@@ -189,7 +189,7 @@ public static class DbCommands
             if (string.Equals(path, source, StringComparison.OrdinalIgnoreCase))
                 throw CliException.Usage("An export cannot be imported over itself. Give --db a catalogue to build.");
 
-            DatabaseFile.ConfirmReplacing(context, path);
+            await DatabaseFile.ConfirmReplacingAsync(context, path);
 
             // The export is read in full before the catalogue is replaced, so a bad one costs nothing
             try

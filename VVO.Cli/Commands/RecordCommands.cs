@@ -149,7 +149,7 @@ public static class RecordCommands
                 .GroupBy(entry => entry.TreeId)
                 .Sum(listing => listing.Count() - 1);
 
-            Confirmation.RequireDeletion(context, records.Count == 1
+            await Confirmation.RequireDeletionAsync(context, records.Count == 1
                 ? records[0].IsFolder
                     ? DeletionWarnings.ForCatalogueFolder(records[0].Name, otherFolders)
                     : DeletionWarnings.ForCatalogueFile(records[0].Name, otherFolders)

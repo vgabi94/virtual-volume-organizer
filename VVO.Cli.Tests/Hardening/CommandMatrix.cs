@@ -59,7 +59,8 @@ public static class CommandMatrix
         new("rm", f => ["rm", f.File.Id.ToString(), "--db", f.Catalogue.Path],
             Destructive: true, ConfirmationWord: "delete", Writes: true),
 
-        new("about", _ => ["about"])
+        new("about", _ => ["about"]),
+        new("mcp stop", _ => ["mcp", "stop"])
     ];
 
     public static IEnumerable<object[]> All => Cases.Select(item => new object[] { item });

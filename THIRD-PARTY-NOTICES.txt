@@ -64,12 +64,20 @@ Copyright (c) .NET Foundation and Contributors
 MessageBox.Avalonia -- MIT License
 https://github.com/AvaloniaCommunity/MessageBox.Avalonia
 
-Microsoft.Extensions.DependencyInjection -- MIT License
+Microsoft.Extensions.DependencyInjection, Microsoft.Extensions.Logging.Abstractions -- MIT License
 https://github.com/dotnet/runtime
 Copyright (c) .NET Foundation and Contributors
 
 System.CommandLine (vvo, the command line) -- MIT License
 https://github.com/dotnet/command-line-api
+Copyright (c) .NET Foundation and Contributors
+
+ModelContextProtocol.Core (vvo mcp, the MCP server) -- MIT License
+https://github.com/modelcontextprotocol/csharp-sdk
+Copyright (c) Anthropic and Contributors
+
+Microsoft.Extensions.AI.Abstractions -- MIT License
+https://github.com/dotnet/extensions
 Copyright (c) .NET Foundation and Contributors
 
 LoadingIndicators.Avalonia -- The Unlicense (public domain)
