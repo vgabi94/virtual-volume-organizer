@@ -2,6 +2,7 @@ using System.CommandLine;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using VVO.Cli;
+using VVO.Cli.Mcp;
 
 namespace VVO.Cli.Tests;
 
@@ -35,7 +36,12 @@ public static class CliRunner
     {
         // Fresh per run: the database service remembers the file it was last pointed at
         using var services = ServiceConfiguration.ConfigureServices(collection =>
-            collection.AddSingleton(terminal ?? ScriptedTerminal.Redirected()));
+        {
+            collection.AddSingleton(terminal ?? ScriptedTerminal.Redirected());
+
+            // Never the user's own, so 'mcp stop' cannot end the servers they are running
+            collection.AddSingleton(new RunningServers(Path.Combine(Path.GetTempPath(), $"VVO_Mcp_{Guid.NewGuid()}")));
+        });
 
         var root = CliApp.BuildRoot(services);
         extend?.Invoke(root, services);

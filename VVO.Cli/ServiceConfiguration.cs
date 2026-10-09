@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using VVO.Cli.Mcp;
 using VVO.Core.Services;
 
 namespace VVO.Cli;
@@ -20,6 +21,7 @@ public static class ServiceConfiguration
         services.AddSingleton<IVirtualVolumeService, VirtualVolumeService>();
         services.AddSingleton<IDatabaseTransferService, DatabaseTransferService>();
         services.AddSingleton<ITerminal, ConsoleTerminal>();
+        services.AddSingleton(RunningServers.Default);
 
         configure?.Invoke(services);
 

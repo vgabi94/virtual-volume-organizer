@@ -1,5 +1,6 @@
 using System.CommandLine;
 using VVO.Cli.Contract;
+using VVO.Cli.Mcp;
 using VVO.Cli.Output;
 using VVO.Core;
 using VVO.Core.Models;
@@ -24,7 +25,7 @@ public static class CompareCommand
         var disk = new Option<string>("--disk") { Description = "Compare with this folder as it is on disk now." }.TakesPath();
         var hidden = Scanning.CreateHiddenOption();
         var includeUnchanged = new Option<bool>("--include-unchanged") { Description = "List what is the same too." };
-        var exitCode = new Option<bool>("--exit-code") { Description = "Exit with 1 when there are differences." };
+        var exitCode = new Option<bool>("--exit-code") { Description = "Exit with 1 when there are differences." }.CliOnly();
 
         var command = new Command(
             "compare",

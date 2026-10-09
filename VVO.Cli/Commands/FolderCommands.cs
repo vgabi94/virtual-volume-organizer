@@ -216,7 +216,7 @@ public static class FolderCommands
             var entry = await Catalogue.EntryAsync(context, context.ParseResult.GetValue(id));
             var folder = await Catalogue.DescribeAsync(context, entry);
 
-            Confirmation.RequireDeletion(context, DeletionWarnings.ForFolder(folder.Title));
+            await Confirmation.RequireDeletionAsync(context, DeletionWarnings.ForFolder(folder.Title));
 
             await context.Service<IVirtualVolumeService>()
                 .RemoveFolderAsync(entry.Id, context.Progress, context.CancellationToken);
@@ -271,7 +271,7 @@ public static class FolderCommands
             var counts = DifferenceCounts.From(compared);
             var differences = compared.Where(row => row.Status != ComparisonStatus.Unchanged).ToList();
 
-            Confirmation.Require(context, new ConfirmationRequest(
+            await Confirmation.RequireAsync(context, new ConfirmationRequest(
                 "Rescan Folder",
                 title,
                 $"{ScanWarnings.RescanProposal} This cannot be undone.",

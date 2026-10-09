@@ -19,20 +19,20 @@ public class ConfirmationTests
             new Option<string>("--label")
         };
 
-        danger.SetJsonAction(services, context =>
+        danger.SetJsonAction(services, async context =>
         {
-            Confirmation.Require(context, Request);
-            return Task.FromResult<object?>(new { Done = true });
+            await Confirmation.RequireAsync(context, Request);
+            return new { Done = true };
         });
 
         root.Subcommands.Add(danger);
 
         var file = new Argument<string>("file").TakesPath();
         var overwrite = new Command("overwrite") { file };
-        overwrite.SetJsonAction(services, context =>
+        overwrite.SetJsonAction(services, async context =>
         {
-            Confirmation.Require(context, Request);
-            return Task.FromResult<object?>(null);
+            await Confirmation.RequireAsync(context, Request);
+            return null;
         });
 
         root.Subcommands.Add(overwrite);

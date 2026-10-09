@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using VVO.Cli.Commands;
+using VVO.Cli.Mcp;
 using VVO.Cli.Output;
 
 namespace VVO.Cli;
@@ -56,16 +57,22 @@ public static class CliApp
         }
 
         root.Subcommands.Add(AboutCommand.Create(services));
+        root.Subcommands.Add(McpCommand.Create(services));
 
         return root;
     }
 
+    /// <param name="handleTermination">
+    /// Whether Ctrl+C and SIGTERM cancel the command. Off for a command an MCP server runs, which
+    /// is cancelled along with the server instead.
+    /// </param>
     public static async Task<int> RunAsync(
         RootCommand root,
         IReadOnlyList<string> args,
         TextWriter output,
         TextWriter error,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        bool handleTermination = true)
     {
         var parseResult = root.Parse(args, Parser);
 
@@ -81,9 +88,13 @@ public static class CliApp
             return (int)ExitCode.Usage;
         }
 
-        return await parseResult.InvokeAsync(
-            new InvocationConfiguration { Output = output, Error = error },
-            cancellationToken);
+        var configuration = new InvocationConfiguration { Output = output, Error = error };
+        if (!handleTermination)
+        {
+            configuration.ProcessTerminationTimeout = null;
+        }
+
+        return await parseResult.InvokeAsync(configuration, cancellationToken);
     }
 
     private static IEnumerable<string> CommandPath(ParseResult parseResult)

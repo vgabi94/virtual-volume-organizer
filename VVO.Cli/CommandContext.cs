@@ -27,6 +27,8 @@ public sealed class CommandContext(ParseResult parseResult, IServiceProvider ser
     public ExitCode ExitCode { get; set; } = ExitCode.Success;
 
     public T Service<T>() where T : notnull => services.GetRequiredService<T>();
+
+    public T? OptionalService<T>() where T : class => services.GetService<T>();
 }
 
 public static class CommandActions
